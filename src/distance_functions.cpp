@@ -21,13 +21,13 @@
 
 double Manhattan_Distance(){
 
-    double mh_dist;
+    double mh_dist = 0;
 
     return mh_dist;
 }
 
 double Eucleidian_Distance(){
-    double eu_dist;
+    double eu_dist = 0;
 
 
     return eu_dist;
