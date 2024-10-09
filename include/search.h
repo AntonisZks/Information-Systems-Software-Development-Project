@@ -1,2 +1,0 @@
-// For:
-// Greedy_Algorithm

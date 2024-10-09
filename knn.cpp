@@ -1,14 +1,10 @@
-// For:
-// Manhattan Distance
-// Eucleidian Distance
-
 // CPP libraries
 // this contains most of the STL headers files (data structures) amd iostream
 // WARNING individual #inlcludes to ensure portability
 // temporary placeholder for clean code
 #include <bits/stdc++.h>
 
-// DECLARATIONS
-
-double Manhattan_Distance();
-double Eucleidian_Distance();
+// Custom header files
+#include "graphFunctions.h"
+#include "distance.h"
+#include "vanama.h"

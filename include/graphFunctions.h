@@ -1,6 +1,6 @@
 // For:
-// Manhattan Distance
-// Eucleidian Distance
+// Greedy_Algorithm
+// Robust_Prune
 
 // CPP libraries
 // this contains most of the STL headers files (data structures) amd iostream
@@ -10,5 +10,5 @@
 
 // DECLARATIONS
 
-double Manhattan_Distance();
-double Eucleidian_Distance();
+void Greedy_Algorithm(void);
+void Robust_Prune(void);

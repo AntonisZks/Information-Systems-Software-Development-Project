@@ -11,12 +11,13 @@
 #include <bits/stdc++.h>
 
 // Custom header files
-#include "search.h"
+#include "graphFunctions.h"
 #include "distance.h"
 #include "vanama.h"
 
 //######################################################################################
 
+// DEFINITIONS
 
 //search graph function
 void Greedy_Algorithm(void){

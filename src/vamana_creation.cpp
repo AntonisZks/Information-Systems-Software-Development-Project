@@ -10,11 +10,13 @@
 #include <bits/stdc++.h>
 
 // Custom header files
-#include "search.h"
+#include "graphFunctions.h"
 #include "distance.h"
 #include "vanama.h"
 
 //######################################################################################
+
+// DEFINITIONS
 
 void Create_Vamana_Index(void){
 
