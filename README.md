@@ -13,3 +13,4 @@ University Project 2024-2025
 * Testing adjacency list graph code from  https://www.geeksforgeeks.org/cpp-program-to-implement-adjacency-list/
 * Included acutest header file for unit testing from https://github.com/mity/acutest/tree/master
 * Reconfiguring directory structre and starting from simple makefile and src files
+* Modularized graph code and adjusted makefile code into the directory /testing
