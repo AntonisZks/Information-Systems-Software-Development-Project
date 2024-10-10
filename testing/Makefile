@@ -18,7 +18,7 @@ OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
 DEPS := $(wildcard $(INC_DIR)/*.h)
 
 # Executable name
-TARGET := $(BIN_DIR)/secretary
+TARGET := $(BIN_DIR)/exec
 
 # Main source file
 MAIN_SRC := main.cpp
