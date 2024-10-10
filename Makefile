@@ -1,50 +1,31 @@
-######################################################
-######### GENERAL PURPOSE CPP MAKEFILE ###############
-######################################################
+CC = g++
+FLAGS = -g -Wall
 
-# Compiler and flags
-CXX := g++
-CXXFLAGS := -std=c++11 -Wall
+INC_DIR = include
+SRC_DIR = src
+OBJ_DIR = build
+EXE_DIR = bin
+TST_DIR = tests
 
-# Directories
-SRC_DIR := src
-INC_DIR := include
-BUILD_DIR := build
-BIN_DIR := bin
+all: build bin $(EXE_DIR)/main
 
-# Source files
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
-DEPS := $(wildcard $(INC_DIR)/*.h)
 
-# Executable name
-TARGET := $(BIN_DIR)/secretary
+$(EXE_DIR)/main: $(OBJ_DIR)/main.o
+	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o
 
-# Main source file
-MAIN_SRC := main.cpp
-MAIN_OBJ := $(BUILD_DIR)/main.o
+$(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/Graph/graph.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c main.cpp
 
-# Build rule
-$(TARGET): $(OBJS) $(MAIN_OBJ)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Object files rule
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
+build:
+	mkdir build
 
-# Main object file rule
-$(MAIN_OBJ): $(MAIN_SRC) $(DEPS)
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
+bin:
+	mkdir bin
 
-# Clean rule
+
+.PHONY: clean
+
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
-
-# PHONY targets
-.PHONY: all clean
-
-# Default target
-all: $(TARGET)
+	rm -r -f bin
+	rm -r -f build
