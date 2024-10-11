@@ -14,3 +14,6 @@ University Project 2024-2025
 * Included acutest header file for unit testing from https://github.com/mity/acutest/tree/master
 * Reconfiguring directory structre and starting from simple makefile and src files
 * Modularized graph code and adjusted makefile code into the directory /testing
+
+# Update log 11/10/24
+* Created new branch unit_testing, for googleTest experiments
