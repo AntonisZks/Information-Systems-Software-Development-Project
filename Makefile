@@ -13,7 +13,7 @@ all: build bin $(EXE_DIR)/main
 $(EXE_DIR)/main: $(OBJ_DIR)/main.o
 	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o
 
-$(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/Graph/graph.h
+$(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/graph.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c main.cpp
 
 
