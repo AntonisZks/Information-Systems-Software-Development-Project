@@ -11,7 +11,7 @@
 #include <bits/stdc++.h>
 
 // Custom header files
-#include "graphFunctions.h"
+#include "graph_functions.h"
 #include "distance.h"
 #include "vanama.h"
 
