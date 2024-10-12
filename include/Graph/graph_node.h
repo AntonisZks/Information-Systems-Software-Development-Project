@@ -1,3 +1,6 @@
+#ifndef GRAPH_NODE_H
+#define GRAPH_NODE_H
+
 #include <iostream>
 #include <vector>
 
@@ -64,3 +67,5 @@ public:
   }
 
 };
+
+#endif /* GRAPH_NODE_H */

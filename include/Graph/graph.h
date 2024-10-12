@@ -1,3 +1,6 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include <iostream>
 #include <vector>
 #include "graph_node.h"
@@ -155,3 +158,5 @@ template <typename graph_t> std::ostream& operator<<(std::ostream& output, const
 
   return output;
 }
+
+#endif /* GRAPH_H */
