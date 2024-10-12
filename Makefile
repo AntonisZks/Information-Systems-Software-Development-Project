@@ -1,50 +1,42 @@
-######################################################
-######### GENERAL PURPOSE CPP MAKEFILE ###############
-######################################################
+# Define the compiler and its flags during compilation
+CC = g++
+FLAGS = -g -Wall
 
-# Compiler and flags
-CXX := g++
-CXXFLAGS := -std=c++11 -Wall
+# Setup constants for code directories
+INC_DIR = include
+SRC_DIR = src
+OBJ_DIR = build
+EXE_DIR = bin
+TST_DIR = tests
 
-# Directories
-SRC_DIR := src
-INC_DIR := include
-BUILD_DIR := build
-BIN_DIR := bin
 
-# Source files
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(SRCS))
-DEPS := $(wildcard $(INC_DIR)/*.h)
+# make all builds evrything
+all: build bin $(EXE_DIR)/graph_test
 
-# Executable name
-TARGET := $(BIN_DIR)/secretary
 
-# Main source file
-MAIN_SRC := main.cpp
-MAIN_OBJ := $(BUILD_DIR)/main.o
+# Graph test executable is being compiled here
+$(EXE_DIR)/graph_test: $(OBJ_DIR)/graph_test.o
+	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_test $(OBJ_DIR)/graph_test.o
 
-# Build rule
-$(TARGET): $(OBJS) $(MAIN_OBJ)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+$(OBJ_DIR)/graph_test.o: $(TST_DIR)/graph_test.cc $(INC_DIR)/acutest.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_test.o -c $(TST_DIR)/graph_test.cc
 
-# Object files rule
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS)
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
 
-# Main object file rule
-$(MAIN_OBJ): $(MAIN_SRC) $(DEPS)
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c -o $@ $<
+# build directory creation 
+# (every object file goes here)
+build:
+	mkdir build
 
-# Clean rule
+
+# bin directory creation 
+# (every executable file goes here)
+bin:
+	mkdir bin
+
+
+# Clean command to clean the workspace
+.PHONY: clean
+
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
-
-# PHONY targets
-.PHONY: all clean
-
-# Default target
-all: $(TARGET)
+	rm -r -f bin
+	rm -r -f build
