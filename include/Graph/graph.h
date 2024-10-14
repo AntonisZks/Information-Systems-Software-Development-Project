@@ -127,6 +127,29 @@ public:
     return true;
   }
 
+  bool disconnectNodes(const graph_t firstNodeData, const graph_t secondNodeData) {
+    GraphNode<graph_t>* firstNode = nullptr;
+
+    // Get the node of the first data
+    for (unsigned int i = 0; i < this->nodesCount; i++) {
+      GraphNode<graph_t>* currentNode = &this->nodes[i];
+      if (currentNode->getData() == firstNodeData) {
+        firstNode = currentNode;
+      }
+    }
+
+    // Check if the node was found
+    if (firstNode == nullptr) {
+      return false;
+    }
+
+    // Remove the given data of the second node from the first node's neighbors
+    firstNode->removeNeighbor(secondNodeData);
+
+    return true;
+
+  }
+
 };
 
 /**

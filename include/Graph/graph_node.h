@@ -2,6 +2,7 @@
 #define GRAPH_NODE_H
 
 #include <iostream>
+#include <algorithm> 
 #include <vector>
 
 /**
@@ -45,6 +46,18 @@ public:
    */
   void addNeighbor(node_t data) {
     this->neighbors.push_back(data);
+  }
+
+  /**
+   * @brief Removes the specific data from the specific node's neighbors.
+   * 
+   * @param data the data to remove
+   */
+  void removeNeighbor(node_t data) {
+    auto it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
+    if (it != this->neighbors.end()) {
+      this->neighbors.erase(it);
+    }
   }
 
   /**
