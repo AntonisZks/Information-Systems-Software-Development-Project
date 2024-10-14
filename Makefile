@@ -11,15 +11,15 @@ TST_DIR = tests
 
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_test
+all: build bin $(EXE_DIR)/graph_node_test
 
 
 # Graph test executable is being compiled here
-$(EXE_DIR)/graph_test: $(OBJ_DIR)/graph_test.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_test $(OBJ_DIR)/graph_test.o
+$(EXE_DIR)/graph_node_test: $(OBJ_DIR)/graph_node_test.o
+	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_node_test $(OBJ_DIR)/graph_node_test.o
 
-$(OBJ_DIR)/graph_test.o: $(TST_DIR)/graph_test.cc $(INC_DIR)/acutest.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_test.o -c $(TST_DIR)/graph_test.cc
+$(OBJ_DIR)/graph_node_test.o: $(TST_DIR)/graph_node_test.cc $(INC_DIR)/acutest.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_node_test.o -c $(TST_DIR)/graph_node_test.cc
 
 
 # build directory creation 
