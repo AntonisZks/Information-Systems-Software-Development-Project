@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm> 
 #include <vector>
+#include <bits/stdc++.h>
 
 /**
  * @brief Struct that represents the node of the Graph Data Structure. It is part of the
@@ -27,7 +28,7 @@ public:
   /**
    * @brief Constructor of the graph node. Sets the data of the node.
    */
-  GraphNode(node_t data) { this->data = data; }
+  GraphNode(node_t data_): data(data_) {}
 
   /**
    * @brief Destructor of the graph node. Exists just to avoid errors.
@@ -45,7 +46,13 @@ public:
    * @param data the data of the neighbor
    */
   void addNeighbor(node_t data) {
-    this->neighbors.push_back(data);
+    
+    // Insert the data to the neighbor vector if, adn only if the data does not already exist
+    int cnt = count(this->neighbors.begin(), this->neighbors.end(), data);
+    if (cnt == 0) {
+      this->neighbors.push_back(data);
+    }
+
   }
 
   /**
@@ -54,6 +61,8 @@ public:
    * @param data the data to remove
    */
   void removeNeighbor(node_t data) {
+
+    // Locate the data inside the neighbors vector and delete it
     auto it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
     if (it != this->neighbors.end()) {
       this->neighbors.erase(it);
