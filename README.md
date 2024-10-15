@@ -21,3 +21,5 @@ University Project 2024-2025
 # Update log 14/10/24
 * pulled from main, acutest trial
 * Updated files
+* ran acutest tests
+
