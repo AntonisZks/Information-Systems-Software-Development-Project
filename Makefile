@@ -40,3 +40,4 @@ bin:
 clean:
 	rm -r -f bin
 	rm -r -f build
+	rm -f main
