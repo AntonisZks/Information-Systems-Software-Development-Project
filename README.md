@@ -22,4 +22,5 @@ University Project 2024-2025
 * pulled from main, acutest trial
 * Updated files
 * ran acutest tests
+* slight update in Makefile
 
