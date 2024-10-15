@@ -17,3 +17,7 @@ University Project 2024-2025
 
 # Update log 11/10/24
 * Created new branch unit_testing, for googleTest experiments
+
+# Update log 14/10/24
+* pulled from main, acutest trial
+* Updated files

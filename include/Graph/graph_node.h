@@ -1,4 +1,8 @@
+#ifndef GRAPH_NODE_H
+#define GRAPH_NODE_H
+
 #include <iostream>
+#include <algorithm> 
 #include <vector>
 
 /**
@@ -45,6 +49,18 @@ public:
   }
 
   /**
+   * @brief Removes the specific data from the specific node's neighbors.
+   * 
+   * @param data the data to remove
+   */
+  void removeNeighbor(node_t data) {
+    auto it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
+    if (it != this->neighbors.end()) {
+      this->neighbors.erase(it);
+    }
+  }
+
+  /**
    * @brief Returns the data of the specific node.
    * 
    * @return the node's data
@@ -64,3 +80,5 @@ public:
   }
 
 };
+
+#endif /* GRAPH_NODE_H */
