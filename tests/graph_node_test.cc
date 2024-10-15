@@ -74,6 +74,7 @@ void test_node_integer_neighbors_fetching(void) {
     node1.addNeighbor(2);
     node1.addNeighbor(3);
     node1.addNeighbor(4);
+    node1.addNeighbor(2);
     
     // Real neighbors
     correctNeighbors = { 2, 3, 4 };
@@ -110,7 +111,8 @@ void test_node_string_neighbors_fetching(void) {
     node1.addNeighbor("Peter");
     node1.addNeighbor("Mary");
     node1.addNeighbor("Michael");
-    
+    node1.addNeighbor("Mary");
+
     // Real and wrong ones
     correctNeighbors = { "Peter", "Mary", "Michael" };
     wrongNeighbors = { "Harry", "George", "Helen" };
@@ -145,7 +147,7 @@ void test_node_remove_neighbor(void) {
 
 TEST_LIST = {
     { "node_data_fetching", test_node_data_fetching },
-    { "neighbors_add_neighbors", test_node_add_neighbors },
+    { "node_add_neighbors", test_node_add_neighbors },
     { "neighbors_fetching_integers", test_node_integer_neighbors_fetching },
     { "neighbors_fetching_strings", test_node_string_neighbors_fetching },
     { "neighbors_remove_neighbors", test_node_remove_neighbor },

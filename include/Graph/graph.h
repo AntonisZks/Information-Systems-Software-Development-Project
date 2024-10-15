@@ -64,6 +64,12 @@ public:
    * @return the node at the given index
    */
   GraphNode<graph_t>* getNode(const unsigned int index) const {
+
+    // Check if the given index is valid
+    if (index > this->nodesCount - 1 || index < 0) {
+      return nullptr;
+    }
+
     GraphNode<graph_t>* node = &this->nodes[index];
     return node;
   }
@@ -75,11 +81,18 @@ public:
    * @param index the index of the node inside the array
    * @return a vector containing the neighbors of the node
    */
-  std::vector<graph_t> getNodeNeighbors(const unsigned int index) const {
+  std::vector<graph_t>* getNodeNeighbors(const unsigned int index) const {
+
+    // Check if the given index is valid
+    if (index > this->nodesCount - 1 || index < 0) {
+      return nullptr;
+    }
+
     GraphNode<graph_t>* node = this->getNode(index);
     std::vector<graph_t> neighbors = node->getNeighbors();
 
     return neighbors;
+    
   }
 
   /**
@@ -127,6 +140,11 @@ public:
     return true;
   }
 
+  /**
+   * @brief Disconnects two nodes inside the graph. Specifically it locates the node containing the
+   * given firstNodeData, and if the node exists it removes the secondNodeData from its neighbors,
+   * if the data exist. If the process worked as expected it returns true, otherwise false.
+   */
   bool disconnectNodes(const graph_t firstNodeData, const graph_t secondNodeData) {
     GraphNode<graph_t>* firstNode = nullptr;
 
