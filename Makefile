@@ -11,7 +11,14 @@ TST_DIR = tests
 
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/main
+
+
+$(EXE_DIR)/main: $(OBJ_DIR)/main.o $(INC_DIR)/Graph/graph.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o
+
+$(OBJ_DIR)/main.o: $(SRC_DIR)/main.cpp $(INC_DIR)/Graph/graph.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c $(SRC_DIR)/main.cpp
 
 
 # Graph test executable is being compiled here
