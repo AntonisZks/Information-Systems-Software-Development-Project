@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-int main() {
+int ReadfvectorFile(){
     std::ifstream file("../data/siftsmall/siftsmall_base.fvecs", std::ios::binary);
 
     if (!file.is_open()) {
