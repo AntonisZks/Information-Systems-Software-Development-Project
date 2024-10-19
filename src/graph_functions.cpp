@@ -19,8 +19,16 @@
 
 // DEFINITIONS
 
-//search graph function
-void Greedy_Algorithm(void){
+/**
+ * @brief Greedy Search Algorithm
+ * 
+ * @param graph the graph to implement the greedy search
+ * @param s the starting node
+ * @param query the current query
+ * @param k the result size
+ * @param L the search list size
+*/
+template<typename graph_t> void GreedySearch(Graph<graph_t> graph, graph_t s, DataVector<graph_t> query, int k, int L){
 
 }
 
