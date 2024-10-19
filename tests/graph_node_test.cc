@@ -52,7 +52,9 @@ void test_node_add_neighbors(void) {
     node1.addNeighbor(4);
     
     computedNeighbors = node1.getNeighbors();
-    correctNeighbors = { 2, 3, 4 };
+    correctNeighbors.push_back(2);
+    correctNeighbors.push_back(3);
+    correctNeighbors.push_back(4);
 
     TEST_CHECK(computedNeighbors == correctNeighbors);
 
@@ -77,7 +79,9 @@ void test_node_integer_neighbors_fetching(void) {
     node1.addNeighbor(2);
     
     // Real neighbors
-    correctNeighbors = { 2, 3, 4 };
+    correctNeighbors.push_back(2);
+    correctNeighbors.push_back(3);
+    correctNeighbors.push_back(4);
 
     computedNeighbors = node1.getNeighbors();
     TEST_CHECK(computedNeighbors == correctNeighbors);
@@ -113,10 +117,15 @@ void test_node_string_neighbors_fetching(void) {
     node1.addNeighbor("Michael");
     node1.addNeighbor("Mary");
 
+    correctNeighbors.push_back("Peter");
+    correctNeighbors.push_back("Mary");
+    correctNeighbors.push_back("Michael");
     // Real and wrong ones
-    correctNeighbors = { "Peter", "Mary", "Michael" };
-    wrongNeighbors = { "Harry", "George", "Helen" };
-
+ 
+    wrongNeighbors.push_back("Peter"); 
+    wrongNeighbors.push_back("Mary");
+    wrongNeighbors.push_back("Michael");
+    
     computedNeighbors = node1.getNeighbors();
     TEST_CHECK(computedNeighbors == correctNeighbors);
     TEST_CHECK(computedNeighbors != wrongNeighbors);
@@ -138,7 +147,9 @@ void test_node_remove_neighbor(void) {
     
     node1.removeNeighbor(3);
 
-    correctNeighbors = { 2, 4 };
+    correctNeighbors.push_back(2);
+    correctNeighbors.push_back(4);
+
     computedNeighbors = node1.getNeighbors();
 
     TEST_CHECK(computedNeighbors == correctNeighbors);

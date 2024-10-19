@@ -4,7 +4,6 @@
 #include <iostream>
 #include <algorithm> 
 #include <vector>
-#include <bits/stdc++.h>
 
 /**
  * @brief Struct that represents the node of the Graph Data Structure. It is part of the
