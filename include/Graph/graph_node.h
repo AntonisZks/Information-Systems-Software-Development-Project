@@ -62,7 +62,7 @@ public:
   void removeNeighbor(node_t data) {
 
     // Locate the data inside the neighbors vector and delete it
-    auto it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
+    typename std::vector<node_t>::iterator it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
     if (it != this->neighbors.end()) {
       this->neighbors.erase(it);
     }
