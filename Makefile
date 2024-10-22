@@ -11,22 +11,22 @@ TST_DIR = tests
 
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/main
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test
 
 
-$(EXE_DIR)/main: $(OBJ_DIR)/main.o $(INC_DIR)/Graph/graph.h
-	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o
-
-$(OBJ_DIR)/main.o: $(SRC_DIR)/main.cpp $(INC_DIR)/Graph/graph.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c $(SRC_DIR)/main.cpp
-
-
-# Graph test executable is being compiled here
+# Graph node test executable is being compiled here
 $(EXE_DIR)/graph_node_test: $(OBJ_DIR)/graph_node_test.o $(INC_DIR)/Graph/graph_node.h $(INC_DIR)/Graph/graph.h
 	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_node_test $(OBJ_DIR)/graph_node_test.o
 
 $(OBJ_DIR)/graph_node_test.o: $(TST_DIR)/graph_node_test.cc $(INC_DIR)/acutest.h $(INC_DIR)/Graph/graph_node.h $(INC_DIR)/Graph/graph.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_node_test.o -c $(TST_DIR)/graph_node_test.cc
+
+# Graph test executable is being compiled here
+$(EXE_DIR)/graph_test: $(OBJ_DIR)/graph_test.o $(INC_DIR)/Graph/graph.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_test $(OBJ_DIR)/graph_test.o
+
+$(OBJ_DIR)/graph_test.o: $(TST_DIR)/graph_test.cc $(INC_DIR)/acutest.h $(INC_DIR)/Graph/graph.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_test.o -c $(TST_DIR)/graph_test.cc
 
 
 # build directory creation 

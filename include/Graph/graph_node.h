@@ -83,8 +83,8 @@ public:
    * 
    * @return a vector containing the neighbors of the node
    */
-  std::vector<node_t> getNeighbors(void) {
-    return this->neighbors;
+  std::vector<node_t>* getNeighbors(void) {
+    return &this->neighbors;
   }
 
 };
