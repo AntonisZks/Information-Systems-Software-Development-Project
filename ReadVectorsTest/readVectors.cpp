@@ -6,7 +6,7 @@
 using namespace std;
 
 //Function to save the vector data to a text file
-void saveVector(const vector<DataVector<float>>& dataVectors, const string& outputFilename) {
+void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename) {
     ofstream outFile(outputFilename);
     
     if (!outFile.is_open()) {
