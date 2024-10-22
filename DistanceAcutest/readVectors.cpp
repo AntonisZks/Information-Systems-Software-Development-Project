@@ -71,7 +71,7 @@ vector<DataVector<float>> ReadVectorFile(const string& filename) {
     return dataVectors; // Return the array of DataVector objects
 }
 
-int main(void) {
+/*int main(void) {
     //read the base vectors
     vector<DataVector<float>> baseDataVector = ReadVectorFile("../data/siftsmall/siftsmall_base.fvecs");
     //save the base vectors
@@ -84,13 +84,13 @@ int main(void) {
 
 
     // Access the first vector's data as an example
-    /*if (!baseDataVector.empty()) {
+    if (!baseDataVector.empty()) {
         DataVector<float>& firstVector = baseDataVector[0]; // From the first vector
         cout << "First vector, first value: " << firstVector.getDataAtIndex(0) << endl;
         cout << "First vector, second value: " << firstVector.getDataAtIndex(1) << endl;
         cout << "First vector, third value: " << firstVector.getDataAtIndex(2) << endl;
-    }*/
+    }
 
     return 0;
-}
+}*/
 
