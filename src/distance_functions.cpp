@@ -1,34 +1,36 @@
-//######################################################################################
-//This file contains:
-// ~> Manhattan_Distance
-// ~> Eucleidian_Distance
-//######################################################################################
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include "../include/DataVector/DataVectorNew.h"  // Include your DataVector header
 
-// CPP libraries
-// this contains most of the STL headers files (data structures) amd iostream
-// WARNING individual #inlcludes to ensure portability
-// temporary placeholder for clean code
-#include <bits/stdc++.h>
+using namespace std;
 
-// Custom header files
-#include "graphFunctions.h"
-#include "distance.h"
-#include "vanama.h"
+// Function to calculate Euclidean distance between two DataVector objects
+double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b) {
+    if (a.getDimension() != b.getDimension()) {
+        throw invalid_argument("Vectors must have the same dimension");
+    }
 
-//######################################################################################
-
-// DEFINITIONS
-
-double Manhattan_Distance(){
-
-    double mh_dist = 0;
-
-    return mh_dist;
+    double sum = 0.0;
+    unsigned int dimension = a.getDimension();
+    for (unsigned int i = 0; i < dimension; ++i) {
+        double diff = a.getDataAtIndex(i) - b.getDataAtIndex(i);
+        sum += diff * diff;
+    }
+    return sqrt(sum);
 }
 
-double Eucleidian_Distance(){
-    double eu_dist = 0;
+// Function to calculate Manhattan distance between two DataVector objects
+double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b) {
+    if (a.getDimension() != b.getDimension()) {
+        throw invalid_argument("Vectors must have the same dimension");
+    }
 
-
-    return eu_dist;
+    double sum = 0.0;
+    unsigned int dimension = a.getDimension();
+    for (unsigned int i = 0; i < dimension; ++i) {
+        sum += abs(a.getDataAtIndex(i) - b.getDataAtIndex(i));
+    }
+    return sum;
 }
