@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]) {
 
-  int fd = open("data/siftsmall/siftsmall_base.fvecs", O_RDONLY | O_CREAT);
+  int fd = open("../data/siftsmall/siftsmall_base.fvecs", O_RDONLY | O_CREAT);
   float c;
   ssize_t sz;
 
