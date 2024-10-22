@@ -6,7 +6,7 @@
 using namespace std;
 
 //Function to save the vector data to a text file
-void saveVector(const vector<DataVector<float>>& dataVectors, const string& outputFilename) {
+void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename) {
     ofstream outFile(outputFilename);
     
     if (!outFile.is_open()) {
@@ -75,12 +75,12 @@ int main(void) {
     //read the base vectors
     vector<DataVector<float>> baseDataVector = ReadVectorFile("../data/siftsmall/siftsmall_base.fvecs");
     //save the base vectors
-    saveVector(baseDataVector, "base_vectors.txt");
+    saveVectors(baseDataVector, "base_vectors.txt");
 
     //read the query vectors
     vector<DataVector<float>> queryDataVector = ReadVectorFile("../data/siftsmall/siftsmall_query.fvecs");
     //save the query vectors
-    saveVector(queryDataVector, "query_vectors.txt");
+    saveVectors(queryDataVector, "query_vectors.txt");
 
 
     // Access the first vector's data as an example
