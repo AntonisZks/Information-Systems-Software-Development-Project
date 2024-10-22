@@ -45,7 +45,7 @@ void test_node_data_fetching(void) {
 void test_node_add_neighbors(void) {
 
     GraphNode<int> node1(1);
-    std::vector<int> computedNeighbors, correctNeighbors;
+    std::vector<int> *computedNeighbors, correctNeighbors;
 
     node1.addNeighbor(2);
     node1.addNeighbor(3);
@@ -56,7 +56,7 @@ void test_node_add_neighbors(void) {
     correctNeighbors.push_back(3);
     correctNeighbors.push_back(4);
 
-    TEST_CHECK(computedNeighbors == correctNeighbors);
+    TEST_CHECK(*computedNeighbors == correctNeighbors);
 
 }
 
@@ -70,7 +70,7 @@ void test_node_integer_neighbors_fetching(void) {
     // --- SMALL AMOUNT OF NEIGHBORS ---
 
     GraphNode<int> node1(1);
-    std::vector<int> computedNeighbors, correctNeighbors;
+    std::vector<int> *computedNeighbors, correctNeighbors;
     
     // Add some neighbors
     node1.addNeighbor(2);
@@ -84,12 +84,12 @@ void test_node_integer_neighbors_fetching(void) {
     correctNeighbors.push_back(4);
 
     computedNeighbors = node1.getNeighbors();
-    TEST_CHECK(computedNeighbors == correctNeighbors);
+    TEST_CHECK(*computedNeighbors == correctNeighbors);
 
     // --- LARGE AMOUNT OF NEIGHBORS ---
 
     GraphNode<int> node2(1);
-    computedNeighbors.clear(); correctNeighbors.clear();
+    computedNeighbors->clear(); correctNeighbors.clear();
 
     for (unsigned int i = 2; i < 10000; i++) {
         node2.addNeighbor(i);
@@ -97,7 +97,7 @@ void test_node_integer_neighbors_fetching(void) {
     }
 
     computedNeighbors = node2.getNeighbors();
-    TEST_CHECK(computedNeighbors == correctNeighbors);
+    TEST_CHECK(*computedNeighbors == correctNeighbors);
     TEST_CHECK(node1.getNeighbors() != node2.getNeighbors());
 
 }
@@ -109,7 +109,7 @@ void test_node_integer_neighbors_fetching(void) {
 void test_node_string_neighbors_fetching(void) {
 
     GraphNode<std::string> node1("Mark");
-    std::vector<std::string> computedNeighbors, correctNeighbors, wrongNeighbors;
+    std::vector<std::string> *computedNeighbors, correctNeighbors, wrongNeighbors;
 
     // Add neighbors
     node1.addNeighbor("Peter");
@@ -117,18 +117,18 @@ void test_node_string_neighbors_fetching(void) {
     node1.addNeighbor("Michael");
     node1.addNeighbor("Mary");
 
+    // Real and wrong ones
     correctNeighbors.push_back("Peter");
     correctNeighbors.push_back("Mary");
     correctNeighbors.push_back("Michael");
-    // Real and wrong ones
  
-    wrongNeighbors.push_back("Peter"); 
-    wrongNeighbors.push_back("Mary");
-    wrongNeighbors.push_back("Michael");
+    wrongNeighbors.push_back("Sally"); 
+    wrongNeighbors.push_back("Harry");
+    wrongNeighbors.push_back("Bob");
     
     computedNeighbors = node1.getNeighbors();
-    TEST_CHECK(computedNeighbors == correctNeighbors);
-    TEST_CHECK(computedNeighbors != wrongNeighbors);
+    TEST_CHECK(*computedNeighbors == correctNeighbors);
+    TEST_CHECK(*computedNeighbors != wrongNeighbors);
 
 }
 
@@ -139,7 +139,7 @@ void test_node_string_neighbors_fetching(void) {
 void test_node_remove_neighbor(void) {
 
     GraphNode<int> node1(1);
-    std::vector<int> computedNeighbors, correctNeighbors;
+    std::vector<int> *computedNeighbors, correctNeighbors;
 
     node1.addNeighbor(2);
     node1.addNeighbor(3);
@@ -152,7 +152,7 @@ void test_node_remove_neighbor(void) {
 
     computedNeighbors = node1.getNeighbors();
 
-    TEST_CHECK(computedNeighbors == correctNeighbors);
+    TEST_CHECK(*computedNeighbors == correctNeighbors);
 
 }
 

@@ -89,7 +89,7 @@ public:
     }
 
     GraphNode<graph_t>* node = this->getNode(index);
-    std::vector<graph_t> neighbors = node->getNeighbors();
+    std::vector<graph_t>* neighbors = node->getNeighbors();
 
     return neighbors;
     
@@ -135,7 +135,6 @@ public:
     
     // Connect the nodes
     firstNode->addNeighbor(secondNode->getData());
-    std::vector<graph_t> neighbors = this->nodes[0].getNeighbors();
     
     return true;
   }
