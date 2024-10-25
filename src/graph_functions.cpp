@@ -47,11 +47,6 @@ struct NodeData {
     }
 };
 
-/*struct Pair {
-    int first;
-    int second;
-};
-using pair = std::pair<int, int>*/
 
 template <typename T>
 void GreedySearch(Graph<T> &graph, NodeData query, int k) {
