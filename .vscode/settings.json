@@ -87,5 +87,6 @@
         "span": "cpp",
         "stop_token": "cpp",
         "syncstream": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
