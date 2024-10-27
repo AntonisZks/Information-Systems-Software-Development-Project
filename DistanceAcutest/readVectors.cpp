@@ -84,13 +84,13 @@ vector<DataVector<float>> ReadVectorFile(const string& filename) {
 
 
     // Access the first vector's data as an example
-    /*if (!baseDataVector.empty()) {
+    if (!baseDataVector.empty()) {
         DataVector<float>& firstVector = baseDataVector[0]; // From the first vector
         cout << "First vector, first value: " << firstVector.getDataAtIndex(0) << endl;
         cout << "First vector, second value: " << firstVector.getDataAtIndex(1) << endl;
         cout << "First vector, third value: " << firstVector.getDataAtIndex(2) << endl;
-    }*/
+    }
 
     return 0;
-}
+}*/
 
