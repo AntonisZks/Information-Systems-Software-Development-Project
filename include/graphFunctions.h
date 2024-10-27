@@ -25,5 +25,5 @@
  * @param k the result size
  * @param L the search list size
 */
-template<typename graph_t> void GreedySearch(Graph<graph_t> graph, graph_t s, DataVector<graph_t> query, int k, int L);
+template<typename graph_t, typename T> std::vector<std::pair<double, T> >, std::set<T> >  GreedySearch(Graph<T> &graph, typename graph_t::NodeData query, int k);
 void Robust_Prune(void);
