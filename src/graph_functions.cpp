@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <map>
+#include <algorithm>
 #include <vector>
 #include <queue>
 #include <set>
@@ -49,7 +50,7 @@ struct NodeData {
 
 
 template <typename T>
-void GreedySearch(Graph<T> &graph, NodeData query, int k) {
+std::pair<std::vector<std::pair<double, T> >, std::set<T> > GreedySearch(Graph<T> &graph, NodeData query, int k) {
     using Pair = std::pair<double, T>;
     std::priority_queue<Pair, std::vector<Pair>, std::greater<Pair> > search_queue;
     std::set<T> visited;
@@ -75,10 +76,8 @@ void GreedySearch(Graph<T> &graph, NodeData query, int k) {
         }
     }
 
-    std::sort(result.begin(), result.end(), [](const Pair &a, const Pair &b) {
-        return a.first < b.first; 
-    });
-
+    return std::make_pair(result, visited);
+    
 
 }
 
