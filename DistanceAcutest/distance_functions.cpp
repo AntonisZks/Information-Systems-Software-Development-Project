@@ -6,12 +6,23 @@
 
 using namespace std;
 
-// Function to calculate Euclidean distance between two DataVector objects
+/**
+ * @brief Function to calculate Euclidean distance between two DataVector objects. It uses
+ * the Euclidean Distance formula for vectors of dimension n and calculates their distance.
+ * 
+ * @param a the first vector
+ * @param b the second vector.
+ * 
+ * @return the Euclidean distance between those two vector.
+*/
 double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b) {
+
+    // Check if the vectors have the same dimension, otherwise throw an error
     if (a.getDimension() != b.getDimension()) {
         throw invalid_argument("Vectors must have the same dimension");
     }
 
+    // Calculate and return Euclidean Distance of the two vectors
     double sum = 0.0;
     unsigned int dimension = a.getDimension();
     for (unsigned int i = 0; i < dimension; ++i) {
@@ -19,18 +30,31 @@ double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b)
         sum += diff * diff;
     }
     return sqrt(sum);
+
 }
 
-// Function to calculate Manhattan distance between two DataVector objects
+/**
+ * @brief Function to calculate Manhattan distance between two DataVector objects. It uses
+ * the Manhattan Distance formula for vectors of dimension n and calculates their distance.
+ * 
+ * @param a the first vector
+ * @param b the second vector.
+ * 
+ * @return the Manhattan distance between those two vector.
+*/
 double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b) {
+
+    // Check if the vectors have the same dimension, otherwise throw an error
     if (a.getDimension() != b.getDimension()) {
         throw invalid_argument("Vectors must have the same dimension");
     }
 
+    // Calculate and return Manhattan Distance of the two vectors
     double sum = 0.0;
     unsigned int dimension = a.getDimension();
     for (unsigned int i = 0; i < dimension; ++i) {
         sum += abs(a.getDataAtIndex(i) - b.getDataAtIndex(i));
     }
     return sum;
+
 }
