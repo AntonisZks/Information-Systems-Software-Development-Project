@@ -4,28 +4,50 @@
 #include <iostream>
 #include <vector>
 
-template <typename dvector_t>
-class DataVector {
+/**
+ * @brief Class that represents the main Vector in which the data are going to
+ * be placed. Specifically it is used to store the data we are reading from the
+ * data sets that are provided at: http://corpus-texmex.irisa.fr/
+*/
+template <typename dvector_t> class DataVector {
 
 private:
     dvector_t* data;
     unsigned int dimension;
 
 public:
-    // Default constructor
+    
+    /**
+     * @brief Default Constructor of the DataVector. Exists just to avoid errors.
+     * Sets the data to NULL and the dimension of the vector to 0.
+    */
     DataVector(void) : data(nullptr), dimension(0) {}
 
-    // Constructor with dimension
+    /**
+     * @brief Constructor of the DataVector. Here all the properties of the Vector are
+     * being initialized. The dimension is being set and memory is being allocated for the
+     * vector data, according to the given dimension.
+     * 
+     * @param dimension_ the dimension of the vector.
+    */
     DataVector(unsigned int dimension_) : dimension(dimension_) {
         this->data = new dvector_t[dimension_];
     }
 
-    // Destructor
+    /**
+     * @brief Destructor of the DataVector. Here all the memory allocated for the data of the 
+     * vector, is being deleted.
+    */
     ~DataVector(void) {
         delete[] this->data;
     }
 
-    // Copy constructor (to handle deep copy)
+    /**
+     * @brief Copy Constructor of the DataVector. Ensures that all the properties and data of
+     * the one vector are successfully copied to another vector.
+     * 
+     * @param other the other vector to copy the data to
+    */
     DataVector(const DataVector& other) : dimension(other.dimension) {
         if (other.data) {
             this->data = new dvector_t[other.dimension];
@@ -35,7 +57,15 @@ public:
         }
     }
 
-    // Copy assignment operator (to handle deep copy)
+    /**
+     * @brief Operator = overloading for the DataVector class. Here we ensure that all the data
+     * of one vector are successfully transferred to another vector, in order to have the same
+     * data and properties like the first one.
+     * 
+     * @param other the other vector to transfer the data to
+     * 
+     * @return the vector itself
+    */
     DataVector& operator=(const DataVector& other) {
         if (this == &other) return *this;  // Self-assignment check
 
@@ -52,13 +82,27 @@ public:
         return *this;
     }
 
-    // Move constructor
+    /**
+     * @brief Move Constructor of the DataVector. Transfers ownership of the data from 
+     * one vector to another without allocating new memory. Ensures that the original
+     * vector releases its memory to prevent double deletion.
+     * 
+     * @param other the other vector to transfer the data from
+    */
     DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension) {
         other.data = nullptr;  // Prevent the original object from freeing the memory
         other.dimension = 0;
     }
 
-    // Move assignment operator
+    /**
+     * @brief Move Assignment Operator for the DataVector. Transfers ownership of the data
+     * from one vector to another, ensuring that the data and properties of the target vector 
+     * are correctly replaced.
+     * 
+     * @param other the other vector to transfer the data from
+     * 
+     * @return the vector itself
+    */
     DataVector& operator=(DataVector&& other) noexcept {
         if (this != &other) {
             delete[] this->data;  // Free the existing resource
@@ -72,17 +116,31 @@ public:
         return *this;
     }
 
-    // Set data at a specific index
+    /**
+     * @brief Sets data at a specific index in the vector.
+     * 
+     * @param data the value to set at the specified index
+     * @param index the position in the vector to set the data
+    */
     void setDataAtIndex(const dvector_t data, const unsigned int index) {
         this->data[index] = data;
     }
 
-    // Get data at a specific index
+    /**
+     * @brief Retrieves data at a specific index in the vector.
+     * 
+     * @param index the position in the vector from which to retrieve the data
+     * @return the data value at the specified index
+    */
     dvector_t getDataAtIndex(const unsigned int index) const {
         return this->data[index];
     }
 
-    // Get the dimension of the vector
+    /**
+     * @brief Retrieves the dimension of the vector.
+     * 
+     * @return the dimension (size) of the vector
+    */
     unsigned int getDimension() const {
         return dimension;
     }
