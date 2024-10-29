@@ -36,11 +36,11 @@ $(OBJ_DIR)/test_distance.o: $(TST_DIR)/test_distance.cc $(INC_DIR)/acutest.h $(I
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_distance.o -c $(TST_DIR)/test_distance.cc
 
 # read_vector executable is being compiled here
-#$(EXE_DIR)/test_read_vectors: $(OBJ_DIR)/test_read_vectors.o $(INC_DIR)/DataVector/DataVector.h
-#	$(CC) $(FLAGS) -o $(EXE_DIR)/test_read_vectors $(OBJ_DIR)/test_read_vectors.o
+$(EXE_DIR)/test_read_vectors: $(OBJ_DIR)/test_read_vectors.o $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/test_read_vectors $(OBJ_DIR)/test_read_vectors.o
 
-#$(OBJ_DIR)/test_read_vectors.o: $(TST_DIR)/test_read_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
-#	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_read_vectors.o -c $(TST_DIR)/test_read_vectors.cc
+$(OBJ_DIR)/test_read_vectors.o: $(TST_DIR)/test_read_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_read_vectors.o -c $(TST_DIR)/test_read_vectors.cc
 
 
 # build directory creation 
