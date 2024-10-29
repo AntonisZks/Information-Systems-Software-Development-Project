@@ -1,6 +1,6 @@
 # Define the compiler and its flags during compilation
 CC = g++
-FLAGS = -g -Wall
+FLAGS = -g -Wall -std=c++11 -I $(INC_DIR)
 
 # Setup constants for code directories
 INC_DIR = include
@@ -10,7 +10,7 @@ EXE_DIR = bin
 TST_DIR = tests
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_read_vectors $(EXE_DIR)/printDataSet
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_read_vectors $(EXE_DIR)/main $(EXE_DIR)/main
 
 
 # Graph node test executable is being compiled here
@@ -45,15 +45,16 @@ $(EXE_DIR)/test_read_vectors: $(OBJ_DIR)/test_read_vectors.o $(OBJ_DIR)/read_vec
 $(OBJ_DIR)/test_read_vectors.o: $(TST_DIR)/test_read_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_read_vectors.o -c $(TST_DIR)/test_read_vectors.cc
 
-# printDataSet files
-$(EXE_DIR)/printDataSet: $(OBJ_DIR)/printDataSet.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h
-	$(CC) $(FLAGS) -o $(EXE_DIR)/printDataSet $(OBJ_DIR)/printDataSet.o $(OBJ_DIR)/read_vectors.o
+# main files
+$(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/graphFunctions.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o
 
-$(OBJ_DIR)/printDataSet.o: printDataSet.cpp $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/printDataSet.o -c printDataSet.cpp
+$(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c main.cpp
 
 $(OBJ_DIR)/read_vectors.o: $(SRC_DIR)/read_vectors.cpp $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/read_vectors.o -c $(SRC_DIR)/read_vectors.cpp
+
 
 
 # build directory creation 

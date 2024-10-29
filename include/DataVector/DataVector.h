@@ -117,6 +117,29 @@ public:
     }
 
     /**
+     * @brief Overloading the == operator for the DataVector class.
+     * 
+     * @param other the other DataVector to compare against
+     * @return true if both vectors are equal, false otherwise
+     */
+    bool operator==(const DataVector& other) const {
+        // First, check if dimensions are the same
+        if (this->dimension != other.dimension) {
+            return false;
+        }
+
+        // Then, check each element for equality
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return false; // Found a difference, so they are not equal
+            }
+        }
+
+        // If all checks pass, the vectors are equal
+        return true;
+    }
+
+    /**
      * @brief Sets data at a specific index in the vector.
      * 
      * @param data the value to set at the specified index
@@ -160,7 +183,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
     
     // Print the first 10 items inside the vector
     out << "[";
-    for (unsigned int i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         out << vector.getDataAtIndex(i);
         out << ", ";
     }
@@ -168,7 +191,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
     out << "... ";
 
     // Print the last 10 items inside the vector
-    for (unsigned int i = vector.getDimension() - 10; i < vector.getDimension() -1; i++) {
+    for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
         out << vector.getDataAtIndex(i);
         out << ", ";
     }

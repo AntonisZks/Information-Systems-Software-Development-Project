@@ -74,6 +74,19 @@ public:
     return node;
   }
 
+  GraphNode<graph_t>* getNodeWithData(const graph_t data) const {
+
+    for (unsigned int i = 0; i < this->nodesCount; i++) {
+      GraphNode<graph_t>* currentNode = &this->nodes[i];
+      if (currentNode->getData() == data) {
+        return currentNode;
+      }
+    }
+
+    return nullptr;
+
+  }
+
   /**
    * @brief Returns the neighbors of a node. It finds the node containing the given data and returns its
    * neighbors inside the graph.
@@ -113,7 +126,7 @@ public:
    * 
    * @returns true if the connection worked successfully, false otherwise
    */
-  bool connectNodes(const graph_t firstNodeData, const graph_t secondNodeData) {
+  bool connectNodesByData(const graph_t firstNodeData, const graph_t secondNodeData) {
     GraphNode<graph_t>* firstNode = nullptr;
     GraphNode<graph_t>* secondNode = nullptr;
     
@@ -139,12 +152,30 @@ public:
     return true;
   }
 
+  bool connectNodesByIndex(const unsigned int index1, const unsigned int index2) {
+    
+    // Check if the two indeces are valid
+    if ((index1 == index2) || (index1 < 0 || index1 > this->nodesCount-1) || (index2 < 0 || index2 > this->nodesCount-1)) {
+      return false;
+    }
+
+    // Locate the two nodes
+    GraphNode<graph_t>* firstNode = &this->nodes[index1];
+    GraphNode<graph_t>* secondNode = &this->nodes[index2];
+
+    // Add second node to the neighbors of node 1
+    firstNode->addNeighbor(secondNode->getData());
+    
+    return true;
+
+  }
+
   /**
    * @brief Disconnects two nodes inside the graph. Specifically it locates the node containing the
    * given firstNodeData, and if the node exists it removes the secondNodeData from its neighbors,
    * if the data exist. If the process worked as expected it returns true, otherwise false.
    */
-  bool disconnectNodes(const graph_t firstNodeData, const graph_t secondNodeData) {
+  bool disconnectNodesByData(const graph_t firstNodeData, const graph_t secondNodeData) {
     GraphNode<graph_t>* firstNode = nullptr;
 
     // Get the node of the first data
@@ -180,13 +211,13 @@ public:
  */
 template <typename graph_t> std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
   for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
-    std::vector<graph_t> neighbors = graph.getNodeNeighbors(i);
+    std::vector<graph_t>* neighbors = graph.getNodeNeighbors(i);
     output << graph.getNodeData(i) << ": ";
 
     output << "[";
-    for (unsigned int j = 0; j < neighbors.size(); j++) {
-      output << neighbors[j];
-      if (j < neighbors.size() - 1) { 
+    for (unsigned int j = 0; j < neighbors->size(); j++) {
+      output << neighbors->at(j);
+      if (j < neighbors->size() - 1) { 
         output << ", ";
       }
     }

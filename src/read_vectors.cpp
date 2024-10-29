@@ -49,8 +49,6 @@ vector<DataVector<float>> ReadVectorFile(const string& filename){
         nb_vectors++;
     }
 
-    cout << "Total number of vectors in: " << filename << "is "<< nb_vectors << endl;
-
     file.close();
     return dataVectors; // Return the array of DataVector objects
 }

@@ -87,6 +87,10 @@ public:
     return &this->neighbors;
   }
 
+  bool operator<(const GraphNode<node_t> other) const {
+    return this->data < other.data;
+  }
+
 };
 
 #endif /* GRAPH_NODE_H */

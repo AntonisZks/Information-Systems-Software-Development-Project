@@ -54,9 +54,9 @@ void test_graph_nodes_connectivity(void) {
 
     // Connect nodes within the graph
     for (unsigned int i = 1; i < graph1.getNodesCount() - 3; i++) {
-        graph1.connectNodes(1, i + 1);
-        graph1.connectNodes(2, i + 2);
-        graph1.connectNodes(3, i - 1);
+        graph1.connectNodesByData(1, i + 1);
+        graph1.connectNodesByData(2, i + 2);
+        graph1.connectNodesByData(3, i - 1);
     }
 
     // Check the neighbors of node 0
