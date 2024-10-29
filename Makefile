@@ -10,7 +10,7 @@ EXE_DIR = bin
 TST_DIR = tests
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_read_vectors
 
 
 # Graph node test executable is being compiled here
@@ -34,6 +34,13 @@ $(EXE_DIR)/test_distance: $(OBJ_DIR)/test_distance.o $(INC_DIR)/Graph/graph.h
 
 $(OBJ_DIR)/test_distance.o: $(TST_DIR)/test_distance.cc $(INC_DIR)/acutest.h $(INC_DIR)/Graph/graph.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_distance.o -c $(TST_DIR)/test_distance.cc
+
+# read_vector executable is being compiled here
+$(EXE_DIR)/test_read_vectors: $(OBJ_DIR)/test_read_vectors.o $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/test_read_vectors $(OBJ_DIR)/test_read_vectors.o
+
+$(OBJ_DIR)/test_read_vectors.o: $(TST_DIR)/test_read_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_read_vectors.o -c $(TST_DIR)/test_read_vectors.cc
 
 
 # build directory creation 

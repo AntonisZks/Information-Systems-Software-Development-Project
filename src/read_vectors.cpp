@@ -5,32 +5,16 @@
 
 using namespace std;
 
-//Function to save the vector data to a text file
-void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename) {
-    ofstream outFile(outputFilename);
-    
-    if (!outFile.is_open()) {
-        cerr << "Error opening file for writing: " << outputFilename << endl;
-        return;
-    }
-
-    for (size_t idx = 0; idx < dataVectors.size(); ++idx) {
-        const auto& dataVector = dataVectors[idx];
-        outFile << "Vector " << idx << ": ";  // Add index label
-        int dimension = dataVector.getDimension(); // Assuming you add a getDimension method to DataVector
-        for (int i = 0; i < dimension; ++i) {
-            outFile << dataVector.getDataAtIndex(i);
-            if (i < dimension - 1) outFile << " "; // Separate values with spaces
-        }
-        outFile << endl; // New line for the next vector
-    }
-
-    outFile.close();
-    cout << "Data saved to " << outputFilename << endl;
-}
-
-//Function to read the file, assign data to DataVector objects, and return a vector of DataVector objects
-vector<DataVector<float>> ReadVectorFile(const string& filename) {
+/**
+ * @brief Function to read a file and convert its data into a vector of DataVector<float> objects.
+ * The file is assumed to be in a binary format where each vector starts with its dimensionality (int),
+ * followed by the float values representing the vector data.
+ * 
+ * @param filename The name of the input file to read vector data from.
+ * 
+ * @return A vector of DataVector<float> objects containing the read data.
+ */
+vector<DataVector<float>> ReadVectorFile(const string& filename){
     ifstream file(filename, ios::binary);
 
     if (!file.is_open()) {
@@ -71,26 +55,34 @@ vector<DataVector<float>> ReadVectorFile(const string& filename) {
     return dataVectors; // Return the array of DataVector objects
 }
 
-int main(void) {
-    //read the base vectors
-    vector<DataVector<float>> baseDataVector = ReadVectorFile("../data/siftsmall/siftsmall_base.fvecs");
-    //save the base vectors
-    saveVectors(baseDataVector, "base_vectors.txt");
+/**
+ * @brief Function to save the vector data to a text file. It iterates through each DataVector
+ * object in the provided vector and writes the index, followed by the vector values, to the file.
+ * 
+ * @param dataVectors A vector of DataVector<float> objects containing the vector data to save.
+ * @param outputFilename The name of the output text file to save the vector data.
+ */
 
-    //read the query vectors
-    vector<DataVector<float>> queryDataVector = ReadVectorFile("../data/siftsmall/siftsmall_query.fvecs");
-    //save the query vectors
-    saveVectors(queryDataVector, "query_vectors.txt");
+void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename){
+    ofstream outFile(outputFilename);
+    
+    if (!outFile.is_open()) {
+        cerr << "Error opening file for writing: " << outputFilename << endl;
+        return;
+    }
 
+    for (size_t idx = 0; idx < dataVectors.size(); ++idx) {
+        const auto& dataVector = dataVectors[idx];
+        outFile << "Vector " << idx << ": ";  // Add index label
+        int dimension = dataVector.getDimension(); // Assuming you add a getDimension method to DataVector
+        for (int i = 0; i < dimension; ++i) {
+            outFile << dataVector.getDataAtIndex(i);
+            if (i < dimension - 1) outFile << " "; // Separate values with spaces
+        }
+        outFile << endl; // New line for the next vector
+    }
 
-    // Access the first vector's data as an example
-    /*if (!baseDataVector.empty()) {
-        DataVector<float>& firstVector = baseDataVector[0]; // From the first vector
-        cout << "First vector, first value: " << firstVector.getDataAtIndex(0) << endl;
-        cout << "First vector, second value: " << firstVector.getDataAtIndex(1) << endl;
-        cout << "First vector, third value: " << firstVector.getDataAtIndex(2) << endl;
-    }*/
-
-    return 0;
+    outFile.close();
+    cout << "Data saved to " << outputFilename << endl;
 }
 
