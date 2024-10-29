@@ -1,16 +1,28 @@
-// For:
-// Manhattan Distance
-// Eucleidian Distance
-
-// CPP libraries
-// this contains most of the STL headers files (data structures) amd iostream
-// WARNING individual #inlcludes to ensure portability
-// temporary placeholder for clean code
 #include <iostream>
-#include <vector>
+#include "../include/acutest.h"
 #include <cmath>
+#include <utility>
+#include <vector>
+#include "/DataVector/DataVector.h"
 
-// DECLARATIONS
+/**
+ * @brief Function to calculate Euclidean distance between two DataVector objects. It uses
+ * the Euclidean Distance formula for vectors of dimension n and calculates their distance.
+ * 
+ * @param a the first vector
+ * @param b the second vector.
+ * 
+ * @return the Euclidean distance between those two vector.
+*/
+double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b);
 
-double Manhattan_Distance();
-double Eucleidian_Distance();
+/**
+ * @brief Function to calculate Manhattan distance between two DataVector objects. It uses
+ * the Manhattan Distance formula for vectors of dimension n and calculates their distance.
+ * 
+ * @param a the first vector
+ * @param b the second vector.
+ * 
+ * @return the Manhattan distance between those two vector.
+*/
+double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b);

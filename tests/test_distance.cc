@@ -1,13 +1,20 @@
 #include <iostream>
 #include "../include/acutest.h"
-#include "../include/DataVector/DataVectorNew.h"  // Include your DataVector class
+#include "../include/distance.h"  //Includes function prototypes and DataVector class
 #include <cmath>
 #include <utility>
 #include <vector>
-#include "../include/readVectors.h"  // Include your DataVector class
 
-// Function to calculate Euclidean distance between two DataVector objects
-double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b) {
+/**
+ * @brief Function to calculate Euclidean distance between two DataVector objects. It uses
+ * the Euclidean Distance formula for vectors of dimension n and calculates their distance.
+ * 
+ * @param a the first vector
+ * @param b the second vector.
+ * 
+ * @return the Euclidean distance between those two vector.
+*/
+double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b){
     if (a.getDimension() != b.getDimension()) {
         throw std::invalid_argument("Vectors must have the same dimension");
     }
@@ -25,7 +32,7 @@ double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b)
  * @brief Test case for the Euclidean Distance between two DataVector objects. Ensures
  * the euclidean distance between two vectors is successfully computed.
 */
-void testEuclideanDistance() {
+void testEuclideanDistance(){
 
     // Initialize one DataVector object
     DataVector<float> vec1(3);
@@ -48,7 +55,7 @@ void testEuclideanDistance() {
 
 }
 
-// Test case for handling vectors of different dimensions
+
 /**
  * @brief Test case for the Euclidean Distance between two DataVector objects. It handles the 
  * case where two vectors don't have the same dimension.
