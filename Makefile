@@ -1,6 +1,6 @@
 # Define the compiler and its flags during compilation
 CC = g++
-FLAGS = -g -Wall
+FLAGS = -g -Wall -std=c++11 -I$(INC_DIR)
 
 # Setup constants for code directories
 INC_DIR = include
