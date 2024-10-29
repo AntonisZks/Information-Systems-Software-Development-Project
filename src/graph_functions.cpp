@@ -1,16 +1,3 @@
-//######################################################################################
-// This file includes the functions applied to the graph:
-// ~> Greedy_Algorithm
-// ~> Robust_Prune
-//######################################################################################
-
-// CPP libraries
-// this contains most of the STL headers files (data structures) amd iostream
-// WARNING individual #inlcludes to ensure portability
-// temporary placeholder for clean code
-
-
-// Custom header files
 #include "graphFunctions.h"
 #include "distance.h"
 #include "vanama.h"
@@ -24,7 +11,7 @@
 #include <cmath>
 #include <functional>
 
-//######################################################################################
+using namespace std;
 
 // DEFINITIONS
 
@@ -38,47 +25,32 @@
  * @param L the search list size
 */
 
-struct NodeData {
-    double x;  
-    double y;  
-
-     
-    double distanceTo(const NodeData &other) const {
-        return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
-    }
-};
-
-
 template <typename T>
-std::pair<std::vector<std::pair<double, T> >, std::set<T> > GreedySearch(Graph<T> &graph, NodeData query, int k) {
-    using Pair = std::pair<double, T>;
-    std::priority_queue<Pair, std::vector<Pair>, std::greater<Pair> > search_queue;
-    std::set<T> visited;
-    using Pair = std::pair<double, T>;
+pair<vector<pair<double, T>>, set<T>> GreedySearch(Graph<T>& graph, const NodeData& query, int k) {
+    using Pair = pair<double, T>;
+    priority_queue<Pair, vector<Pair>, greater<Pair>> search_queue;
+    set<T> visited;
 
-     
+    // Populate the priority queue with distances
     for (const auto& node : graph.nodes) {
         double dist = node.second.distanceTo(query);
-        search_queue.push(Pair(dist, node.first));
+        search_queue.emplace(dist, node.first);
     }
 
-    std::vector<Pair> result;
+    vector<Pair> result;
 
-    
+    // Select the k closest neighbors
     while (!search_queue.empty() && result.size() < k) {
         Pair closest = search_queue.top();
         search_queue.pop();
-        
-         
-        if (visited.count(closest.second) == 0) {
-            visited.insert(closest.second);
+
+        // Only add unvisited nodes
+        if (visited.insert(closest.second).second) {
             result.push_back(closest);
         }
     }
 
-    return std::make_pair(result, visited);
-    
-
+    return { result, visited };
 }
 
 //NOT void, will take arguement a graph and return a pruned graph
