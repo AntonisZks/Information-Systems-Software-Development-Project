@@ -1,5 +1,7 @@
+#ifndef DISTANCE_H
+#define DISTANCE_H
+
 #include <iostream>
-#include "../include/acutest.h"
 #include <cmath>
 #include <utility>
 #include <vector>
@@ -26,3 +28,5 @@ double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b)
  * @return the Manhattan distance between those two vector.
 */
 double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b);
+
+#endif /* DISTANCE_H */

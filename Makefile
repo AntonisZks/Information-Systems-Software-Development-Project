@@ -10,7 +10,7 @@ EXE_DIR = bin
 TST_DIR = tests
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/printDataSet
 
 
 # Graph node test executable is being compiled here
@@ -29,12 +29,25 @@ $(OBJ_DIR)/graph_test.o: $(TST_DIR)/graph_test.cc $(INC_DIR)/acutest.h $(INC_DIR
 
 
 # Test distance executable is being compiled here
-$(EXE_DIR)/test_distance: $(OBJ_DIR)/test_distance.o $(INC_DIR)/Graph/graph.h
-	$(CC) $(FLAGS) -o $(EXE_DIR)/test_distance $(OBJ_DIR)/test_distance.o
+$(EXE_DIR)/test_distance: $(OBJ_DIR)/test_distance.o $(OBJ_DIR)/distance_functions.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/distance.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/test_distance $(OBJ_DIR)/test_distance.o $(OBJ_DIR)/distance_functions.o
 
 $(OBJ_DIR)/test_distance.o: $(TST_DIR)/test_distance.cc $(INC_DIR)/acutest.h $(INC_DIR)/Graph/graph.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_distance.o -c $(TST_DIR)/test_distance.cc
 
+$(OBJ_DIR)/distance_functions.o: $(SRC_DIR)/distance_functions.cpp $(INC_DIR)/distance.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/distance_functions.o -c $(SRC_DIR)/distance_functions.cpp
+
+
+# printDataSet files
+$(EXE_DIR)/printDataSet: $(OBJ_DIR)/printDataSet.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/readVectors.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/printDataSet $(OBJ_DIR)/printDataSet.o $(OBJ_DIR)/read_vectors.o
+
+$(OBJ_DIR)/printDataSet.o: printDataSet.cpp $(INC_DIR)/Graph/graph.h $(INC_DIR)/readVectors.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/printDataSet.o -c printDataSet.cpp
+
+$(OBJ_DIR)/read_vectors.o: $(SRC_DIR)/readVectors.cpp $(INC_DIR)/readVectors.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/read_vectors.o -c $(SRC_DIR)/readVectors.cpp
 
 # build directory creation 
 # (every object file goes here)

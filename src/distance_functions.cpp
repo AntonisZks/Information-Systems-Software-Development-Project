@@ -11,9 +11,10 @@ using namespace std;
  * the Euclidean Distance formula for vectors of dimension n and calculates their distance.
  * 
  * @param a the first vector
- * @param b the second vector.
+ * @param b the second vector
  * 
- * @return the Euclidean distance between those two vector.
+ * @return the Euclidean distance between those two vector
+ * @throws invalid_argument error in case of different dimensions
 */
 double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b){
     if (a.getDimension() != b.getDimension()) {
@@ -35,9 +36,10 @@ double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b)
  * the Manhattan Distance formula for vectors of dimension n and calculates their distance.
  * 
  * @param a the first vector
- * @param b the second vector.
+ * @param b the second vector
  * 
- * @return the Manhattan distance between those two vector.
+ * @return the Manhattan distance between those two vector
+ * @throws invalid_argument error in case of different dimensions
 */
 double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b){
     if (a.getDimension() != b.getDimension()) {
