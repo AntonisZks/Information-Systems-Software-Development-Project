@@ -144,6 +144,38 @@ public:
     unsigned int getDimension() const {
         return dimension;
     }
+    
 };
+
+/**
+ * @brief Operator << overloading for printing a DataVector object. Speicifically it prints the 
+ * first and last 10 items of the vector.
+ * 
+ * @param out the output stream object
+ * @param vector the DataVector object to print
+ * 
+ * @return the putput stream
+*/
+template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
+    
+    // Print the first 10 items inside the vector
+    out << "[";
+    for (unsigned int i = 0; i < 10; i++) {
+        out << vector.getDataAtIndex(i);
+        out << ", ";
+    }
+
+    out << "... ";
+
+    // Print the last 10 items inside the vector
+    for (unsigned int i = vector.getDimension() - 10; i < vector.getDimension() -1; i++) {
+        out << vector.getDataAtIndex(i);
+        out << ", ";
+    }
+    out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
+
+    return out;
+
+}
 
 #endif /* DATA_VECTOR_H */
