@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "include/Graph/graph.h"
-#include "include/readVectors.h"
+#include "include/read_data.h"
 #include "include/DataVector/DataVector.h"
 
 int main(int argc, char* argv[]) {
