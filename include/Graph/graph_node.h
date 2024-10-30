@@ -6,10 +6,11 @@
 #include <vector>
 
 /**
- * @brief Struct that represents the node of the Graph Data Structure. It is part of the
- * graph implementation, and consists of some data and its neighbor nodes. Data could be any
- * type the user would like, and the neighbors is a vector containing the data of every neighbor 
- * node inside the graph.
+ * @brief Struct that represents a node in a graph. Each node contains data of a specified type 
+ *        and a list of its neighbors within the graph. This struct is designed to support a variety
+ *        of data types for flexible graph applications.
+ * 
+ * @param node_t The data type for the node's data
  */
 template <typename node_t> struct GraphNode {
 
@@ -20,73 +21,109 @@ private:
 public:
 
   /**
-   * @brief Default constructor of the graph node. Exists just to avoid errors.
+   * @brief Default constructor for GraphNode. Creates a graph node with uninitialized data. Primarily for 
+   * internal use or as a placeholder.
    */
   GraphNode(void) {}
 
   /**
-   * @brief Constructor of the graph node. Sets the data of the node.
+   * @brief Constructs a GraphNode with specified data.
+   * 
+   * @param data_ The data to be stored in the node
    */
   GraphNode(node_t data_): data(data_) {}
 
   /**
-   * @brief Destructor of the graph node. Exists just to avoid errors.
+   * @brief Destructor for GraphNode. Cleans up node resources if necessary.
    */
   ~GraphNode(void) {}
 
+  /**
+   * @brief Sets the data of the node.
+   * 
+   * @param data The data to assign to this node
+   */
   void setData(node_t data) {
     this->data = data;
   }
 
   /**
-   * @brief Adds a neighbor to the node. Specifically it adds the data of the neighbor 
-   * at the back of the vector structure containing the neighbors.
+   * @brief Adds a neighbor to the node, if it does not already exist in the neighbors list.
    * 
-   * @param data the data of the neighbor
+   * @param data The data of the neighbor to add
    */
   void addNeighbor(node_t data) {
-    
-    // Insert the data to the neighbor vector if, adn only if the data does not already exist
-    int cnt = count(this->neighbors.begin(), this->neighbors.end(), data);
-    if (cnt == 0) {
+    // Add data to neighbors only if it is not already present.
+    if (std::count(this->neighbors.begin(), this->neighbors.end(), data) == 0) {
       this->neighbors.push_back(data);
     }
-
   }
 
   /**
-   * @brief Removes the specific data from the specific node's neighbors.
+   * @brief Removes a specified neighbor from the node's neighbor list.
    * 
-   * @param data the data to remove
+   * @param data The data of the neighbor to remove
    */
   void removeNeighbor(node_t data) {
-
-    // Locate the data inside the neighbors vector and delete it
-    typename std::vector<node_t>::iterator it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
+    // Find and remove the neighbor data from the neighbors list.
+    auto it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
     if (it != this->neighbors.end()) {
       this->neighbors.erase(it);
     }
   }
 
   /**
-   * @brief Returns the data of the specific node.
+   * @brief Retrieves the data stored in this node.
    * 
-   * @return the node's data
+   * @return The data contained in the node
    */
-  node_t getData(void) {
+  node_t getData(void) const {
     return this->data;
   }
 
   /**
-   * @brief Returns the neighbors of the node. Specifically it returns a vector containing
-   * the data of each neighbor node.
+   * @brief Retrieves the list of neighbors for this node.
    * 
-   * @return a vector containing the neighbors of the node
+   * @return A pointer to a vector containing the neighbors' data
    */
   std::vector<node_t>* getNeighbors(void) {
     return &this->neighbors;
   }
 
+  /**
+   * @brief Less-than operator to allow ordering of nodes by data.
+   * 
+   * @param other The other GraphNode to compare against
+   * @return True if this node's data is less than the other node's data
+   */
+  bool operator<(const GraphNode<node_t> other) const {
+    return this->data < other.data;
+  }
+
+  /**
+   * @brief Equality operator to compare nodes based on their data.
+   * 
+   * @param other The other GraphNode to compare against
+   * @return True if this node's data is equal to the other node's data
+   */
+  bool operator==(const GraphNode& other) const {
+    return this->data == other.data;
+  }
 };
+
+/**
+ * @brief Overloads the << operator to output the node's data to an output stream.
+ * 
+ * @param node_t The data type stored in the node
+ * @param out The output stream to write to
+ * @param node The GraphNode whose data will be output
+ * 
+ * @return The output stream with node data appended
+ */
+template <typename node_t> 
+std::ostream& operator<<(std::ostream& out, const GraphNode<node_t> node) {
+  out << node.getData();
+  return out;
+}
 
 #endif /* GRAPH_NODE_H */

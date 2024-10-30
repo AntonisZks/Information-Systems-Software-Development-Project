@@ -1,4 +1,4 @@
-#include "graphFunctions.h"
+#include "../include/graphFunctions.h"
 #include "distance.h"
 #include "vanama.h"
 
@@ -25,33 +25,39 @@ using namespace std;
  * @param L the search list size
 */
 
-template <typename T>
-pair<vector<pair<double, T>>, set<T>> GreedySearch(Graph<T>& graph, const NodeData& query, int k) {
-    using Pair = pair<double, T>;
-    priority_queue<Pair, vector<Pair>, greater<Pair>> search_queue;
-    set<T> visited;
+// template <typename T>
+// pair<vector<pair<double, T>>, set<T>> GreedySearch(Graph<T>& graph, const NodeData& query, int k) {
+//     using Pair = pair<double, T>;
+//     priority_queue<Pair, vector<Pair>, greater<Pair>> search_queue;
+//     set<T> visited;
 
-    // Populate the priority queue with distances
-    for (const auto& node : graph.nodes) {
-        double dist = node.second.distanceTo(query);
-        search_queue.emplace(dist, node.first);
-    }
+//     // Populate the priority queue with distances
+//     for (const auto& node : graph.nodes) {
+//         double dist = node.second.distanceTo(query);
+//         search_queue.emplace(dist, node.first);
+//     }
 
-    vector<Pair> result;
+//     vector<Pair> result;
 
-    // Select the k closest neighbors
-    while (!search_queue.empty() && result.size() < k) {
-        Pair closest = search_queue.top();
-        search_queue.pop();
+//     // Select the k closest neighbors
+//     while (!search_queue.empty() && result.size() < k) {
+//         Pair closest = search_queue.top();
+//         search_queue.pop();
 
-        // Only add unvisited nodes
-        if (visited.insert(closest.second).second) {
-            result.push_back(closest);
-        }
-    }
+//         // Only add unvisited nodes
+//         if (visited.insert(closest.second).second) {
+//             result.push_back(closest);
+//         }
+//     }
 
-    return { result, visited };
-}
+//     return { result, visited };
+// }
+
+// template<typename graph_t> void GreedySearch(Graph<graph_t> &graph, GraphNode<graph_t>& s, DataVector<float> xq, int k, int L) {
+
+//     std::cout << "Hello, World!" << std::endl;
+
+// }
 
 //NOT void, will take arguement a graph and return a pruned graph
 void Robust_Prune(void){
