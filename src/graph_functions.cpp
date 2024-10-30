@@ -1,84 +1,70 @@
-
 #include "../include/graphFunctions.h"
-#include "../include/Graph/graph.h"
-
-#include <iostream>
-#include <map>
-#include <algorithm>
+#include "../include/DataVector/DataVector.h"
 #include <vector>
 #include <queue>
-#include <set>
-#include <cmath>
-#include <functional>
-#include <cmath>
-#include <utility>
 #include <limits>
-#include <string>
-#include <map>
-
-
+#include <cmath>
 
 using namespace std;
 
-// DEFINITIONS
+// GreedySearch algorithm to find the k-nearest neighbors
+template <typename dvector_t>
+std::vector<DataVector<dvector_t>> GreedySearch(
+    const std::vector<DataVector<dvector_t>>& dataset,
+    const DataVector<dvector_t>& query,
+    int k
+) 
+{
+    // Priority queue to store the nearest neighbors
+    std::priority_queue<std::pair<double, DataVector<dvector_t>>> nearest_neighbors;
 
-/**
- * @brief Greedy Search Algorithm
- * 
- * @param graph the graph to implement the greedy search
- * @param s the starting node
- * @param query the current query
- * @param k the result size
- * @param L the search list size
-*/
+    // Iterate through the dataset to find the k-nearest neighbors
+    for (const auto& data_vector : dataset) {
+        double distance = query.euclideanDistance(data_vector); 
 
-
-// GreedySearch function to find the k closest nodes in a Graph to a given query node's data
-template <typename T>
-std::pair<std::vector<std::pair<double, T>>, std::set<T>> GreedySearch(Graph<T>& graph, const T& query, int k, int L) {
-    using Pair = std::pair<double, T>;
-    std::priority_queue<Pair, std::vector<Pair>, std::greater<Pair>> search_queue;
-    std::set<T> visited;
-    std::vector<Pair> result;
-
-    // Initialize search with the starting node (assume first node as start)
-    T start_node = graph.getNodeData(0); // Modify this if a different starting point 
-    search_queue.emplace(start_node.distanceTo(query), start_node);
-    
-    // Main search loop
-    while (!search_queue.empty() && result.size() < k) {
-        // Get the closest unvisited node
-        Pair closest = search_queue.top();
-        search_queue.pop();
-
-        // If this node hasn't been visited, process it
-        if (visited.insert(closest.second).second) { // insert returns false if already visited
-            result.push_back(closest);
-
-            // Add neighbors to the search queue
-            auto neighbors = graph.getNodeNeighbors(closest.second);
-            for (const auto& neighbor : *neighbors) {
-                if (visited.find(neighbor) == visited.end()) {
-                    double dist = neighbor.distanceTo(query);
-                    search_queue.emplace(dist, neighbor);
-                }
-            }
-
-            // Maintain only the closest L points in the search queue if it exceeds size L
-            while (search_queue.size() > L) {
-                search_queue.pop();
-            }
+        if (nearest_neighbors.size() < k) {
+            nearest_neighbors.push({distance, data_vector});
+        } else if (distance < nearest_neighbors.top().first) {
+            nearest_neighbors.pop();
+            nearest_neighbors.push({distance, data_vector});
         }
     }
 
-    return {result, visited};
+    // Extract the k-nearest neighbors from the priority queue
+    std::vector<DataVector<dvector_t>> result;
+    while (!nearest_neighbors.empty()) {
+        result.push_back(nearest_neighbors.top().second);
+        nearest_neighbors.pop();
+    }
+
+    // Reverse the result to have the nearest neighbors in ascending order of distance
+    std::reverse(result.begin(), result.end());
+
+    return result;
 }
 
-
-
+// Declaration only
 template <typename graph_t>
-std::vector<graph_t> robustPrune(unsigned int p_index, std::vector<unsigned int> candidate_indices, float alpha, unsigned int R) {
-    
+std::vector<graph_t> robustPrune(unsigned int p_index, std::vector<unsigned int> candidate_indices, float alpha, unsigned int R);
+
+
+
+int main() {
+    // Example usage of GreedySearch function
+    std::vector<DataVector<int>> dataset; // Assuming DataVector<int> is a valid type
+    DataVector<int> query; // Assuming DataVector<int> is a valid type
+    int k = 3;
+
+    // Call the GreedySearch function
+    std::vector<DataVector<int>> result = GreedySearch(dataset, query, k);
+
+    // Print the results
+
+    std::cout << "K-Nearest Neighbors:" << std::endl;
+    for (const auto& neighbor : result) {
+        // Assuming DataVector has a method to print its contents
+        std::cout << neighbor << std::endl; // Assuming operator<< is overloaded for DataVector
+    }
+
+    return 0;
 }
-
-

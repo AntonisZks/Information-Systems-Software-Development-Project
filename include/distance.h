@@ -16,7 +16,8 @@
  * 
  * @return the Euclidean distance between those two vector.
 */
-double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b);
+template <typename dvector_t>
+double euclideanDistance(const DataVector<dvector_t>& a, const DataVector<dvector_t>& b);
 
 /**
  * @brief Function to calculate Manhattan distance between two DataVector objects. It uses

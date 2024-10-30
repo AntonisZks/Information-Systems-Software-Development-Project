@@ -1,8 +1,11 @@
+
 #ifndef DATA_VECTOR_H
 #define DATA_VECTOR_H
 
 #include <iostream>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 /**
  * @brief Class that represents the main Vector in which the data are going to
@@ -90,7 +93,7 @@ public:
      * @param other the other vector to transfer the data from
     */
     DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension) {
-        other.data = nullptr;  // Prevent the original object from freeing the memory
+        other.data = nullptr;
         other.dimension = 0;
     }
 
@@ -144,38 +147,67 @@ public:
     unsigned int getDimension() const {
         return dimension;
     }
-    
+
+    // Constructor using std::vector
+    DataVector(const std::vector<dvector_t>& vec) : dimension(vec.size()) {
+        this->data = new dvector_t[dimension];
+        std::copy(vec.begin(), vec.end(), this->data);
+    }
+
+    // Method to calculate Euclidean distance
+    double euclideanDistance(const DataVector<dvector_t>& other) const {
+        double sum = 0.0;
+        for (size_t i = 0; i < dimension; ++i) {
+            sum += std::pow(data[i] - other.data[i], 2);
+        }
+        return std::sqrt(sum);
+    }
+
+    // Comparison operator for priority queue
+    bool operator<(const DataVector<dvector_t>& other) const {
+        for (size_t i = 0; i < dimension; ++i) {
+            if (data[i] < other.data[i]) return true;
+            if (data[i] > other.data[i]) return false;
+        }
+        return false;
+    }
 };
 
 /**
- * @brief Operator << overloading for printing a DataVector object. Speicifically it prints the 
+ * @brief Operator << overloading for printing a DataVector object. Specifically it prints the 
  * first and last 10 items of the vector.
  * 
  * @param out the output stream object
  * @param vector the DataVector object to print
  * 
- * @return the putput stream
+ * @return the output stream
 */
-template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
+template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector) {
     
     // Print the first 10 items inside the vector
     out << "[";
-    for (unsigned int i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < 10 && i < vector.getDimension(); i++) {
         out << vector.getDataAtIndex(i);
-        out << ", ";
+        if (i != 9 && i != vector.getDimension() - 1) {
+            out << ", ";
+        }
     }
 
-    out << "... ";
+    if (vector.getDimension() > 10) {
+        out << "... ";
 
-    // Print the last 10 items inside the vector
-    for (unsigned int i = vector.getDimension() - 10; i < vector.getDimension() -1; i++) {
-        out << vector.getDataAtIndex(i);
-        out << ", ";
+        // Print the last 10 items inside the vector
+        for (unsigned int i = vector.getDimension() - 10; i < vector.getDimension() - 1; i++) {
+            out << vector.getDataAtIndex(i);
+            if (i != vector.getDimension() - 2) {
+                out << ", ";
+            }
+        }
+        out << vector.getDataAtIndex(vector.getDimension() - 1);
     }
-    out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
+    out << "]";
 
     return out;
-
 }
 
 #endif /* DATA_VECTOR_H */
