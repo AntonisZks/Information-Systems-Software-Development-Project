@@ -1,6 +1,6 @@
-#include "graphFunctions.h"
-#include "distance.h"
-#include "vanama.h"
+
+#include "../include/graphFunctions.h"
+#include "../include/Graph/graph.h"
 
 #include <iostream>
 #include <map>
@@ -10,6 +10,13 @@
 #include <set>
 #include <cmath>
 #include <functional>
+#include <cmath>
+#include <utility>
+#include <limits>
+#include <string>
+#include <map>
+
+
 
 using namespace std;
 
@@ -25,35 +32,53 @@ using namespace std;
  * @param L the search list size
 */
 
+
+// GreedySearch function to find the k closest nodes in a Graph to a given query node's data
 template <typename T>
-pair<vector<pair<double, T>>, set<T>> GreedySearch(Graph<T>& graph, const NodeData& query, int k) {
-    using Pair = pair<double, T>;
-    priority_queue<Pair, vector<Pair>, greater<Pair>> search_queue;
-    set<T> visited;
+std::pair<std::vector<std::pair<double, T>>, std::set<T>> GreedySearch(Graph<T>& graph, const T& query, int k, int L) {
+    using Pair = std::pair<double, T>;
+    std::priority_queue<Pair, std::vector<Pair>, std::greater<Pair>> search_queue;
+    std::set<T> visited;
+    std::vector<Pair> result;
 
-    // Populate the priority queue with distances
-    for (const auto& node : graph.nodes) {
-        double dist = node.second.distanceTo(query);
-        search_queue.emplace(dist, node.first);
-    }
-
-    vector<Pair> result;
-
-    // Select the k closest neighbors
+    // Initialize search with the starting node (assume first node as start)
+    T start_node = graph.getNodeData(0); // Modify this if a different starting point 
+    search_queue.emplace(start_node.distanceTo(query), start_node);
+    
+    // Main search loop
     while (!search_queue.empty() && result.size() < k) {
+        // Get the closest unvisited node
         Pair closest = search_queue.top();
         search_queue.pop();
 
-        // Only add unvisited nodes
-        if (visited.insert(closest.second).second) {
+        // If this node hasn't been visited, process it
+        if (visited.insert(closest.second).second) { // insert returns false if already visited
             result.push_back(closest);
+
+            // Add neighbors to the search queue
+            auto neighbors = graph.getNodeNeighbors(closest.second);
+            for (const auto& neighbor : *neighbors) {
+                if (visited.find(neighbor) == visited.end()) {
+                    double dist = neighbor.distanceTo(query);
+                    search_queue.emplace(dist, neighbor);
+                }
+            }
+
+            // Maintain only the closest L points in the search queue if it exceeds size L
+            while (search_queue.size() > L) {
+                search_queue.pop();
+            }
         }
     }
 
-    return { result, visited };
+    return {result, visited};
 }
 
-//NOT void, will take arguement a graph and return a pruned graph
-void Robust_Prune(void){
 
+
+template <typename graph_t>
+std::vector<graph_t> robustPrune(unsigned int p_index, std::vector<unsigned int> candidate_indices, float alpha, unsigned int R) {
+    
 }
+
+
