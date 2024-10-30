@@ -11,7 +11,7 @@
 static std::set<int> getRandomIndeces(const unsigned int max, const unsigned int i) {
   std::set<int> indeces;
 
-  while (indeces.size() < 3) {
+  while (indeces.size() < 20) {
     unsigned int randInd = rand() % max;
     if (randInd != i) {
         indeces.insert(randInd);
@@ -19,6 +19,20 @@ static std::set<int> getRandomIndeces(const unsigned int max, const unsigned int
   }
 
   return indeces;
+
+}
+
+template <typename set_t>
+static void printSet(const std::set<set_t> set) {
+
+  std::cout << "{";
+  for (unsigned int i = 0; i < set.size(); i++) {
+    auto it = set.begin();
+    std::advance(it, i);
+    set_t currentItem = *it;
+    std::cout << currentItem.getData() << ", ";
+  }
+  std::cout << "}" << std::endl;
 
 }
 
@@ -63,7 +77,12 @@ int main(int argc, char* argv[]) {
   }
 
   GraphNode<DataVector<float>>* start_node = graph.getNode(0);
-  GreedySearch(graph, *start_node, query_vectors.at(0), 5, 10);
+  std::pair<std::set<GraphNode<DataVector<float>>>, std::set<GraphNode<DataVector<float>>>> result = GreedySearch(graph, *start_node, query_vectors.at(0), 10, 15);
+
+  std::cout << "K-nearest points: ";
+  printSet(result.first);
+  std::cout << "Visited: ";
+  printSet(result.second);
 
   return 0;
 

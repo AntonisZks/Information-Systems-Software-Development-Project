@@ -18,7 +18,8 @@ using namespace std;
 */
 double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b){
     if (a.getDimension() != b.getDimension()) {
-        throw invalid_argument("Vectors must have the same dimension");
+        std::cout << a.getDimension() << " " << b.getDimension() << std::endl;
+        throw std::invalid_argument("Vectors must have the same dimension");
     }
 
     double sum = 0.0;
@@ -43,7 +44,7 @@ double euclideanDistance(const DataVector<float>& a, const DataVector<float>& b)
 */
 double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b){
     if (a.getDimension() != b.getDimension()) {
-        throw invalid_argument("Vectors must have the same dimension");
+        throw std::invalid_argument("Vectors must have the same dimension");
     }
 
     double sum = 0.0;

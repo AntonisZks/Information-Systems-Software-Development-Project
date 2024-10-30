@@ -91,6 +91,15 @@ public:
     return this->data < other.data;
   }
 
+  bool operator==(const GraphNode& other) const {
+    return this->data == other.data;
+  }
+
 };
+
+template <typename node_t> std::ostream& operator<<(std::ostream& out, const GraphNode<node_t> node) {
+  out << node.getData();
+  return out;
+}
 
 #endif /* GRAPH_NODE_H */

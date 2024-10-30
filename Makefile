@@ -46,8 +46,8 @@ $(OBJ_DIR)/test_data_vectors.o: $(TST_DIR)/test_data_vectors.cc $(INC_DIR)/acute
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_data_vectors.o -c $(TST_DIR)/test_data_vectors.cc
 
 # main files
-$(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/graphFunctions.h
-	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o
+$(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/graphFunctions.h
+	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
 
 $(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c main.cpp
