@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 /**
  * @brief Class that represents the main Vector in which the data are going to
@@ -137,6 +138,67 @@ public:
 
         // If all checks pass, the vectors are equal
         return true;
+    }
+
+    /**
+     * @brief Calculates the Euclidean norm (magnitude) of the DataVector. Specifically it represents 
+     * the vector's length in n-dimensional space. Useful for comparing vectors based on their magnitudes.
+     * The Euclidean norm is calculated as:
+     * 
+     *   norm = sqrt(sum(data[i]^2)) for all elements in the vector
+     * 
+     * @return A floating-point number representing the Euclidean norm of the vector.
+     */
+    float magnitude(void) const {
+
+        // Calculate the euclidean norm of the vector
+        float sum = 0.0;
+        for (unsigned int i = 0; i < this->dimension; i++) {
+            sum += this->data[i] * this->data[i];
+        }
+
+        return std::sqrt(sum);
+
+    }
+
+    /**
+     * @brief Overloads the less-than operator to compare two DataVector objects based on their Euclidean 
+     * norm (magnitude).
+     * 
+     * @param other The DataVector to compare with the current object.
+     * @return True if the magnitude of the current DataVector is less than that 
+     *         of the other DataVector; otherwise, false.
+     */
+    bool operator<(const DataVector& other) const {
+        
+        // Check if the dimensions are not the same
+        if (this->dimension != other.dimension) {
+            throw std::invalid_argument("Vectors must have the same dimension for comparison");
+        }
+
+        // Otherwise check according to their individual data
+        return this->magnitude() < other.magnitude();
+
+    }
+
+    /**
+     * @brief Overloads the greater-than operator to compare two DataVector objects based on their Euclidean 
+     * norm (magnitude).
+     * 
+     * @param other The DataVector to compare with the current object.
+     * @return True if the magnitude of the current DataVector is less than that 
+     *         of the other DataVector; otherwise, false.
+     */
+    bool operator>(const DataVector& other) const {
+        
+        // Check if the dimensions are not the same
+        if (this->dimension != other.dimension) {
+            throw std::invalid_argument("Vectors must have the same dimension for comparison");
+        }
+
+        // Otherwise check according to their individual data
+        return this->magnitude() > other.magnitude();
+
     }
 
     /**

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <set>
 #include <algorithm>
 #include <unordered_map>
 #include "Graph/graph.h"
@@ -27,7 +28,9 @@
 */
 template<typename graph_t> void GreedySearch(Graph<graph_t> &graph, GraphNode<graph_t>& s, DataVector<float> xq, int k, int L) {
 
-  std::cout << "Hello, World!" << std::endl;
+  // Initialize sets L <-- {s} and V <-- {}
+  std::set<GraphNode<graph_t>> candidates; candidates.insert(s);
+  std::set<GraphNode<graph_t>> visited;
 
 }
 

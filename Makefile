@@ -10,7 +10,7 @@ EXE_DIR = bin
 TST_DIR = tests
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_read_vectors $(EXE_DIR)/main $(EXE_DIR)/main
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_data_vectors $(EXE_DIR)/main $(EXE_DIR)/main
 
 
 # Graph node test executable is being compiled here
@@ -39,11 +39,11 @@ $(OBJ_DIR)/distance_functions.o: $(SRC_DIR)/distance_functions.cpp $(INC_DIR)/di
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/distance_functions.o -c $(SRC_DIR)/distance_functions.cpp
 
 # read_vector executable is being compiled here
-$(EXE_DIR)/test_read_vectors: $(OBJ_DIR)/test_read_vectors.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/read_data.h 
-	$(CC) $(FLAGS) -o $(EXE_DIR)/test_read_vectors $(OBJ_DIR)/test_read_vectors.o $(OBJ_DIR)/read_vectors.o
+$(EXE_DIR)/test_data_vectors: $(OBJ_DIR)/test_data_vectors.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/read_data.h 
+	$(CC) $(FLAGS) -o $(EXE_DIR)/test_data_vectors $(OBJ_DIR)/test_data_vectors.o $(OBJ_DIR)/read_vectors.o
 
-$(OBJ_DIR)/test_read_vectors.o: $(TST_DIR)/test_read_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_read_vectors.o -c $(TST_DIR)/test_read_vectors.cc
+$(OBJ_DIR)/test_data_vectors.o: $(TST_DIR)/test_data_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_data_vectors.o -c $(TST_DIR)/test_data_vectors.cc
 
 # main files
 $(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/graphFunctions.h
