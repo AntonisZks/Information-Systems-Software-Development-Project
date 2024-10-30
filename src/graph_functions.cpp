@@ -48,23 +48,3 @@ template <typename graph_t>
 std::vector<graph_t> robustPrune(unsigned int p_index, std::vector<unsigned int> candidate_indices, float alpha, unsigned int R);
 
 
-
-int main() {
-    // Example usage of GreedySearch function
-    std::vector<DataVector<int>> dataset; // Assuming DataVector<int> is a valid type
-    DataVector<int> query; // Assuming DataVector<int> is a valid type
-    int k = 3;
-
-    // Call the GreedySearch function
-    std::vector<DataVector<int>> result = GreedySearch(dataset, query, k);
-
-    // Print the results
-
-    std::cout << "K-Nearest Neighbors:" << std::endl;
-    for (const auto& neighbor : result) {
-        // Assuming DataVector has a method to print its contents
-        std::cout << neighbor << std::endl; // Assuming operator<< is overloaded for DataVector
-    }
-
-    return 0;
-}
