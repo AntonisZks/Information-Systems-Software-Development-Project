@@ -125,15 +125,30 @@ int main(int argc, char* argv[]) {
   std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_path);
 
   // Create the graph and get its first node
-  GreedySearchGraph graph = createGraph(base_vectors, 10);
-  GreedySearchNode* start_node = graph.getNode(0);
+GreedySearchGraph graph = createGraph(base_vectors, 10);
+GreedySearchNode* start_node = graph.getNode(0);
 
-  // Execute the Greedy Search Algorithm to the graph
-  std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result = GreedySearch(graph, *start_node, query_vectors.at(0), 10, 15);
+// Execute the Greedy Search Algorithm to the graph
+std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result = GreedySearch(graph, *start_node, query_vectors.at(0), 10, 15);
 
-  std::cout << "K-nearest points: "; printSet(result.first);
-  std::cout << "Visited: "; printSet(result.second);
+std::cout << "K-nearest points: "; printSet(result.first);
+std::cout << "Visited: "; printSet(result.second);
 
-  return 0;
+// Execute the Robust Prune Algorithm to the graph
 
+// Convert query_vector to a GraphNode
+GraphNode<DataVector<float>> query_node(query_vectors.at(0));
+// Create the graph with more edges per node
+GreedySearchGraph graph1 = createGraph(base_vectors, 50); // Increase max_edges
+
+// Execute the Robust Prune Algorithm to the graph
+std::pair<std::set<GraphNode<DataVector<float>>>, std::set<GraphNode<DataVector<float>>>> pruned_result = robustPrune(graph1, *start_node, 2.0f, 15);
+
+std::cout << "Visited nodes: ";
+ printSet(pruned_result.first);
+ std::cout << "Pruned neighbors: ";
+ printSet(pruned_result.second);
+
+
+return 0;
 }

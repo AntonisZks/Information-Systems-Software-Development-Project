@@ -109,6 +109,33 @@ public:
   bool operator==(const GraphNode& other) const {
     return this->data == other.data;
   }
+
+  /**
+   * @brief Retrieves the index of this node.
+   * 
+   * @return The index of the node
+   */
+private:
+  int index;
+
+public:
+  /**
+   * @brief Sets the index of the node.
+   * 
+   * @param idx The index to assign to this node
+   */
+  void setIndex(int idx) {
+    this->index = idx;
+  }
+
+  /**
+   * @brief Retrieves the index of this node.
+   * 
+   * @return The index of the node
+   */
+  int getIndex() const {
+    return index;
+  }
 };
 
 /**
