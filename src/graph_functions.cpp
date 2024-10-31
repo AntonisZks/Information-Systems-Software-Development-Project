@@ -1,4 +1,4 @@
-#include "../include/graphFunctions.h"
+#include "../include/GreedySearch.h"
 #include "distance.h"
 #include "vanama.h"
 

@@ -248,7 +248,7 @@ static GraphNode<graph_t> getPstar(const GraphNodeSet<graph_t>& candidates_minus
  */
 template <typename graph_t> 
 GreedySearchResult<graph_t> 
-GreedySearch(const Graph<graph_t> &graph, const GraphNode<graph_t>& s, const GreedySearchVector& xq, const result_size_t k, const search_list_size_t L) {
+GreedySearch(const GraphNode<graph_t>& s, const GreedySearchVector& xq, const result_size_t k, const search_list_size_t L) {
 
   std::set<GraphNode<graph_t>> candidates_minus_visited;
 

@@ -7,37 +7,12 @@
 #include "include/read_data.h"
 #include "include/DataVector/DataVector.h"
 #include "include/GreedySearch.h"
+#include "include/vanama.h"
 
 // Type Alias
 typedef GraphNode<DataVector<float>> GreedySearchNode;
 typedef Graph<DataVector<float>> GreedySearchGraph;
 typedef std::set<GreedySearchNode> GreedySearchNodeSet;
-
-/**
- * @brief Generates a set of unique random indices, excluding a specific index.
- * 
- * @param max The maximum value for random index generation
- * @param i The index to exclude from the random selection
- * @param length The number of unique random indices to generate
- * 
- * @return A set of unique random indices of the specified length, excluding index i
- */
-static std::set<int> generateRandomIndeces(const unsigned int max, const unsigned int i, unsigned int length) {
-
-  // Initialize a set for the indeces
-  std::set<int> indeces;
-
-  // Keep asigning random integer values to the set until we reach the given length
-  while (indeces.size() < length) {
-    unsigned int randInd = rand() % max;
-    if (randInd != i) {
-        indeces.insert(randInd);
-    }
-  }
-
-  return indeces;
-
-}
 
 /**
  * @brief Prints the contents of a set, where each element is a node with data.
@@ -75,22 +50,6 @@ static Graph<DataVector<float>> createGraph(const std::vector<DataVector<float>>
     graph.setNodeData(i, base_vectors.at(i));
   }
 
-  // Fill the graph randomly
-  for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
-      
-    // Generate a random range of indeces and apply those indeces as neighbors for the current node
-    std::set<int> indeces = generateRandomIndeces(graph.getNodesCount(), i, max_edges);
-
-    for (unsigned int j = 0; j < indeces.size(); j++) {
-      std::set<int>::iterator it = indeces.begin();
-      std::advance(it, j);
-      auto currentIndex = *it;
-
-      graph.connectNodesByIndex(i, currentIndex);
-    }
-      
-  }
-
   return graph;
 
 }
@@ -125,30 +84,10 @@ int main(int argc, char* argv[]) {
   std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_path);
 
   // Create the graph and get its first node
-GreedySearchGraph graph = createGraph(base_vectors, 10);
-GreedySearchNode* start_node = graph.getNode(0);
+  GreedySearchGraph graph = createGraph(base_vectors, 10);
 
-// Execute the Greedy Search Algorithm to the graph
-std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result = GreedySearch(graph, *start_node, query_vectors.at(0), 10, 15);
+  Create_Vamana_Index(graph, 2, 5, 10);
 
-std::cout << "K-nearest points: "; printSet(result.first);
-std::cout << "Visited: "; printSet(result.second);
+  return 0;
 
-// Execute the Robust Prune Algorithm to the graph
-
-// Convert query_vector to a GraphNode
-GraphNode<DataVector<float>> query_node(query_vectors.at(0));
-// Create the graph with more edges per node
-GreedySearchGraph graph1 = createGraph(base_vectors, 50); // Increase max_edges
-
-// Execute the Robust Prune Algorithm to the graph
-std::pair<std::set<GraphNode<DataVector<float>>>, std::set<GraphNode<DataVector<float>>>> pruned_result = robustPrune(graph1, *start_node, 2.0f, 15);
-
-std::cout << "Visited nodes: ";
- printSet(pruned_result.first);
- std::cout << "Pruned neighbors: ";
- printSet(pruned_result.second);
-
-
-return 0;
 }
