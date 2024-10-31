@@ -5,7 +5,7 @@
 #include <bits/stdc++.h>
 
 // Custom header files
-#include "graphFunctions.h"
+#include "GreedySearch.h"
 #include "distance.h"
 #include "vanama.h"
 
