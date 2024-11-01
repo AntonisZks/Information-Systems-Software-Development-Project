@@ -7,6 +7,7 @@
 #include "include/read_data.h"
 #include "include/DataVector/DataVector.h"
 #include "include/GreedySearch.h"
+#include "include/GreedySearch.h"
 
 // Type Alias
 typedef GraphNode<DataVector<float>> GreedySearchNode;

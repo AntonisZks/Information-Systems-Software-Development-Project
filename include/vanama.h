@@ -16,6 +16,15 @@
 typedef GraphNode<DataVector<float>> GreedySearchNode;
 typedef Graph<DataVector<float>> GreedySearchGraph;
 typedef std::set<GreedySearchNode> GreedySearchNodeSet;
+#include <algorithm>
+#include <random>
+#include "Graph/graph.h"
+#include "GreedySearch.h"
+
+// Type Alias
+typedef GraphNode<DataVector<float>> GreedySearchNode;
+typedef Graph<DataVector<float>> GreedySearchGraph;
+typedef std::set<GreedySearchNode> GreedySearchNodeSet;
 
 // DECLARATIONS
 
