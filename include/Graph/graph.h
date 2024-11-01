@@ -26,6 +26,9 @@ public:
    */
   Graph(unsigned int nodesCount_) : nodesCount(nodesCount_) {
     this->nodes = new GraphNode<graph_t>[nodesCount_];
+    for (unsigned int i = 0; i < nodesCount_; i++) {
+      this->nodes[i].setIndex(i);
+    }
   }
 
   /**
