@@ -300,16 +300,17 @@ std::pair<std::set<GraphNode<T>>, std::set<GraphNode<T>>> robustPrune(Graph<T>& 
 
     // Initialize candidate_indices with all node indices except the start node
     for (unsigned int i = 0; i < graph.getNodesCount(); ++i) {
-        if (i != start_node.getIndex()) {
+        if (i != (unsigned int)start_node.getIndex()) {
             candidate_indices.push_back(i);
         }
     }
+
 
     // Get a reference to the point p
     GraphNode<T>* p = graph.getNode(start_node.getIndex());
 
     // Repeat until we have R neighbors or candidate indices are exhausted
-    while (!candidate_indices.empty() && prunedNeighbors.size() < R) {
+    while (!candidate_indices.empty() && (int)prunedNeighbors.size() < R) {
         // Find the closest neighbor to p within candidate_indices
         unsigned int closest_index = candidate_indices[0];
         float min_distance = euclideanDistance(p->getData(), graph.getNode(closest_index)->getData());
@@ -349,7 +350,7 @@ std::pair<std::set<GraphNode<T>>, std::set<GraphNode<T>>> robustPrune(Graph<T>& 
         }
 
         // Stop if we have reached the limit R
-        if (prunedNeighbors.size() == R) {
+        if ((int)prunedNeighbors.size() == R) {
             break;
         }
     }

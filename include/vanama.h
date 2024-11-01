@@ -120,6 +120,8 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
 
   for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
 
+    std::cout << "Node " << i << std::endl;
+
     // Denote currentNode to be the node at index sigma[i]
     GraphNode<graph_t>* currentNode = graph.getNode(sigma.at(i));
     std::pair<GreedySearchNodeSet, GreedySearchNodeSet> greedySearchResult;
@@ -130,7 +132,8 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
     GreedySearchNodeSet visited = greedySearchResult.second;
 
     // Run RobustPrune(sigma(i), V, alpha, R) to update out-neighbors of sigma(i)
-    // TODO: Robust Prune goes here...
+    std::pair<std::set<GraphNode<graph_t>>, std::set<GraphNode<graph_t>>> robustResult;
+    robustResult = robustPrune(graph, *currentNode, alpha, R);
 
     // For all point j in N_out(sigma[i]) do...
     // Here we iterate through all the neighbors of the node located at the index sigma[i]
@@ -150,8 +153,6 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
         graph_t neighborNeighborData = neighborNeighbors->at(k);
         GraphNode<graph_t>* neighborNeighborNode = graph.getNodeWithData(neighborNeighborData);
         outgoing.insert(*neighborNeighborNode);
-
-        break;
       
       }
       outgoing.insert(*currentNode);
@@ -161,14 +162,13 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
       if (outgoing.size() > R) {
 
         // Run RobustPrune(j, N_out(j) union {sigma(i)}, alpha, R) to update out-neighbors of j
-        // TODO: Robust Prune goes here...
+        std::pair<std::set<GraphNode<graph_t>>, std::set<GraphNode<graph_t>>> robustResult2;
+        robustResult2 = robustPrune(graph, *currentNeighbor, alpha, R);
 
       } else {
         // Update N_out(j) <-- N_out(j) union sigma(i)
         currentNeighbor->addNeighbor(currentNode->getData());
       }
-
-      break;
 
     }
 

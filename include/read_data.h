@@ -16,7 +16,7 @@ using namespace std;        // Optional: can avoid repeating std::
  * 
  * @return A vector of DataVector<float> objects containing the read data.
  */
-vector<DataVector<float>> ReadVectorFile(const string& filename);
+vector<DataVector<float>> ReadVectorFile(const string& filename, int max_elements=-1);
 
 /**
  * @brief Function to save the vector data to a text file. It iterates through each DataVector

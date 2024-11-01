@@ -80,13 +80,15 @@ int main(int argc, char* argv[]) {
   query_path = argv[2];
   
   // Store the dataset vectors
-  std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_path);
-  std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_path);
+  std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_path, 2000);
+  std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_path, 100);
 
   // Create the graph and get its first node
   GreedySearchGraph graph = createGraph(base_vectors, 10);
 
-  Create_Vamana_Index(graph, 2, 5, 10);
+  Create_Vamana_Index(graph, 1.5, 2, 3);
+
+  std::cout << graph << std::endl;
 
   return 0;
 

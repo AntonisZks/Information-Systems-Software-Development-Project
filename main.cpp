@@ -129,7 +129,7 @@ GreedySearchGraph graph = createGraph(base_vectors, 10);
 GreedySearchNode* start_node = graph.getNode(0);
 
 // Execute the Greedy Search Algorithm to the graph
-std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result = GreedySearch(graph, *start_node, query_vectors.at(0), 10, 15);
+std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result = GreedySearch(*start_node, query_vectors.at(0), 10, 15);
 
 std::cout << "K-nearest points: "; printSet(result.first);
 std::cout << "Visited: "; printSet(result.second);
