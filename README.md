@@ -42,7 +42,15 @@
   - read_data.h
   - vamana.h
 - /src
+  - dstance_functions.cpp
+  - graph_functions.cpp
+  - read_vectors.cpp
+  - vamana_creation.cpp
 - /tests
+  - graph_node_test.cc
+  - graph_test.cc
+  - test_data_vectors.cc
+  - test_distance.cc
 - main.cpp
 - README.md
 - run_all_tests.sh
