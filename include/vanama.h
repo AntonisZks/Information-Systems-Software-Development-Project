@@ -169,7 +169,8 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
   // Let s denote the medoid of the dataset P (the graph)
   // Let sigma denote a random permutation of 1, 2, ..., n
   fillGraphRandomly(graph, R);
-  GraphNode<graph_t>* s = graph.getNode(0); // FIXME: s should be the mediod 
+  GraphNode<graph_t> medoid = findMedoid(graph);
+  GraphNode<graph_t>* s = &medoid;
   std::vector<int> sigma = generateRandomPermutation(0, graph.getNodesCount()-1);
 
   for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
