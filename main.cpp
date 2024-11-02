@@ -8,6 +8,7 @@
 #include "include/DataVector/DataVector.h"
 #include "include/GreedySearch.h"
 #include "include/GreedySearch.h"
+#include "include/recall.h"
 
 // Type Alias
 typedef GraphNode<DataVector<float>> GreedySearchNode;
@@ -110,46 +111,49 @@ int main(int argc, char* argv[]) {
 
   std::string base_path;
   std::string query_path;
+  std::string groundtruth_path;
 
   // Check if the program call was correct
-  if (argc != 3) {
-    std::cout << "Usage: " << argv[0] << " [base_path] " << "[query_path]" << std::endl;
+  if (argc != 4) {
+    std::cout << "Usage: " << argv[0] << " [base_path] " << "[query_path]" << " [groundtruth_path]" << std::endl;
     return 1;
   }
 
   // Assign the path of the dataset and read its contents
   base_path = argv[1];
   query_path = argv[2];
-  
+  groundtruth_path = argv[3];
+
   // Store the dataset vectors
   std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_path);
   std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_path);
+  std::vector<DataVector<int>> groundtruth = ReadGroundTruth(groundtruth_path);
+  
 
   // Create the graph and get its first node
-GreedySearchGraph graph = createGraph(base_vectors, 10);
-GreedySearchNode* start_node = graph.getNode(0);
+  GreedySearchGraph graph = createGraph(base_vectors, 200);
+  GreedySearchNode* start_node = graph.getNode(0);
 
-// Execute the Greedy Search Algorithm to the graph
-std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result = GreedySearch(*start_node, query_vectors.at(0), 10, 15);
+  // Execute the Greedy Search Algorithm to the graph
+  std::pair<GreedySearchNodeSet, GreedySearchNodeSet> result;
+  result = GreedySearch(*start_node, query_vectors.at(89), 130, 500);
 
-std::cout << "K-nearest points: "; printSet(result.first);
-std::cout << "Visited: "; printSet(result.second);
+  // Get the approximate points according to groundtruth for query 0
+  std::set<GraphNode<DataVector<float>>> realNearestPoints;
+  DataVector<int> groundtruth_vector = groundtruth.at(0);
+  for (unsigned int i = 0; i < groundtruth_vector.getDimension(); i++) {
 
-// Execute the Robust Prune Algorithm to the graph
+    unsigned int index = groundtruth_vector.getDataAtIndex(i);
+    GraphNode<DataVector<float>>* currentNode = graph.getNode(index);
+    realNearestPoints.insert(*currentNode);
 
-// Convert query_vector to a GraphNode
-GraphNode<DataVector<float>> query_node(query_vectors.at(0));
-// Create the graph with more edges per node
-GreedySearchGraph graph1 = createGraph(base_vectors, 50); // Increase max_edges
+  }
+  std::cout << std::endl;
 
-// Execute the Robust Prune Algorithm to the graph
-std::pair<std::set<GraphNode<DataVector<float>>>, std::set<GraphNode<DataVector<float>>>> pruned_result = robustPrune(graph1, *start_node, 2.0f, 15);
-
-std::cout << "Visited nodes: ";
- printSet(pruned_result.first);
- std::cout << "Pruned neighbors: ";
- printSet(pruned_result.second);
+  std::cout << (float)calculateRecallEvaluation(result.first, realNearestPoints) << std::endl;
 
 
-return 0;
+
+  return 0;
 }
+

@@ -62,6 +62,46 @@ vector<DataVector<float>> ReadVectorFile(const string& filename, int max_element
     return dataVectors; // Return the array of DataVector objects
 }
 
+vector<DataVector<int>> ReadGroundTruth(const string& filename) {
+    ifstream file(filename, ios::binary);
+
+    if (!file.is_open()) {
+        cerr << "Error opening file: " << filename << endl;
+        return {};
+    }
+
+    vector<DataVector<int>> dataVectors; // Vector to store DataVector objects
+    int nb_vectors = 0;
+
+    while (file) {
+        int d;  // Dimensionality of the vector (first 4 bytes)
+
+        // Read dimensionality (4 bytes)
+        file.read(reinterpret_cast<char*>(&d), sizeof(d));
+
+        if (file.eof())
+            break; // Exit loop if end of file is reached
+
+        // Create a DataVector object with the given dimension
+        DataVector<int> dataVector(d);
+
+        // Read the actual vector data (d * 4 bytes for float data)
+        for (int i = 0; i < d; ++i) {
+            int value;
+            file.read(reinterpret_cast<char*>(&value), sizeof(value));
+            dataVector.setDataAtIndex(value, i);  // Set the data at the respective index
+        }
+
+        // Add the DataVector object to the vector
+        dataVectors.push_back(dataVector);
+        nb_vectors++;
+    }
+
+    file.close();
+
+    return dataVectors; // Return the array of DataVector objects
+}
+
 /**
  * @brief Function to save the vector data to a text file. It iterates through each DataVector
  * object in the provided vector and writes the index, followed by the vector values, to the file.

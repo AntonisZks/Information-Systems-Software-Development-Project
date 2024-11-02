@@ -11,7 +11,7 @@ EXE_DIR = bin
 TST_DIR = tests
 
 # make all builds evrything
-all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_data_vectors $(EXE_DIR)/main $(EXE_DIR)/main2
+all: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_data_vectors $(EXE_DIR)/test_recall $(EXE_DIR)/main $(EXE_DIR)/main2
 
 
 # Graph node test executable is being compiled here
@@ -45,6 +45,13 @@ $(EXE_DIR)/test_data_vectors: $(OBJ_DIR)/test_data_vectors.o $(OBJ_DIR)/read_vec
 
 $(OBJ_DIR)/test_data_vectors.o: $(TST_DIR)/test_data_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataVector/DataVector.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_data_vectors.o -c $(TST_DIR)/test_data_vectors.cc
+
+# Testing Recall
+$(EXE_DIR)/test_recall: $(OBJ_DIR)/test_recall.o $(INC_DIR)/recall.h 
+	$(CC) $(FLAGS) -o $(EXE_DIR)/test_recall $(OBJ_DIR)/test_recall.o
+
+$(OBJ_DIR)/test_recall.o: $(TST_DIR)/test_recall.cc $(INC_DIR)/acutest.h $(INC_DIR)/recall.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_recall.o -c $(TST_DIR)/test_recall.cc
 
 # main files
 $(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o $(INC_DIR)/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataVector/DataVector.h $(INC_DIR)/GreedySearch.h

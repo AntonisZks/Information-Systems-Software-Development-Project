@@ -18,6 +18,8 @@ using namespace std;        // Optional: can avoid repeating std::
  */
 vector<DataVector<float>> ReadVectorFile(const string& filename, int max_elements=-1);
 
+vector<DataVector<int>> ReadGroundTruth(const string& filename);
+
 /**
  * @brief Function to save the vector data to a text file. It iterates through each DataVector
  * object in the provided vector and writes the index, followed by the vector values, to the file.
