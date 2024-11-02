@@ -15,8 +15,8 @@
 # Overview
 
 ### Χαρακτηριστικά Κώδικα
-- Γλώσσα Υλοποίησης: C++
-- Μεταγλώττιση: **g++** (έγινε modularization των αρχείων σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
+- <ins>Γλώσσα Υλοποίησης:</ins> C++
+- <ins>Μεταγλώττιση:</ins> **g++** (έγινε modularization των αρχείων σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
 - <ins>Επαλήθευση Ορθότητας Κώδικα:</ins> **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (για την εκτέλεση τoυς έγινε χρήση [shell script](https://www.shellscript.sh/))
 
 ### Μεταγλώττιση και Εκτέλεση
