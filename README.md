@@ -12,10 +12,37 @@
 
 </div>
 
-# Project Overview
-Στο πρώτο μέρος του Project κληθήκαμε να υλοποιήσουμε τοn Αλγόριθμο **Vamana**, o oποίος λειτουργεί ως μία προσσεγιστική επίλυση του Προβλήματος της Εύρεσης των Κ-Εγγύτερων Γειτόνων. Η υλοποίησή μας στηρίχθηκε πάνω στο αρθρο του 2019, [DiskANN:Fast Accurate Billion-point Nearest Neigbhour Search on a Single Node Search](https://proceedings.neurips.cc/paper_files/paper/2019/file/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Paper.pdf). Πιο συγκεκριμένα, στο πρώτο μέρος μας ζητήθηκε να υλοποιήσουμε τα εξείς:
+# Overview
 
-*  Vamana
+## Χαρακτηριστικά Κώδικα
+- Γλώσσα Υλοποίησης: C++
+- Μεταγλώττιση: **g++** (έγινε modularization των αρχείων σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
+- Επαλήθευση Ορθότητας Κώδικα: **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (για την εκτέλεση τoυς έγινε χρήση [shell script](https://www.shellscript.sh/))
+
+## Μεταγλώττιση και Εκτέλεση
+- Για την Μεταγλώττιση του Κώδικα:
+`make all`
+- Για την Εκτέλεση των **Unit Test**: 
+`./run_all_tests.sh`
+- Για την εκτέλεση του Αλγορίθμου **Vamana**: 
+`./bin/vamana`
+- Καθαρισμός αρχείων: 
+`make clean`
+
+## Modularization
+
+## Datasets
+
+## Περιγραφή Πρώτου Μέρους και Ζητούμενα
+Τα δεδομένα που χρησιμοποιούνται για τον Αλγόριθμο **Vamana**. επεξήγηση του τί είναι
+
+Στο πρώτο μέρος του Project κληθήκαμε να υλοποιήσουμε τοn Αλγόριθμο **Vamana Indexing**, o oποίος λειτουργεί ως μία Προσεγγιστική Λυση του Προβλήματος της Εύρεσης των Κ-Εγγύτερων Γειτόνων, μέσω της χρήσης κατευθυνόμενου γράφου για την αναπαράσταση και επεξεργασία των δεδομένων. Η υλοποίησή μας στηρίχθηκε πάνω στο αρθρο του 2019, [DiskANN:Fast Accurate Billion-point Nearest Neigbhour Search on a Single Node Search](https://proceedings.neurips.cc/paper_files/paper/2019/file/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Paper.pdf). Πιο συγκεκριμένα, στο πρώτο μέρος μας ζητήθηκε να υλοποιήσουμε τα εξής:
+
+- VamanaIndex()
+  - GreedySearch()
+  - RobustPrune()
+
+Για την εξέταση της λειτουργικότητας του **Vamana Indexing Algorithm** ήταν αναγκάιο να δημιουργήσουμε συμπληρωματικές κλάσεις και μεθόδους όπου αναλύνοται 
 
 # Χαρακτηριστικά Κώδικα
 - Γλώσσα Υλοποίησης: C++
