@@ -58,9 +58,14 @@
 
 
 ### Datasets
-Τα [δεδομένα](http://corpus-texmex.irisa.fr/) που χρησιμοποιούνται για τον Αλγόριθμο **Vamana Indexing**. Στον κώδικά μας αξιοποιήσαμε το σετ δεδομένων `ANN_SIFT10K`. το οποίο αποτελειται από τα παρακάτω:
-- 10.000 base vectors διάστασης 128.
-- 
+Abriviation\
+VIA = Vamana Indexing Algorithm
+
+Τα [δεδομένα](http://corpus-texmex.irisa.fr/) που χρησιμοποιούνται για τον Αλγόριθμο **Vamana Indexing**. Είναι σετ διανυσμάτων 128 διαστάσεων από αριθμούς κινητής υποδιαστολής (float). Στον κώδικά μας αξιοποιήσαμε το σετ δεδομένων `ANN_SIFT10K`. το οποίο περιέχει:
+- `shiftsmall_base.fvecs`: 10.000 base vectors διάστασης 128. Κάθε vector θα αντιστοιχεί σε ένα κόμβο του γράφου **Vamana**, και περιέχει 128 floats.
+- `shiftsmall_query.fvecs`: 100 query vectors διάστασης 128. Οι "search" vectors. O V.I.A θα υπολογίσει τους πλησιέστερους γείτονες αυτών των vector.
+- `shiftsmall_groundtruth.ivecs`: Αυτό το αρχείο, για κάθε query vector 100 ακεραιες τιμές που αντιπροσωπεύουν τους identifiers (start 0) των vectors poy είναι οι εγγύτεροι γείτονες των 
+- `shiftsmall_learn.fvecs`: 10.000 base vectors διάστασης 128.
 
 
 ### Περιγραφή Πρώτου Μέρους Project και Ζητούμενα
