@@ -14,12 +14,12 @@
 
 # Overview
 
-## Χαρακτηριστικά Κώδικα
+### Χαρακτηριστικά Κώδικα
 - Γλώσσα Υλοποίησης: C++
 - Μεταγλώττιση: **g++** (έγινε modularization των αρχείων σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
 - Επαλήθευση Ορθότητας Κώδικα: **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (για την εκτέλεση τoυς έγινε χρήση [shell script](https://www.shellscript.sh/))
 
-## Μεταγλώττιση και Εκτέλεση
+### Μεταγλώττιση και Εκτέλεση
 - Για την Μεταγλώττιση του Κώδικα:
 `make all`
 - Για την Εκτέλεση των **Unit Test**: 
@@ -29,9 +29,9 @@
 - Καθαρισμός αρχείων: 
 `make clean`
 
-## Modularization
+### Modularization
 
-## Datasets
+### Datasets
 
 ## Περιγραφή Πρώτου Μέρους και Ζητούμενα
 Τα δεδομένα που χρησιμοποιούνται για τον Αλγόριθμο **Vamana**. επεξήγηση του τί είναι
@@ -43,23 +43,6 @@
   - RobustPrune()
 
 Για την εξέταση της λειτουργικότητας του **Vamana Indexing Algorithm** ήταν αναγκάιο να δημιουργήσουμε συμπληρωματικές κλάσεις και μεθόδους όπου αναλύνοται 
-
-# Χαρακτηριστικά Κώδικα
-- Γλώσσα Υλοποίησης: C++
-- Μεταγλώττιση: **g++** (έγινε modularization των αρχείων σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
-- Επαλήθευση Ορθότητας Κώδικα: **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (για την εκτέλεση τoυς έγινε χρήση [shell script](https://www.shellscript.sh/))
-
-# Μεταγλώττιση και Εκτέλεση
-- Για την Μεταγλώττιση του Κώδικα:
-`make all`
-- Για την Εκτέλεση των **Unit Test**: 
-`./run_all_tests.sh`
-- Για την εκτέλεση του Αλγορίθμου **Vamana**: 
-`./bin/vamana`
-- Καθαρισμός αρχείων: 
-`make clean`
-
-# Modularization
 
 # Διαδικασία Ανάπτυξης, Συνεργασία και Αρμοδιότητες Συμμετεχόντων της Ομάδας
 - Ζήκας Αντώνιος (1115202100038)
