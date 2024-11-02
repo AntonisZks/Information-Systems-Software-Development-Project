@@ -30,6 +30,23 @@
 `make clean`
 
 ### Modularization
+- /data
+  - /siftsmall
+- /docs
+- /include
+  - /DataVector
+  - /Graph
+  - acutest.h
+  - distance.h
+  - GreedySearch.h
+  - read_data.h
+  - vamana.h
+- /src
+- /tests
+- main.cpp
+- README.md
+- run_all_tests.sh
+
 
 
 ### Datasets
