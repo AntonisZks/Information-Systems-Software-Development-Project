@@ -13,7 +13,14 @@
 </div>
 
 # Project Overview
-Στο πρώτο μέρος του Project κληθήκαμε να υλοποιήσουμε τοn Αλγόριθμο **Vamana**, oποίος λειτουργεί ως μία προσσεγιστική επίλυση του Προβλήματος της Εύρεσης των Κ-Εγγύτερων Γειτόνων. Η υλοποίησή μας στηρίχθηκε πάνω στο αρθρο του 2019 [DiskANN:Fast Accurate Billion-point Nearest Neigbhour Search on a Single Node Search](https://proceedings.neurips.cc/paper_files/paper/2019/file/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Paper.pdf)
+
+Γλώσσα Υλοποίησης : C++
+
+Στο πρώτο μέρος του Project κληθήκαμε να υλοποιήσουμε τοn Αλγόριθμο **Vamana**, oποίος λειτουργεί ως μία προσσεγιστική επίλυση του Προβλήματος της Εύρεσης των Κ-Εγγύτερων Γειτόνων. Η υλοποίησή μας στηρίχθηκε πάνω στο αρθρο του 2019, [DiskANN:Fast Accurate Billion-point Nearest Neigbhour Search on a Single Node Search](https://proceedings.neurips.cc/paper_files/paper/2019/file/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Paper.pdf). Πιο συγκεκριμένα, στο πρώτο μέρος μας ζητήθηκε να υλοποιήσουμε τις εξείς λειτουργικότητες:
+
+*  Vamana
+
+
 
 
 
