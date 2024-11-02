@@ -29,32 +29,6 @@
 - Καθαρισμός αρχείων: 
 `make clean`
 
-### Modularization
-- /data
-  - /siftsmall
-- /docs
-- /include
-  - /DataVector
-  - /Graph
-  - acutest.h
-  - distance.h
-  - GreedySearch.h
-  - read_data.h
-  - vamana.h
-- /src
-  - dstance_functions.cpp
-  - graph_functions.cpp
-  - read_vectors.cpp
-  - vamana_creation.cpp
-- /tests
-  - graph_node_test.cc
-  - graph_test.cc
-  - test_data_vectors.cc
-  - test_distance.cc
-- main.cpp
-- README.md
-- run_all_tests.sh
-
 ### Datasets
 
 *VIA = Vamana Indexing Algorithm*
@@ -67,7 +41,7 @@
 
 
 ### Περιγραφή Πρώτου Μέρους Project και Ζητούμενα
-Στο πρώτο μέρος του Project κληθήκαμε να υλοποιήσουμε τον Αλγόριθμο **Vamana Indexing**, o oποίος λειτουργεί ως μία Προσεγγιστική Λυση του Προβλήματος της Εύρεσης των Κ-Εγγύτερων Γειτόνων, μέσω της χρήσης κατευθυνόμενου γράφου για την αναπαράσταση και επεξεργασία των δεδομένων. Η υλοποίησή μας στηρίχθηκε πάνω στο αρθρο του 2019, [DiskANN:Fast Accurate Billion-point Nearest Neigbhour Search on a Single Node Search](https://proceedings.neurips.cc/paper_files/paper/2019/file/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Paper.pdf). Πιο συγκεκριμένα, μας ζητήθηκε να υλοποιήσουμε τα εξής:
+Στο πρώτο μέρος του Project κληθήκαμε να υλοποιήσουμε τον Αλγόριθμο **Vamana Indexing**, o oποίος λειτουργεί ως μία Προσεγγιστική Λυση του Προβλήματος της Εύρεσης των Κ-Εγγύτερων Γειτόνων, μέσω της χρήσης κατευθυνόμενου γράφου για την αναπαράσταση και επεξεργασία των δεδομένων. Η υλοποίησή μας στηρίχθηκε πάνω στο αρθρο του 2019, [DiskANN:Fast Accurate Billion-point Nearest Neighbour Search on a Single Node Search](https://proceedings.neurips.cc/paper_files/paper/2019/file/09853c7fb1d3f8ee67a61b6bf4a7f8e6-Paper.pdf). Πιο συγκεκριμένα, μας ζητήθηκε να υλοποιήσουμε τα εξής:
 
 - `VamanaIndex()`
   - `GreedySearch()`
