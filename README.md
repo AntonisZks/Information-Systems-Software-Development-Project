@@ -17,17 +17,17 @@
 - Μεταγλώττιση: **g++** (έγινε modularization των αρχείων σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
 - Επαλήθευση Ορθότητας Κώδικα: **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (για την εκτέλεση τoυς έγινε χρήση [shell script](https://www.shellscript.sh/))
 
-# Μεταγλώττιση και Εκτέλεση του Κώδικα
-- Για την Μεταγλώττιση του Κώδικα
+# Μεταγλώττιση και Εκτέλεση
+- Για την Μεταγλώττιση του Κώδικα\
 `make all`
-- Για την Εκτέλεση των Unit Test
+- Για την Εκτέλεση των Unit Test\
 `./run_all_tests.sh`
-- Για την εκτέλεση του Αλγορίθμου **Vamana**
+- Για την εκτέλεση του Αλγορίθμου **Vamana**\
 `./bin/vamana`
-- Καθαρισμός αρχείων
+- Καθαρισμός αρχείων\
 `make clean`
 
-# Modularization του Κώδικα
+# Modularization
 
 # Αρμοδιότητες Συμμετεχόντων της Ομάδας
 
