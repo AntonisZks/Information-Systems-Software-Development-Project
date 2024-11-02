@@ -12,6 +12,13 @@
 
 </div>
 
+# Χαρακτηριστικά Κώδικα
+
+- Γλώσσα Υλοποίησης: C++
+- Μεταγλώττιση: g++ (modularization σε directories και χρήση [Makefile](https://www.gnu.org/software/make/manual/make.html))
+- Επαλήθευση Ορθότητας Κώδικα: Unit Tests με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest)
+
+
 # Project Overview
 
 Γλώσσα Υλοποίησης : C++
