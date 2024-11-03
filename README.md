@@ -24,8 +24,8 @@
 `make all`
 - Για την Εκτέλεση των **Unit Test**: 
 `./run_all_tests.sh`
-- Για την εκτέλεση του Αλγορίθμου **Vamana**: 
-`./bin/vamana`
+- Για την εκτέλεση του **Vamana Indexing Algorithm**: 
+  `time ./bin/vamana`
 - Καθαρισμός αρχείων: 
 `make clean`
 
@@ -36,7 +36,7 @@
 Τα [δεδομένα](http://corpus-texmex.irisa.fr/) που χρησιμοποιούνται για τον Αλγόριθμο **Vamana Indexing**. Είναι σετ διανυσμάτων 128 διαστάσεων (με αριθμούς κινητής υποδιαστολής (float)). Στον κώδικά μας αξιοποιήσαμε το σετ δεδομένων `ANN_SIFT10K`. το οποίο περιέχει:
 - `shiftsmall_base.fvecs`: 10.000 base vectors διάστασης 128. Κάθε vector θα αντιστοιχεί σε ένα κόμβο του γράφου **Vamana**, και περιέχει 128 floats.
 - `shiftsmall_query.fvecs`: 100 query vectors διάστασης 128. Οι "search" vectors μας. O VIA θα υπολογίσει τους πλησιέστερους γείτονες αυτών των vector.
-- `shiftsmall_groundtruth.ivecs`: Αυτό το αρχείο, για κάθε query vector, περιέχει 100 ακεραιες τιμές που αντιπροσωπεύουν τους identifiers (start 0) των base vectors που είναι οι εγγύτεροι γείτονες τους. 
+- `shiftsmall_groundtruth.ivecs`: Αυτό το αρχείο, για κάθε query vector, περιέχει 100 ακεραιες τιμές που αντιπροσωπεύουν τους identifiers (start 0) των base vectors που είναι οι εγγύτεροι γείτονες τους.
 - `shiftsmall_learn.fvecs`: 25,000 learn vectors διάστασης 128. Σε αντίθεση με τα query vectors, τα learn vectors χρησιμοποιούνται αποκλειστικά για το optimization phase της ανάπτυξης του project στην παραμετροποιήση και βελτιστοποίηση των συναρτήσεων `RobustPrune()` και `GreedySearch()`.
 
 
@@ -47,13 +47,6 @@
   - `GreedySearch()`
   - `RobustPrune()`
   - `Recall()`
-    
-<div align="center">
-  
-  <img src="images/GreedeSearch.png" alt="Alt Text" width="300" height="300"> <img src="images/RobustPrune.png" alt="Alt Text" width="300" height="300">
-  <img src="images/VIA.png" alt="Alt Text" width="500" height="300">
-  
-</div>
 
 Για την εξέταση της λειτουργικότητας του **VIA** ήταν αναγκάιο να δημιουργήσουμε συμπληρωματικές κλάσεις και μεθόδους για:
 - Ανάγνωση και αποθήκευση των [δεδομένων](http://corpus-texmex.irisa.fr/) (με συμπληρωματικές μεθόδους για ανάκτηση δεδομένων).
@@ -89,5 +82,11 @@
   - Ολική συμβολή στην βελτιστοποίηση και αποσφαλμάτωση κώδικά για την ομαλή εκτέλεση των επιμέρους συνασρτήσεων.
 
 # Ανάλυση / Σχεδιαστικές Επιλογές / Flowchart Αλγορίθμου
+Η υλοποίηση των συναρτήσεων `VamanaIndex()`, `GreedySearch()`, `RobustPrune()` και `Recall()`, έγινε σύμφωνα με τους ψευδοκώδικες που παρουσιάζονται στο άρθρο, και φάινονται παρακάτω:
 
-Το πρόγραμμα μπορέι να χωριστεί 
+<div align="center">
+  
+  <img src="images/GreedeSearch.png" alt="Alt Text" width="300" height="300"> <img src="images/RobustPrune.png" alt="Alt Text" width="300" height="300">
+  <img src="images/VIA.png" alt="Alt Text" width="500" height="300">
+  
+</div>
