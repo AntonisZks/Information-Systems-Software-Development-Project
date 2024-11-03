@@ -48,7 +48,7 @@
   - `RobustPrune()`
   - `Recall()`
   - 
-  ![GreedySearch](/images/GreedySearch.png)
+  ![GreedySearch](images/GreedeSearch.png)
 
 Για την εξέταση της λειτουργικότητας του **VIA** ήταν αναγκάιο να δημιουργήσουμε συμπληρωματικές κλάσεις και μεθόδους για:
 - Ανάγνωση και αποθήκευση των [δεδομένων](http://corpus-texmex.irisa.fr/) (με συμπληρωματικές μεθόδους για ανάκτηση δεδομένων).
