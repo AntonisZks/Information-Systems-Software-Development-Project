@@ -47,8 +47,13 @@
   - `GreedySearch()`
   - `RobustPrune()`
   - `Recall()`
-
-  <img src="images/GreedeSearch.png" alt="Alt Text" width="300" height="300"> <img src="images/GreedeSearch.png" alt="Alt Text" width="300" height="300"> 
+    
+<div align="center">
+  
+  <img src="images/GreedeSearch.png" alt="Alt Text" width="300" height="300"> <img src="images/RobustPrune.png" alt="Alt Text" width="300" height="300">
+  <img src="images/VIA.png" alt="Alt Text" width="500" height="300">
+  
+</div>
 
 Για την εξέταση της λειτουργικότητας του **VIA** ήταν αναγκάιο να δημιουργήσουμε συμπληρωματικές κλάσεις και μεθόδους για:
 - Ανάγνωση και αποθήκευση των [δεδομένων](http://corpus-texmex.irisa.fr/) (με συμπληρωματικές μεθόδους για ανάκτηση δεδομένων).
