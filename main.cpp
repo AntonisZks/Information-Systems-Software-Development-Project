@@ -24,11 +24,12 @@
  * @return A set containing the exact nearest neighbors for a query vector.
  */
 static std::set<DataVector<float>> 
-getExactNearestNeighbors(std::vector<DataVector<float>>& base_vectors, std::vector<DataVector<int>>& groundtruth_values) {
+getExactNearestNeighbors(
+  std::vector<DataVector<float>>& base_vectors, std::vector<DataVector<int>>& groundtruth_values, const unsigned int query_number) {
 
   std::set<DataVector<float>> realNeighbors;
 
-  DataVector<int> realNearestIndeces = groundtruth_values.at(0);
+  DataVector<int> realNearestIndeces = groundtruth_values.at(query_number);
   for (unsigned int i = 0; i < realNearestIndeces.getDimension(); i++) {
     int currentIndex = realNearestIndeces.getDataAtIndex(i);
     DataVector<float> currentData = base_vectors.at(currentIndex);
@@ -52,9 +53,10 @@ int main(int argc, char* argv[]) {
   srand(static_cast<unsigned int>(time(0)));
 
   // Check for valid program execution
-  if (argc != 4) {
+  if (argc != 9) {
     std::cout << "Usage: " << argv[0] << " [base_vectors_file]";
-    std::cout << " [query_vectors_file]" << " [groundtruth_file]" << std::endl;
+    std::cout << " [query_vectors_file]" << " [groundtruth_file]";
+    std::cout << " [k]" <<  " [alpha]" << " [L]" << " [R]" << " [query_number]"<< std::endl;
 
     return 1;
   }
@@ -63,6 +65,13 @@ int main(int argc, char* argv[]) {
   std::string base_file = argv[1];
   std::string query_file = argv[2];
   std::string groundtruth_file = argv[3];
+
+  // Store the search parameters
+  unsigned int k = std::stoi(argv[4]);
+  float alpha = std::stof(argv[5]);
+  unsigned int L = std::stoi(argv[6]);
+  unsigned int R = std::stoi(argv[7]);
+  unsigned int query_number = std::stoi(argv[8]);
   
   // Receive the data vectors from the dataset files
   std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_file);
@@ -70,18 +79,17 @@ int main(int argc, char* argv[]) {
   std::vector<DataVector<int>> groundtruth_values = ReadGroundTruth(groundtruth_file);
 
   // Get the exact nearest neighbors
-  std::set<DataVector<float>> realNeighbors = getExactNearestNeighbors(base_vectors, groundtruth_values);
-
+  std::set<DataVector<float>> realNeighbors = getExactNearestNeighbors(base_vectors, groundtruth_values, query_number);
 
   // Creating the Vamana Indexing Graph
-  Graph<DataVector<float>> G = Vamana(base_vectors, 1.0, 120, 14);
+  Graph<DataVector<float>> G = Vamana(base_vectors, alpha, L, R);
 
   // Run the Greedy Search Algorithm in order to evaluate the results
   GraphNode<DataVector<float>>* s = G.getNode(0);
   std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
 
   // Evaluate the results using the recall evaluation function
-  greedyResult = GreedySearch(G, *s, query_vectors.at(0), 100, 120);
+  greedyResult = GreedySearch(G, *s, query_vectors.at(query_number), k, L);
   float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
 
   std::cout << "Recall: " << recall*100 << "%" << std::endl;
