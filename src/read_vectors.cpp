@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../include/DataVector/DataVector.h"  // Include your DataVector class
+#include "../include/DataStructures/DataVector/DataVector.h"
 
 using namespace std;
 

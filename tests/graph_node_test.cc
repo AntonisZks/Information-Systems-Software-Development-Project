@@ -4,8 +4,8 @@
 
 #include "../include/acutest.h"
 
-#include "../include/Graph/graph_node.h"
-#include "../include/Graph/graph.h"
+#include "../include/DataStructures/Graph/graph_node.h"
+#include "../include/DataStructures/Graph/graph.h"
 
 
 /**

@@ -3,7 +3,7 @@
 
 #include <vector>           // Required for std::vector
 #include <string>           // Required for std::string
-#include "../include/DataVector/DataVector.h"  // Adjust the path if necessary
+#include "DataStructures/DataVector/DataVector.h"
 
 using namespace std;        // Optional: can avoid repeating std::
 

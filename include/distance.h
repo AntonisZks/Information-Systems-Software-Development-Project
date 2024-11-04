@@ -5,7 +5,7 @@
 #include <cmath>
 #include <utility>
 #include <vector>
-#include "DataVector/DataVector.h"
+#include "DataStructures/DataVector/DataVector.h"
 
 /**
  * @brief Function to calculate Euclidean distance between two DataVector objects. It uses

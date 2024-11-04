@@ -3,12 +3,12 @@
 #include <vector>
 #include <set>
 #include <ctime>
-#include "include/Graph/graph.h"
+#include "include/DataStructures/Graph/graph.h"
 #include "include/read_data.h"
-#include "include/DataVector/DataVector.h"
-#include "include/GreedySearch.h"
-#include "include/GreedySearch.h"
-#include "include/recall.h"
+#include "include/DataStructures/DataVector/DataVector.h"
+#include "include/Algorithms/GreedySearch.h"
+#include "include/Algorithms/GreedySearch.h"
+#include "include/Evaluation/recall.h"
 
 // Type Alias
 typedef GraphNode<DataVector<float>> GreedySearchNode;
