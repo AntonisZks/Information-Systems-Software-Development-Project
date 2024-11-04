@@ -57,6 +57,16 @@ vector<DataVector<float>> ReadVectorFile(const string& filename){
     return dataVectors; // Return the array of DataVector objects
 }
 
+/**
+ * @brief Reads a binary file and converts its data into a vector of DataVector<int> objects,
+ * typically for storing ground truth information.
+ * 
+ * The file is assumed to have the same binary format as in `ReadVectorFile`.
+ * 
+ * @param filename The name of the file containing ground truth vector data.
+ * 
+ * @return A vector of DataVector<int> objects.
+ */
 vector<DataVector<int>> ReadGroundTruth(const string& filename) {
     ifstream file(filename, ios::binary);
 

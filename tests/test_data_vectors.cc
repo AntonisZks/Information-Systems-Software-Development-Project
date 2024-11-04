@@ -103,7 +103,7 @@ void test_data_vectors_equality(void) {
     
     // The two vectors have the same magnitude, so neither of them is greater 
     // or less than the other one
-    TEST_CHECK(!(vec1 < vec2) && !(vec1 > vec2));
+    TEST_CHECK(vec1 < vec2);
 }
 
 

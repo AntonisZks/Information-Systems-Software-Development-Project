@@ -13,18 +13,11 @@
 #include <queue>
 #include <cmath>
 
-// Type Alias
-template <typename graph_t> using GraphNodeSet = std::set<GraphNode<graph_t>>;
-template <typename graph_t> using GreedySearchResult = std::pair<GraphNodeSet<graph_t>, GraphNodeSet<graph_t>>;
-
-typedef DataVector<float> GreedySearchVector;
-typedef unsigned int result_size_t;
-typedef unsigned int search_list_size_t;
-
 /**
- * @brief Computes the difference between two sets.
+ * @brief Computes the difference between two sets, returning elements
+ * that are in the first set but not in the second.
  * 
- * @param set_t Type of elements in the set
+ * @param set_t Type of elements in the sets
  * @param set1 The first set
  * @param set2 The second set
  * 
@@ -32,11 +25,9 @@ typedef unsigned int search_list_size_t;
  */
 template <typename set_t> 
 static std::set<set_t> getSetDifference(const std::set<set_t>& set1, const std::set<set_t>& set2) {
+  std::set<set_t> result; // Resulting set to hold the difference
 
-  // Create a result set indicating the result of the difference operation
-  std::set<set_t> result;
-
-  // Compute the difference of the two sets
+  // Compute difference and store in result
   std::set_difference(
     set1.begin(), set1.end(), 
     set2.begin(), set2.end(), 
@@ -44,332 +35,142 @@ static std::set<set_t> getSetDifference(const std::set<set_t>& set1, const std::
   );
 
   return result;
-
 }
 
 /**
- * @brief Retrieves the element at a specific index from a set.
+ * @brief Retrieves the element at a specific index in a set. This function enables index-based access in a set, 
+ * even though sets are not indexed containers.
  * 
  * @param set_t Type of elements in the set
- * @param index The zero-based index of the element
- * @param set The set to access
+ * @param index The zero-based index of the desired element
+ * @param set The set from which to retrieve the element
  * 
  * @return The element at the specified index
  * @throws std::invalid_argument if the index is out of range
  */
 template <typename set_t>
 static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>& set) {
-
-  // Check if the given index is valid
-  if (index < 0 || index >= set.size()) {
+  // Validate index
+  if (index >= set.size()) {
     throw std::invalid_argument("Index is not valid");
   }
 
-  // Find the item at the given index and return it
+  // Advance an iterator to the indexed position
   auto it = set.begin();
   std::advance(it, index);
 
-  return *it;
-
+  return *it; // Return the element at the specified index
 }
 
 /**
- * @brief Creates a sorted array of graph nodes based on Euclidean distance to a query vector.
+ * @brief Comparator structure for ordering elements by Euclidean distance.
  * 
- * @param graph_t Data type stored in the graph nodes
- * @param candidates Set of candidate nodes to sort
- * @param xq Query vector for distance computation
- * 
- * @return Pointer to a dynamically allocated array of sorted candidate nodes
+ * This functor orders elements based on their Euclidean distance to a target vector.
+ * If two elements have the same distance, they are compared lexicographically.
  */
-template <typename graph_t> 
-static GraphNode<graph_t>* getCandidatesArray(const GraphNodeSet<graph_t>& candidates, const GreedySearchVector& xq) {
-
-  double distance1, distance2;
-
-  // Create an array to store the items of the candidates set
-  GraphNode<graph_t>* candidates_items = new GraphNode<graph_t>[candidates.size()];
-
-  // Move all the items to the array
-  for (unsigned int i = 0; i < candidates.size(); i++) {
-    GraphNode<graph_t> currentNode = getSetItemAtIndex(i, candidates);
-    candidates_items[i] = currentNode;
-  }
-
-  // Sort the array using Bubble Sort according to the Euclidean Distance of the inner vectors
-  for (unsigned int i = 0; i < candidates.size() - 1; i++) {
-    
-    bool swapped = false;
-    for (unsigned int j = 0; j < candidates.size() - i - 1; j++) {
-      
-      try {
-        distance1 = euclideanDistance(candidates_items[j].getData(), xq);
-        distance2 = euclideanDistance(candidates_items[j + 1].getData(), xq);
-      }
-      catch (const std::invalid_argument& e) {
-        std::cerr << "Invalid argument while computing distances for sorting candidates" << std::endl;
-        delete [] candidates_items;
-        exit(1);
-      }
-      
-      if (distance1 < distance2) {
-        std::swap(candidates_items[j], candidates_items[j + 1]);
-        swapped = true;
-      }
-
-    }
-    if (!swapped) { break; }
-  }
-
-  return candidates_items;
-
-}
-
-/**
- * @brief Limits a set of graph nodes to the N nearest nodes relative to a query vector.
- * 
- * @param graph_t Data type stored in the graph nodes
- * @param candidates Set of candidate nodes to filter
- * @param xq Query vector for distance computation
- * @param N Maximum number of nearest nodes to retain
- */
-template <typename graph_t>
-static void getNNearestPointsTo(GraphNodeSet<graph_t>& candidates, const GreedySearchVector xq, unsigned int N) {
-
-  // Create a candidates array to store all the vectors temporary
-  GraphNode<graph_t>* candidates_items = getCandidatesArray(candidates, xq);
-
-  // Clear the candidates set and insert the sorted vectors
-  candidates.clear();
-  for (unsigned int i = 0; i < N; i++) {
-    candidates.insert(candidates_items[i]);
-  }
-
-  // Delete the array
-  delete [] candidates_items;
-
-}
-
-/**
- * @brief Retrieves all neighboring nodes of a given graph node.
- * 
- * @param graph_t Data type stored in the graph nodes
- * @param p_star The node whose neighbors are to be retrieved
- * 
- * @return A set containing all neighboring nodes of p_star
- */
-template <typename graph_t>
-static GraphNodeSet<graph_t> getPstarNeighbors(GraphNode<graph_t>& p_star) {
-
-  // Create a set for the neighbors and a vector for the neighbor nodes
-  GraphNodeSet<graph_t> n_out;
-  std::vector<graph_t>* neighbors = p_star.getNeighbors();
-
-  // Iterate through the neighbor vectors and insert each one in the neighbors set
-  for (unsigned int i = 0; i < neighbors->size(); i++) {
-    GraphNode<graph_t> newNode(neighbors->at(i));
-    n_out.insert(newNode);
-  }
-
-  return n_out;
-
-}
-
-/**
- * @brief Finds the node in a candidate set with the minimum Euclidean distance to a query vector.
- * 
- * @param graph_t Data type stored in the graph nodes
- * @param candidates_minus_visited Set of candidate nodes not yet visited
- * @param xq Query vector for distance computation
- * 
- * @return The node in candidates_minus_visited closest to xq
- */
-template <typename graph_t>
-static GraphNode<graph_t> getPstar(const GraphNodeSet<graph_t>& candidates_minus_visited, const GreedySearchVector& xq) {
-
-  double p_star_distance;
-  double distance;
-
-  // Set the first vector of the candidates as p*
-  GraphNode<graph_t> p_star = getSetItemAtIndex(0, candidates_minus_visited);
-  graph_t p_star_xp = p_star.getData();
-  
-  // Receive its euclidian distance from the query vector
-  try {
-    p_star_distance = euclideanDistance(p_star_xp, xq);
-  } 
-  catch (const std::invalid_argument& e) {
-    std::cout << "Invalid argument while computing p_star_distance" << e.what() << std::endl;
-    exit(1);
-  }
-
-  // Find the minimum euclidean distance from the query vector, and store the corresponding base vector as p*
-  for (unsigned int i = 1; i < candidates_minus_visited.size(); i++) {
-
-    // Get the current vector
-    GraphNode<graph_t> currentNode = getSetItemAtIndex(i, candidates_minus_visited);
-    graph_t xp = currentNode.getData();
-
-    // Compute its euclidean distance from the query vector
-    try {
-      distance = euclideanDistance(xp, xq);
-    }
-    catch (const std::invalid_argument& e) {
-      std::cout << "Invalid argument while computing distance" << e.what() << std::endl;
-      exit(1);
-    }
-
-    // Update p* if neede
-    if (distance < p_star_distance) {
-      p_star = currentNode;
-      p_star_xp = xp;
-      p_star_distance = distance;
-    }
-
-  }
-
-  return p_star;
-
-}
-
-/**
- * @brief Greedy search algorithm for finding the k closest nodes in a graph relative to a query vector.
- * 
- * @param graph_t Data type stored in the graph nodes
- * @param graph The graph to search
- * @param s Starting node for the search
- * @param xq Query vector for distance computation
- * @param k Number of nearest nodes to return
- * @param L Maximum number of nodes in the search list
- * 
- * @return Pair of sets: first contains the k closest nodes, and second contains the visited nodes
- */
-template <typename graph_t> 
-GreedySearchResult<graph_t> 
-GreedySearch(const GraphNode<graph_t>& s, const GreedySearchVector& xq, const result_size_t k, const search_list_size_t L) {
-
-  std::set<GraphNode<graph_t>> candidates_minus_visited;
-
-  // Initialize sets L <-- {s} and V <-- {}
-  std::set<GraphNode<graph_t>> candidates; candidates.insert(s);
-  std::set<GraphNode<graph_t>> visited;
-
-  candidates_minus_visited = getSetDifference(candidates, visited);
-  while (!candidates_minus_visited.empty()) {
-    
-    // Calculate p* <-- argmin_{p in L \ V}(||xp - xq||)
-    GraphNode<graph_t> p_star = getPstar(candidates_minus_visited, xq);
-
-    // Update L <-- L union N_out(p*) and V <-- V union {p*}
-    std::set<GraphNode<graph_t>> n_out = getPstarNeighbors(p_star);
-    candidates.insert(n_out.begin(), n_out.end());
-    visited.insert(p_star);
-
-    // Check if |canidates| > L
-    if (candidates.size() > L) {
-      getNNearestPointsTo(candidates, xq, L);
-    }
-
-    candidates_minus_visited = getSetDifference(candidates, visited);
-
-  }
-
-  // Receive k closest points from candidates
-  getNNearestPointsTo(candidates, xq, k);
-
-  // Create the greedy search result pair of values
-  GreedySearchResult<graph_t> result;
-  result.first = candidates;
-  result.second = visited;
-
-  return result;
-
-}
-
 template <typename graph_t>
 struct EuclideanDistanceOrder {
-  
-  graph_t xq;
 
-  // Constructor to initialize the target point
+  graph_t xq; // Target vector for distance comparisons
+
+  // Constructor to initialize the target vector
   EuclideanDistanceOrder(const graph_t& target) : xq(target) {}
 
+  // Comparison operator: compares two elements based on distance to the target vector
   bool operator()(const graph_t& a, const graph_t& b) {
-    // Calculate distances
     double distanceA = euclideanDistance(a, xq);
     double distanceB = euclideanDistance(b, xq);
 
-    // First compare distances
+    // Primary comparison by distance
     if (distanceA != distanceB) {
-      return distanceA < distanceB;  // Sort by distance
+      return distanceA < distanceB;
     }
     
-    // If distances are the same, use a secondary comparison
-    return a < b; // Replace with appropriate secondary attribute
+    // Secondary comparison if distances are the same
+    return a < b;
   }
 
 };
 
+/**
+ * @brief Greedy search algorithm for finding the k nearest nodes in a graph relative to a query vector.
+ * 
+ * This function implements a greedy search that iteratively explores the closest nodes to the query vector.
+ * It maintains a candidate set of nodes to visit and a visited set of nodes already processed.
+ * 
+ * @param graph_t Type of data stored in the graph nodes
+ * @param G The graph to search
+ * @param s Starting node for the search
+ * @param xq Query vector for distance computation
+ * @param k Number of nearest nodes to return
+ * @param L Maximum number of nodes in the candidate set
+ * 
+ * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
+ */
 template <typename graph_t>
 std::pair<std::set<graph_t>, std::set<graph_t>>
-GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
-    
+GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
+  
   std::set<graph_t> candidates = {s.getData()};
   std::set<graph_t> visited = {};
 
+  // Calculate initial difference between candidates and visited sets
   std::set<graph_t> candidates_minus_visited = getSetDifference(candidates, visited);
   unsigned int cnt = 0;
+
+  // Main search loop: continue until there are no unvisited candidates
   while (!candidates_minus_visited.empty()) {
 
+    // Select the closest candidate to the query vector xq
     graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
     float p_star_distance = euclideanDistance(p_star, xq);
 
+    // Compare each unvisited candidate's distance to find the nearest
     for (auto xp : candidates_minus_visited) {
       float currentDistance = euclideanDistance(xp, xq);
-      
       if (currentDistance < p_star_distance) {
         p_star_distance = currentDistance;
         p_star = xp;
       }
     }
 
+    // Retrieve neighbors of the closest node, p_star, and add them to candidates
     GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
     std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
 
     for (auto neighbor : *p_star_neighbors) {
       candidates.insert(neighbor);
     }
-    visited.insert(p_star);
+    visited.insert(p_star); // Mark the closest node as visited
 
-    if (candidates.size() > (long unsigned int)L) {
-
-
+    // Limit the size of candidates to L by keeping the closest L elements to the query
+    if (candidates.size() > static_cast<size_t>(L)) {
       std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
-      for (auto candidate: candidates) {
+      for (auto candidate : candidates) {
         newCandidates.insert(candidate);
       }
       
+      // Reassign only the closest L candidates back to candidates set
       candidates.clear();
-
       auto it = newCandidates.begin();
       for (unsigned int i = 0; i < L && it != newCandidates.end(); i++, it++) {
         candidates.insert(*it);
       }
-      
     }
 
+    // Update candidates_minus_visited with the new difference after adding p_star to visited
     candidates_minus_visited = getSetDifference(candidates, visited);
-    cnt++;
-
+    cnt++; // Increment loop counter for diagnostics if needed
   }
 
+  // Final selection of k closest candidates after main loop
   std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
-  for (auto candidate: candidates) {
+  for (auto candidate : candidates) {
     newCandidates.insert(candidate);
   }
 
+  // Reassign only the closest k candidates to the candidates set for final result
   candidates.clear();
-
   auto it = newCandidates.begin();
   for (unsigned int i = 0; i < k && it != newCandidates.end(); i++, it++) {
     candidates.insert(*it);
@@ -378,7 +179,5 @@ GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_
   return {candidates, visited};
 
 }
-
-
 
 #endif /* GREEDY_SEARCH_H */
