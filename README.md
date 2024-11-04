@@ -116,6 +116,8 @@
 ### Initialization Phase
 Στο Initialization phase, γίνεται η ανάγνωση και η αποθήκευση των δεδομένων μας από τις συναρτήσεις:
 - `ReadVectorFile()`
+- `ReadgroundΤruth()`
+Η οποίες διαβάζουν από τα αρχεία `siftsmall_base.fvecs`, `siftsmall_query.fvecs` και `siftsmall_groundtruth.ivecs` τα δεδομένα μας.
 
 ### Vamana Phase
 
