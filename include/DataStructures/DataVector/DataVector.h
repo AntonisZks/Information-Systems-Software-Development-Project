@@ -261,22 +261,37 @@ public:
  * @return the putput stream
 */
 template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
-    
-    // Print the first 10 items inside the vector
-    out << "[";
-    for (unsigned int i = 0; i < 3; i++) {
-        out << vector.getDataAtIndex(i);
-        out << ", ";
-    }
 
-    out << "... ";
+    if (vector.getDimension() > 3) {
 
-    // Print the last 10 items inside the vector
-    for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
-        out << vector.getDataAtIndex(i);
-        out << ", ";
+        // Print the first 10 items inside the vector
+        out << "[";
+        for (unsigned int i = 0; i < 3; i++) {
+            out << vector.getDataAtIndex(i);
+            out << ", ";
+        }
+
+        out << "... ";
+
+        // Print the last 10 items inside the vector
+        for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
+            out << vector.getDataAtIndex(i);
+            out << ", ";
+        }
+        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
+
+    } else {
+
+        out << "[";
+        for (unsigned int i = 0; i < vector.getDimension(); i++) {
+            out << vector.getDataAtIndex(i);
+            if (i < vector.getDimension() - 1) {
+                out << ", ";
+            }
+        }
+        out << "] " << "(" << vector.getIndex() <<  ")";
+
     }
-    out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
 
     return out;
 

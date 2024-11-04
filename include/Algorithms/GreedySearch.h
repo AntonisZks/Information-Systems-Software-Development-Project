@@ -1,5 +1,5 @@
-#ifndef GRAPH_FUNCTIONS_H
-#define GRAPH_FUNCTIONS_H
+#ifndef GREEDY_SEARCH_H
+#define GREEDY_SEARCH_H
 
 #include <iostream>
 #include <vector>
@@ -288,5 +288,114 @@ GreedySearch(const GraphNode<graph_t>& s, const GreedySearchVector& xq, const re
 
 }
 
+template <typename graph_t>
+struct EuclideanDistanceOrder {
+  
+  graph_t xq;
 
-#endif /* GRAPH_FUNCTIONS_H */
+  // Constructor to initialize the target point
+  EuclideanDistanceOrder(const graph_t& target) : xq(target) {}
+
+  bool operator()(const graph_t& a, const graph_t& b) {
+    return euclideanDistance(a, xq) < euclideanDistance(b, xq);
+  }
+
+};
+
+template <typename graph_t>
+std::pair<std::set<graph_t>, std::set<graph_t>>
+GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
+    
+  std::set<graph_t> candidates = {s.getData()};
+  std::set<graph_t> visited = {};
+
+  std::set<graph_t> candidates_minus_visited = getSetDifference(candidates, visited);
+  unsigned int cnt = 0;
+  while (!candidates_minus_visited.empty()) {
+
+    std::cout << "------------- Execution " << cnt << "-------------" << std::endl;
+    std::cout << "L: ";
+    for (auto data : candidates) {
+      std::cout << data << ", ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "V: ";
+    for (auto data : visited) {
+      std::cout << data << ", ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "L\\V: ";
+    for (auto data : candidates_minus_visited) {
+      std::cout << data << ", ";
+    }
+    std::cout << std::endl;
+
+    graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
+    float p_star_distance = euclideanDistance(p_star, xq);
+
+    for (auto xp : candidates_minus_visited) {
+      float currentDistance = euclideanDistance(xp, xq);
+      
+      if (currentDistance < p_star_distance) {
+        p_star_distance = currentDistance;
+        p_star = xp;
+      }
+    }
+
+    GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
+    std::cout << "P* found: " << p_star_node->getData() << std::endl;
+    std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
+
+    std::cout << "P* Neighbors: ";
+    for (auto neighbor : *p_star_neighbors) {
+      std::cout << neighbor << ", ";
+    }
+    std::cout << std::endl;
+
+    for (auto neighbor : *p_star_neighbors) {
+      candidates.insert(neighbor);
+    }
+    visited.insert(p_star);
+
+    if (candidates.size() > (long unsigned int)L) {
+
+      std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
+      for (auto candidate: candidates) {
+        newCandidates.insert(candidate);
+      }
+
+      candidates.clear();
+
+      auto it = newCandidates.begin();
+      for (unsigned int i = 0; i < L && it != newCandidates.end(); i++, it++) {
+        candidates.insert(*it);
+      }
+      
+    }
+
+    candidates_minus_visited = getSetDifference(candidates, visited);
+    cnt++;
+
+  }
+
+  std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
+  for (auto candidate: candidates) {
+    newCandidates.insert(candidate);
+  }
+
+  candidates.clear();
+
+  auto it = newCandidates.begin();
+  for (unsigned int i = 0; i < k && it != newCandidates.end(); i++, it++) {
+    candidates.insert(*it);
+  }
+
+  return {candidates, visited};
+
+}
+
+
+
+#endif /* GREEDY_SEARCH_H */
