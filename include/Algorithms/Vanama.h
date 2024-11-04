@@ -232,7 +232,7 @@ Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
     graph_t sigma_i = sigma_i_node->getData();
 
     greedySearchResult = GreedySearch2(G, *s, P.at(sigma.at(i)), 1, L);
-    RobustPrune2(G, *sigma_i_node, greedySearchResult.second, alpha, R);
+    RobustPrune(G, *sigma_i_node, greedySearchResult.second, alpha, R);
 
     std::vector<graph_t>* sigma_i_neighbors = sigma_i_node->getNeighbors();
     for (auto j : *sigma_i_neighbors) {
@@ -246,7 +246,7 @@ Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
       outgoing.insert(sigma_i);
 
       if (outgoing.size() > (long unsigned int)R) {
-        RobustPrune2(G, *j_node, outgoing, alpha, R);
+        RobustPrune(G, *j_node, outgoing, alpha, R);
       }
       else {
         j_node->addNeighbor(sigma_i);
