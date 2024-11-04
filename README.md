@@ -23,7 +23,7 @@
 - Για την Μεταγλώττιση του Κώδικα:
 `make all`
 - Για την Εκτέλεση των **Unit Test**: 
-`./run_all_tests.sh`
+`./scripts/run_all_tests.sh`
 - Για την εκτέλεση του **Vamana Indexing Algorithm**, με Κ=100, α=10, L=120, R=120, query index = 0: 
   `time ./bin/main 'data/siftsmall/siftsmall_base.fvecs' 'data/siftsmall/siftsmall_query.fvecs' 'data/siftsmall/siftsmall_groundtruth.ivecs' 100 1.0 120 14 0`
 - Καθαρισμός αρχείων: 
