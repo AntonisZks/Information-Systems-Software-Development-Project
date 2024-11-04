@@ -1,5 +1,5 @@
-#ifndef GRAPH_FUNCTIONS_H
-#define GRAPH_FUNCTIONS_H
+#ifndef GREEDY_SEARCH_H
+#define GREEDY_SEARCH_H
 
 #include <iostream>
 #include <vector>
@@ -7,13 +7,11 @@
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
-#include "Graph/graph.h"
-#include "DataVector/DataVector.h"
-#include "distance.h"
+#include "../DataStructures/Graph/graph.h"
+#include "../DataStructures/DataVector/DataVector.h"
+#include "../distance.h"
 #include <queue>
 #include <cmath>
-
-
 
 // Type Alias
 template <typename graph_t> using GraphNodeSet = std::set<GraphNode<graph_t>>;
@@ -288,75 +286,99 @@ GreedySearch(const GraphNode<graph_t>& s, const GreedySearchVector& xq, const re
 
 }
 
+template <typename graph_t>
+struct EuclideanDistanceOrder {
+  
+  graph_t xq;
 
+  // Constructor to initialize the target point
+  EuclideanDistanceOrder(const graph_t& target) : xq(target) {}
 
-// RobustPrune function
-template<typename T>
-std::pair<std::set<GraphNode<T>>, std::set<GraphNode<T>>> robustPrune(Graph<T>& graph, const GraphNode<T>& start_node, float alpha, int R) {
-    std::vector<T> prunedNeighbors;
-    std::set<GraphNode<T>> visited_nodes;
-    std::set<GraphNode<T>> pruned_neighbors;
-    std::vector<unsigned int> candidate_indices;
+  bool operator()(const graph_t& a, const graph_t& b) {
+    // Calculate distances
+    double distanceA = euclideanDistance(a, xq);
+    double distanceB = euclideanDistance(b, xq);
 
-    // Initialize candidate_indices with all node indices except the start node
-    for (unsigned int i = 0; i < graph.getNodesCount(); ++i) {
-        if (i != (unsigned int)start_node.getIndex()) {
-            candidate_indices.push_back(i);
-        }
+    // First compare distances
+    if (distanceA != distanceB) {
+      return distanceA < distanceB;  // Sort by distance
+    }
+    
+    // If distances are the same, use a secondary comparison
+    return a < b; // Replace with appropriate secondary attribute
+  }
+
+};
+
+template <typename graph_t>
+std::pair<std::set<graph_t>, std::set<graph_t>>
+GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
+    
+  std::set<graph_t> candidates = {s.getData()};
+  std::set<graph_t> visited = {};
+
+  std::set<graph_t> candidates_minus_visited = getSetDifference(candidates, visited);
+  unsigned int cnt = 0;
+  while (!candidates_minus_visited.empty()) {
+
+    graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
+    float p_star_distance = euclideanDistance(p_star, xq);
+
+    for (auto xp : candidates_minus_visited) {
+      float currentDistance = euclideanDistance(xp, xq);
+      
+      if (currentDistance < p_star_distance) {
+        p_star_distance = currentDistance;
+        p_star = xp;
+      }
     }
 
+    GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
+    std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
 
-    // Get a reference to the point p
-    GraphNode<T>* p = graph.getNode(start_node.getIndex());
+    for (auto neighbor : *p_star_neighbors) {
+      candidates.insert(neighbor);
+    }
+    visited.insert(p_star);
 
-    // Repeat until we have R neighbors or candidate indices are exhausted
-    while (!candidate_indices.empty() && (int)prunedNeighbors.size() < R) {
-        // Find the closest neighbor to p within candidate_indices
-        unsigned int closest_index = candidate_indices[0];
-        float min_distance = euclideanDistance(p->getData(), graph.getNode(closest_index)->getData());
+    if (candidates.size() > (long unsigned int)L) {
 
-        for (unsigned int i = 1; i < candidate_indices.size(); ++i) {
-            unsigned int current_index = candidate_indices[i];
-            float current_distance = euclideanDistance(p->getData(), graph.getNode(current_index)->getData());
 
-            if (current_distance < min_distance) {
-                closest_index = current_index;
-                min_distance = current_distance;
-            }
-        }
+      std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
+      for (auto candidate: candidates) {
+        newCandidates.insert(candidate);
+      }
+      
+      candidates.clear();
 
-        // Get the closest node
-        GraphNode<T>* closestNode = graph.getNode(closest_index);
-
-        // Add the closest neighbor to the set of final neighbors
-        prunedNeighbors.push_back(closestNode->getData());
-        pruned_neighbors.insert(*closestNode);
-        visited_nodes.insert(*closestNode); // Add to visited nodes
-
-        // Remove the closest neighbor from candidate indices
-        candidate_indices.erase(std::remove(candidate_indices.begin(), candidate_indices.end(), closest_index), candidate_indices.end());
-
-        // Remove neighbors that do not meet the distance threshold alpha * d(p, closestNode)
-        float threshold_distance = alpha * min_distance;
-        for (auto it = candidate_indices.begin(); it != candidate_indices.end();) {
-            GraphNode<T>* candidateNode = graph.getNode(*it);
-            if (euclideanDistance(p->getData(), candidateNode->getData()) > threshold_distance) {
-                // Remove candidate if the distance exceeds the threshold
-                it = candidate_indices.erase(it);
-            } else {
-                visited_nodes.insert(*candidateNode); // Add to visited nodes
-                ++it;
-            }
-        }
-
-        // Stop if we have reached the limit R
-        if ((int)prunedNeighbors.size() == R) {
-            break;
-        }
+      auto it = newCandidates.begin();
+      for (unsigned int i = 0; i < L && it != newCandidates.end(); i++, it++) {
+        candidates.insert(*it);
+      }
+      
     }
 
-    return {visited_nodes, pruned_neighbors};
+    candidates_minus_visited = getSetDifference(candidates, visited);
+    cnt++;
+
+  }
+
+  std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
+  for (auto candidate: candidates) {
+    newCandidates.insert(candidate);
+  }
+
+  candidates.clear();
+
+  auto it = newCandidates.begin();
+  for (unsigned int i = 0; i < k && it != newCandidates.end(); i++, it++) {
+    candidates.insert(*it);
+  }
+
+  return {candidates, visited};
+
 }
 
 
-#endif /* GRAPH_FUNCTIONS_H */
+
+#endif /* GREEDY_SEARCH_H */

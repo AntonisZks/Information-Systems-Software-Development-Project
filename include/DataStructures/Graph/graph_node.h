@@ -43,7 +43,7 @@ public:
    * 
    * @param data The data to assign to this node
    */
-  void setData(node_t data) {
+  void setData(const node_t& data) {
     this->data = data;
   }
 
@@ -88,6 +88,13 @@ public:
    */
   std::vector<node_t>* getNeighbors(void) {
     return &this->neighbors;
+  }
+
+  /**
+   * @brief Clears out all the neighbors of the node
+  */
+  void clearNeighbors(void) {
+    this->neighbors.clear();
   }
 
   /**

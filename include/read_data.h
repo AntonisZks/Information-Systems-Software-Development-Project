@@ -3,7 +3,7 @@
 
 #include <vector>           // Required for std::vector
 #include <string>           // Required for std::string
-#include "../include/DataVector/DataVector.h"  // Adjust the path if necessary
+#include "DataStructures/DataVector/DataVector.h"
 
 using namespace std;        // Optional: can avoid repeating std::
 
@@ -16,7 +16,9 @@ using namespace std;        // Optional: can avoid repeating std::
  * 
  * @return A vector of DataVector<float> objects containing the read data.
  */
-vector<DataVector<float>> ReadVectorFile(const string& filename, int max_elements=-1);
+vector<DataVector<float>> ReadVectorFile(const string& filename);
+
+vector<DataVector<int>> ReadGroundTruth(const string& filename);
 
 /**
  * @brief Function to save the vector data to a text file. It iterates through each DataVector

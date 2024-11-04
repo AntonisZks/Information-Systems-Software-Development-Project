@@ -15,14 +15,15 @@ template <typename dvector_t> class DataVector {
 private:
     dvector_t* data;
     unsigned int dimension;
+    unsigned int graphIndex;
 
 public:
-    
+
     /**
      * @brief Default Constructor of the DataVector. Exists just to avoid errors.
      * Sets the data to NULL and the dimension of the vector to 0.
     */
-    DataVector(void) : data(nullptr), dimension(0) {}
+    DataVector(void) : data(nullptr), dimension(0), graphIndex(0) {}
 
     /**
      * @brief Constructor of the DataVector. Here all the properties of the Vector are
@@ -31,7 +32,7 @@ public:
      * 
      * @param dimension_ the dimension of the vector.
     */
-    DataVector(unsigned int dimension_) : dimension(dimension_) {
+    DataVector(unsigned int dimension_, unsigned int index_=0) : dimension(dimension_), graphIndex(index_) {
         this->data = new dvector_t[dimension_];
     }
 
@@ -49,7 +50,7 @@ public:
      * 
      * @param other the other vector to copy the data to
     */
-    DataVector(const DataVector& other) : dimension(other.dimension) {
+    DataVector(const DataVector& other) : dimension(other.dimension), graphIndex(other.graphIndex) {
         if (other.data) {
             this->data = new dvector_t[other.dimension];
             std::copy(other.data, other.data + other.dimension, this->data);
@@ -73,6 +74,7 @@ public:
         delete[] this->data;  // Free the existing resource
 
         this->dimension = other.dimension;
+        this->graphIndex = other.graphIndex;
         if (other.data) {
             this->data = new dvector_t[other.dimension];
             std::copy(other.data, other.data + other.dimension, this->data);
@@ -90,7 +92,7 @@ public:
      * 
      * @param other the other vector to transfer the data from
     */
-    DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension) {
+    DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension), graphIndex(other.graphIndex) {
         other.data = nullptr;  // Prevent the original object from freeing the memory
         other.dimension = 0;
     }
@@ -115,29 +117,6 @@ public:
             other.dimension = 0;
         }
         return *this;
-    }
-
-    /**
-     * @brief Overloading the == operator for the DataVector class.
-     * 
-     * @param other the other DataVector to compare against
-     * @return true if both vectors are equal, false otherwise
-     */
-    bool operator==(const DataVector& other) const {
-        // First, check if dimensions are the same
-        if (this->dimension != other.dimension) {
-            return false;
-        }
-
-        // Then, check each element for equality
-        for (unsigned int i = 0; i < this->dimension; ++i) {
-            if (this->data[i] != other.data[i]) {
-                return false; // Found a difference, so they are not equal
-            }
-        }
-
-        // If all checks pass, the vectors are equal
-        return true;
     }
 
     /**
@@ -170,16 +149,32 @@ public:
      *         of the other DataVector; otherwise, false.
      */
     bool operator<(const DataVector& other) const {
-        
-        // Check if the dimensions are not the same
+
         if (this->dimension != other.dimension) {
+            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
-        // Otherwise check according to their individual data
-        return this->magnitude() < other.magnitude();
+        // Compare magnitudes first
+        float thisMagnitude = this->magnitude();
+        float otherMagnitude = other.magnitude();
 
+        if (thisMagnitude != otherMagnitude) {
+            return thisMagnitude < otherMagnitude;
+        }
+
+        // If magnitudes are equal, perform lexicographical comparison
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return this->data[i] < other.data[i];
+            }
+        }
+
+        // If all elements are equal, return false
+        return false;
     }
+
+
 
     /**
      * @brief Overloads the greater-than operator to compare two DataVector objects based on their Euclidean 
@@ -191,15 +186,54 @@ public:
      */
     bool operator>(const DataVector& other) const {
         
-        // Check if the dimensions are not the same
         if (this->dimension != other.dimension) {
+            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
-        // Otherwise check according to their individual data
-        return this->magnitude() > other.magnitude();
+        // Compare magnitudes first
+        float thisMagnitude = this->magnitude();
+        float otherMagnitude = other.magnitude();
 
+        if (thisMagnitude != otherMagnitude) {
+            return thisMagnitude > otherMagnitude;
+        }
+
+        // If magnitudes are equal, perform lexicographical comparison
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return this->data[i] > other.data[i];
+            }
+        }
+
+        // If all elements are equal, return false
+        return false;
     }
+
+    /**
+     * @brief Overloading the == operator for the DataVector class.
+     * 
+     * @param other the other DataVector to compare against
+     * @return true if both vectors are equal (same dimension and same data), false otherwise
+     */
+    bool operator==(const DataVector& other) const {
+
+        // First, check if dimensions are the same
+        if (this->dimension != other.dimension) {
+            return false;
+        }
+
+        // Then, check each element for equality
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return false; // Found a difference, so they are not equal
+            }
+        }
+
+        // If all checks pass, the vectors are equal
+        return true;
+    }
+
 
     /**
      * @brief Sets data at a specific index in the vector.
@@ -229,6 +263,14 @@ public:
     unsigned int getDimension() const {
         return dimension;
     }
+
+    void setIndex(const unsigned int& index) {
+        this->graphIndex = index;
+    }
+
+    unsigned int getIndex(void) const {
+        return this->graphIndex;
+    }
     
 };
 
@@ -242,22 +284,37 @@ public:
  * @return the putput stream
 */
 template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
-    
-    // Print the first 10 items inside the vector
-    out << "[";
-    for (unsigned int i = 0; i < 3; i++) {
-        out << vector.getDataAtIndex(i);
-        out << ", ";
-    }
 
-    out << "... ";
+    if (vector.getDimension() > 3) {
 
-    // Print the last 10 items inside the vector
-    for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
-        out << vector.getDataAtIndex(i);
-        out << ", ";
+        // Print the first 10 items inside the vector
+        out << "[";
+        for (unsigned int i = 0; i < 3; i++) {
+            out << vector.getDataAtIndex(i);
+            out << ", ";
+        }
+
+        out << "... ";
+
+        // Print the last 10 items inside the vector
+        for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
+            out << vector.getDataAtIndex(i);
+            out << ", ";
+        }
+        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
+
+    } else {
+
+        out << "[";
+        for (unsigned int i = 0; i < vector.getDimension(); i++) {
+            out << vector.getDataAtIndex(i);
+            if (i < vector.getDimension() - 1) {
+                out << ", ";
+            }
+        }
+        out << "] ";
+
     }
-    out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
 
     return out;
 
