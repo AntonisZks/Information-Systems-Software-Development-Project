@@ -11,6 +11,7 @@
 #include <random>
 #include "../DataStructures/Graph/graph.h"
 #include "GreedySearch.h"
+#include "RobustPrune.h"
 
 // Type Alias
 typedef GraphNode<DataVector<float>> GreedySearchNode;
@@ -40,32 +41,6 @@ template <typename set_t> static void print_set(const std::set<set_t> set) {
 }
 
 /**
- * @brief Generates a set of unique random indices, excluding a specific index.
- * 
- * @param max The maximum value for random index generation
- * @param i The index to exclude from the random selection
- * @param length The number of unique random indices to generate
- * 
- * @return A set of unique random indices of the specified length, excluding index i
- */
-static std::set<int> generateRandomIndeces(const unsigned int max, const unsigned int i, unsigned int length) {
-
-  // Initialize a set for the indeces
-  std::set<int> indeces;
-
-  // Keep asigning random integer values to the set until we reach the given length
-  while (indeces.size() < length) {
-    unsigned int randInd = rand() % max;
-    if (randInd != i) {
-        indeces.insert(randInd);
-    }
-  }
-
-  return indeces;
-
-}
-
-/**
  * @brief Fills a graph by adding edges between nodes based on random selection.
  * 
  * @param graph the graph to fill
@@ -89,21 +64,6 @@ static void fillGraphRandomly(Graph<graph_t>& graph, const unsigned int max_edge
     }
       
   }
-
-}
-
-static std::vector<int> generateRandomPermutation(const unsigned int start, const unsigned int end) {
-
-  std::vector<int> permutation;
-  for (unsigned int i = start; i <= end; i++) {
-    permutation.push_back(i);
-  }
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::shuffle(permutation.begin(), permutation.end(), gen);
-
-  return permutation;
 
 }
 
@@ -240,10 +200,61 @@ static Graph<DataVector<float>> createGraph(const std::vector<DataVector<float>>
 
 }
 
+static std::vector<int> generateRandomPermutation(const unsigned int start, const unsigned int end) {
+
+  std::vector<int> permutation;
+  for (unsigned int i = start; i <= end; i++) {
+    permutation.push_back(i);
+  }
+
+  std::mt19937 gen(42);
+  std::shuffle(permutation.begin(), permutation.end(), gen);
+
+  return permutation;
+
+}
+
 template <typename graph_t>
 Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
 
+  std::pair<std::set<graph_t>, std::set<graph_t>> greedySearchResult;
+  unsigned int n = P.size();
+
   Graph<graph_t> G = createGraph(P, R);
+  GraphNode<graph_t>* s = G.getNode(0);
+  std::vector<int> sigma = generateRandomPermutation(0, n-1);
+
+  for (unsigned int i = 0; i < n; i++) {
+    
+    std::cout << "Node " << i << "..." << std::endl;
+
+    GraphNode<graph_t>* sigma_i_node = G.getNode(sigma.at(i));
+    graph_t sigma_i = sigma_i_node->getData();
+
+    greedySearchResult = GreedySearch2(G, *s, P.at(sigma.at(i)), 1, L);
+    RobustPrune2(G, *sigma_i_node, greedySearchResult.second, alpha, R);
+
+    std::vector<graph_t>* sigma_i_neighbors = sigma_i_node->getNeighbors();
+    for (auto j : *sigma_i_neighbors) {
+      
+      std::set<graph_t> outgoing;
+      GraphNode<graph_t>* j_node = G.getNode(j.getIndex());
+
+      for (auto neighbor : *j_node->getNeighbors()) {
+        outgoing.insert(neighbor);
+      }
+      outgoing.insert(sigma_i);
+
+      if (outgoing.size() > (long unsigned int)R) {
+        RobustPrune2(G, *j_node, outgoing, alpha, R);
+      }
+      else {
+        j_node->addNeighbor(sigma_i);
+      }
+
+    }
+
+  }
 
   return G;
 

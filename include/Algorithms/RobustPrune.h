@@ -90,6 +90,7 @@ void RobustPrune2(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_
   V.erase(p);
   p_node.clearNeighbors();
 
+
   while (!V.empty()) {
 
     graph_t p_star = getSetItemAtIndex(0, V);
@@ -110,7 +111,8 @@ void RobustPrune2(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_
       break;
     }
 
-    for (auto p_tone : V) {
+    std::set<graph_t> V_copy = V;
+    for (auto p_tone : V_copy) {
       if ((alpha * euclideanDistance(p_star, p_tone)) < euclideanDistance(p, p_tone)) {
         V.erase(p_tone);
       }

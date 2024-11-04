@@ -73,21 +73,20 @@ int main(int argc, char* argv[]) {
   baseVectors.push_back(v8);
   
 
-  std::set<DataVector<float>> realNeighbors = { v4, v6, v3 };
+  std::set<DataVector<float>> realNeighbors; // { v4, v6, v3 };
 
-  Graph<DataVector<float>> G = Vamana(baseVectors, 1.2, 3, 7);
-  std::cout << G << std::endl;
+  Graph<DataVector<float>> G = Vamana(base_vectors, 1.0, 120, 14);
   GraphNode<DataVector<float>>* s = G.getNode(0);
 
-  // DataVector<int> realNearestIndeces = groundtruth_values.at(0);
-  // for (unsigned int i = 0; i < realNearestIndeces.getDimension(); i++) {
-  //   int currentIndex = realNearestIndeces.getDataAtIndex(i);
-  //   GraphNode<DataVector<float>>* currentNode = G.getNode(currentIndex);
-  //   realNeighbors.insert(currentNode->getData());
-  // }
+  DataVector<int> realNearestIndeces = groundtruth_values.at(0);
+  for (unsigned int i = 0; i < realNearestIndeces.getDimension(); i++) {
+    int currentIndex = realNearestIndeces.getDataAtIndex(i);
+    GraphNode<DataVector<float>>* currentNode = G.getNode(currentIndex);
+    realNeighbors.insert(currentNode->getData());
+  }
 
   std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
-  greedyResult = GreedySearch2(G, *s, q, 3, 5);
+  greedyResult = GreedySearch2(G, *s, query_vectors.at(0), 100, 120);
 
   std::cout << calculateRecallEvaluation(greedyResult.first, realNeighbors) << std::endl;
 
