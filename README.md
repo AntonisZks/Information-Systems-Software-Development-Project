@@ -85,7 +85,7 @@
 
 <div align="center">
   
-  <img src="images/GreedeSearch.png" alt="Alt Text" width="300" height="300"> <img src="images/RobustPrune.png" alt="Alt Text" width="300" height="300">
+  <img src="images/GreedySearch.png" alt="Alt Text" width="300" height="300"> <img src="images/RobustPrune.png" alt="Alt Text" width="300" height="300">
   <img src="images/VIA.png" alt="Alt Text" width="500" height="300">
   
 </div>
