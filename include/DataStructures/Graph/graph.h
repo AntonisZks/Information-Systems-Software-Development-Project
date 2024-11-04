@@ -6,6 +6,8 @@
 #include "graph_node.h"
 #include <numeric>  
 #include <random>
+#include "../../graphics.h"
+
 /**
  * @brief Implements a directed, unweighted graph data structure. Each node in the graph contains 
  * data of any specified type and a list of its neighbors.
@@ -228,6 +230,7 @@ std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
  */
 template<typename T>
 GraphNode<T> findMedoid(const Graph<T>& graph, int sample_size = 100) {
+
     const int node_count = graph.getNodesCount();  // Get the total number of nodes in the graph
     sample_size = std::min(sample_size, node_count);  // Ensure the sample size doesn’t exceed the total node count
 
@@ -247,15 +250,19 @@ GraphNode<T> findMedoid(const Graph<T>& graph, int sample_size = 100) {
 
     // Compute pairwise distances between each pair of sampled nodes
     for (int i = 0; i < sample_size; ++i) {
-        for (int j = i + 1; j < sample_size; ++j) {
-            // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
-            float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
-            
-            // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
-            // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
-            distance_matrix[i][j] = dist;
-            distance_matrix[j][i] = dist;
-        }
+
+      double percentage = (double)(100*i)/sample_size;
+      printProgressBar(percentage, "Computing the mediod point:     ");
+
+      for (int j = i + 1; j < sample_size; ++j) {
+        // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
+        float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
+        
+        // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
+        // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
+        distance_matrix[i][j] = dist;
+        distance_matrix[j][i] = dist;
+      }
     }
 
     // Find the medoid node among the sampled nodes by calculating the average distance for each one
@@ -264,22 +271,24 @@ GraphNode<T> findMedoid(const Graph<T>& graph, int sample_size = 100) {
 
     // Loop through each sampled node to calculate its average distance to other sampled nodes
     for (int i = 0; i < sample_size; ++i) {
-        // Calculate the total distance from node `i` to all other nodes in the sample
-        float total_distance = std::accumulate(distance_matrix[i].begin(), distance_matrix[i].end(), 0.0f);
-        
-        // Compute the average distance by dividing the total distance by the number of other nodes (sample_size - 1)
-        float average_distance = total_distance / (sample_size - 1);
+      // Calculate the total distance from node `i` to all other nodes in the sample
+      float total_distance = std::accumulate(distance_matrix[i].begin(), distance_matrix[i].end(), 0.0f);
+      
+      // Compute the average distance by dividing the total distance by the number of other nodes (sample_size - 1)
+      float average_distance = total_distance / (sample_size - 1);
 
-        // Check if this node has a smaller average distance than the smallest found so far
-        if (average_distance < min_average_distance) {
-            // Update the minimum average distance and set this node as the current medoid candidate
-            min_average_distance = average_distance;
-            medoid_node = graph.getNode(sampled_indices[i]);
-        }
+      // Check if this node has a smaller average distance than the smallest found so far
+      if (average_distance < min_average_distance) {
+        // Update the minimum average distance and set this node as the current medoid candidate
+        min_average_distance = average_distance;
+        medoid_node = graph.getNode(sampled_indices[i]);
+      }
     }
 
+    printProgressBar(100, "Computing the mediod point:     ");
 
     return *medoid_node;
+
 }
 
 

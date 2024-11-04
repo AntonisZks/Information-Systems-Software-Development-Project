@@ -27,13 +27,13 @@ double calculateRecallEvaluation(const std::set<graph_t>& X, const std::set<grap
 
   );
 
-// Compute the intersection of sets X and G, and insert the result into 'result'
-std::set_intersection(X.begin(), X.end(), G.begin(), G.end(), std::inserter(result, result.begin()));
+  // Compute the intersection of sets X and G, and insert the result into 'result'
+  std::set_intersection(X.begin(), X.end(), G.begin(), G.end(), std::inserter(result, result.begin()));
 
-// Get the size of set G
-unsigned int k = G.size();
+  // Get the size of set G
+  unsigned int k = G.size();
 
-// Return the ratio of the size of the intersection to the size of G
-return (double)result.size() / (double)k;
+  // Return the ratio of the size of the intersection to the size of G
+  return (double)result.size() / (double)k;
 
 }
