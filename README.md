@@ -115,11 +115,16 @@
 
 ### Initialization Phase
 Στο Initialization phase, γίνεται η ανάγνωση και η αποθήκευση των δεδομένων μας από τις συναρτήσεις:
+
 - `ReadVectorFile()`
 - `ReadgroundΤruth()`
+  
 Η οποίες διαβάζουν από τα αρχεία `siftsmall_base.fvecs`, `siftsmall_query.fvecs` και `siftsmall_groundtruth.ivecs` τα δεδομένα μας.
 
 ### Vamana Phase
+Σε δεύτερη φάση, ξεκινά η  δημιουργία του τυχάιου γράφου από την `Vamana()`, η οποία αναθέτει τα δεδομένα του `siftsmall_base.fvecs` σε αντικείμενα της κλάσης `node`, και ύστερα δημιουργεί τυχαίες εξερχόμενες ακμές πό καθένα από αυτούς (με όριο τον αριθμό R που ορίζουμε από την γραμμή εντολών).
+
+
 
 ### Validity Phase
 
