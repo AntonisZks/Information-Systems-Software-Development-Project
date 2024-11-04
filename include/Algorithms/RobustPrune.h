@@ -1,125 +1,71 @@
-#ifndef ROBUST_PRUNE_H
-#define ROBUST_PRUNE_H
-
-#include <iostream>
-#include <set>
-#include "../distance.h"
-#include "../DataStructures/Graph/graph.h"
-
-// RobustPrune function
-template<typename T>
-std::pair<std::set<GraphNode<T>>, std::set<GraphNode<T>>> 
-robustPrune(Graph<T>& graph, const GraphNode<T>& start_node, float alpha, int R) {
-  std::vector<T> prunedNeighbors;
-  std::set<GraphNode<T>> visited_nodes;
-  std::set<GraphNode<T>> pruned_neighbors;
-  std::vector<unsigned int> candidate_indices;
-
-  // Initialize candidate_indices with all node indices except the start node
-  for (unsigned int i = 0; i < graph.getNodesCount(); ++i) {
-    if (i != (unsigned int)start_node.getIndex()) {
-      candidate_indices.push_back(i);
-    }
-  }
-
-
-  // Get a reference to the point p
-  GraphNode<T>* p = graph.getNode(start_node.getIndex());
-
-  // Repeat until we have R neighbors or candidate indices are exhausted
-  while (!candidate_indices.empty() && (int)prunedNeighbors.size() < R) {
-    // Find the closest neighbor to p within candidate_indices
-    unsigned int closest_index = candidate_indices[0];
-    float min_distance = euclideanDistance(p->getData(), graph.getNode(closest_index)->getData());
-
-    for (unsigned int i = 1; i < candidate_indices.size(); ++i) {
-      unsigned int current_index = candidate_indices[i];
-      float current_distance = euclideanDistance(p->getData(), graph.getNode(current_index)->getData());
-
-      if (current_distance < min_distance) {
-        closest_index = current_index;
-        min_distance = current_distance;
-      }
-    }
-
-    // Get the closest node
-    GraphNode<T>* closestNode = graph.getNode(closest_index);
-
-    // Add the closest neighbor to the set of final neighbors
-    prunedNeighbors.push_back(closestNode->getData());
-    pruned_neighbors.insert(*closestNode);
-    visited_nodes.insert(*closestNode); // Add to visited nodes
-
-    // Remove the closest neighbor from candidate indices
-    candidate_indices.erase(
-      std::remove(candidate_indices.begin(), candidate_indices.end(), closest_index), candidate_indices.end()
-    );
-
-    // Remove neighbors that do not meet the distance threshold alpha * d(p, closestNode)
-    float threshold_distance = alpha * min_distance;
-    for (auto it = candidate_indices.begin(); it != candidate_indices.end();) {
-      GraphNode<T>* candidateNode = graph.getNode(*it);
-      if (euclideanDistance(p->getData(), candidateNode->getData()) > threshold_distance) {
-        // Remove candidate if the distance exceeds the threshold
-        it = candidate_indices.erase(it);
-      } else {
-        visited_nodes.insert(*candidateNode); // Add to visited nodes
-        ++it;
-      }
-    }
-
-    // Stop if we have reached the limit R
-    if ((int)prunedNeighbors.size() == R) {
-      break;
-    }
-  }
-
-  return {visited_nodes, pruned_neighbors};
-}
-
-
+/**
+ * @brief Prunes the neighbors of a given node in a graph based on a robust pruning algorithm.
+ *
+ * This function modifies the neighbors of the given node `p_node` in the graph `G` by selecting
+ * a subset of neighbors that are within a certain distance threshold defined by `alpha` and `R`.
+ *
+ * @tparam graph_t The type of the graph nodes.
+ * @param G The graph containing the node to be pruned.
+ * @param p_node The node whose neighbors are to be pruned.
+ * @param V A set of graph nodes to be considered for pruning.
+ * @param alpha A float value used as a multiplier for the distance threshold.
+ * @param R An integer specifying the maximum number of neighbors to retain.
+ *
+ * The function performs the following steps:
+ * 1. Retrieves the data of the node `p_node` and its neighbors.
+ * 2. Inserts all neighbors of `p_node` into the set `V` and clears the neighbors of `p_node`.
+ * 3. Iteratively selects the closest neighbor `p_star` from `V` to `p_node` and adds it to the neighbors of `p_node`.
+ * 4. Removes nodes from `V` that do not satisfy the distance threshold defined by `alpha`.
+ * 5. Stops when the number of neighbors of `p_node` reaches `R` or `V` is empty.
+ */
 template <typename graph_t>
-void RobustPrune2(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
+void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
+    
+    // Get the data of the node p_node
+    graph_t p = p_node.getData();
 
-  graph_t p = p_node.getData();
-
-  std::vector<graph_t>* neighbors = p_node.getNeighbors();
-  for (auto neighbor : *neighbors) {
-    V.insert(neighbor);
-  }
-  V.erase(p);
-  p_node.clearNeighbors();
-
-
-  while (!V.empty()) {
-
-    graph_t p_star = getSetItemAtIndex(0, V);
-    float p_star_distance = euclideanDistance(p, p_star);
-
-    for (auto p_tone : V) {
-      float currentDistance = euclideanDistance(p, p_tone);
-      
-      if (currentDistance < p_star_distance) {
-        p_star_distance = currentDistance;
-        p_star = p_tone;
-      }
+    // Retrieve all neighbors of p_node and insert them into set V
+    std::vector<graph_t>* neighbors = p_node.getNeighbors();
+    for (auto neighbor : *neighbors) {
+        V.insert(neighbor);
     }
+    // Remove p_node itself from V
+    V.erase(p);
+    // Clear the neighbors of p_node
+    p_node.clearNeighbors();
 
-    p_node.addNeighbor(p_star);
+    // Continue pruning until V is empty or the desired number of neighbors is reached
+    while (!V.empty()) {
 
-    if (p_node.getNeighbors()->size() == (long unsigned int)R) {
-      break;
+        // Find the closest neighbor to p_node in V
+        graph_t p_star = getSetItemAtIndex(0, V);
+        float p_star_distance = euclideanDistance(p, p_star);
+
+        // Update p_star if a closer neighbor is found
+        for (auto p_tone : V) {
+            float currentDistance = euclideanDistance(p, p_tone);
+            
+            if (currentDistance < p_star_distance) {
+                p_star_distance = currentDistance;
+                p_star = p_tone;
+            }
+        }
+
+        // Add the closest neighbor to p_node
+        p_node.addNeighbor(p_star);
+
+        // Check if the desired number of neighbors has been reached
+        if (p_node.getNeighbors()->size() == (long unsigned int)R) {
+            break;
+        }
+
+        // Create a copy of V to avoid modifying the original set during iteration
+        std::set<graph_t> V_copy = V;
+        for (auto p_tone : V_copy) {
+            // Remove neighbors that are too far from p_star based on alpha and euclideanDistance
+            if ((alpha * euclideanDistance(p_star, p_tone)) < euclideanDistance(p, p_tone)) {
+                V.erase(p_tone);
+            }
+        }
     }
-
-    std::set<graph_t> V_copy = V;
-    for (auto p_tone : V_copy) {
-      if ((alpha * euclideanDistance(p_star, p_tone)) < euclideanDistance(p, p_tone)) {
-        V.erase(p_tone);
-      }
-    }
-
-  }
-
 }
-
-#endif
