@@ -13,8 +13,6 @@
 #include <queue>
 #include <cmath>
 
-
-
 // Type Alias
 template <typename graph_t> using GraphNodeSet = std::set<GraphNode<graph_t>>;
 template <typename graph_t> using GreedySearchResult = std::pair<GraphNodeSet<graph_t>, GraphNodeSet<graph_t>>;
@@ -297,7 +295,17 @@ struct EuclideanDistanceOrder {
   EuclideanDistanceOrder(const graph_t& target) : xq(target) {}
 
   bool operator()(const graph_t& a, const graph_t& b) {
-    return euclideanDistance(a, xq) < euclideanDistance(b, xq);
+    // Calculate distances
+    double distanceA = euclideanDistance(a, xq);
+    double distanceB = euclideanDistance(b, xq);
+
+    // First compare distances
+    if (distanceA != distanceB) {
+      return distanceA < distanceB;  // Sort by distance
+    }
+    
+    // If distances are the same, use a secondary comparison
+    return a < b; // Replace with appropriate secondary attribute
   }
 
 };
@@ -313,25 +321,6 @@ GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_
   unsigned int cnt = 0;
   while (!candidates_minus_visited.empty()) {
 
-    std::cout << "------------- Execution " << cnt << "-------------" << std::endl;
-    std::cout << "L: ";
-    for (auto data : candidates) {
-      std::cout << data << ", ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "V: ";
-    for (auto data : visited) {
-      std::cout << data << ", ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "L\\V: ";
-    for (auto data : candidates_minus_visited) {
-      std::cout << data << ", ";
-    }
-    std::cout << std::endl;
-
     graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
     float p_star_distance = euclideanDistance(p_star, xq);
 
@@ -345,14 +334,7 @@ GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_
     }
 
     GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
-    std::cout << "P* found: " << p_star_node->getData() << std::endl;
     std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
-
-    std::cout << "P* Neighbors: ";
-    for (auto neighbor : *p_star_neighbors) {
-      std::cout << neighbor << ", ";
-    }
-    std::cout << std::endl;
 
     for (auto neighbor : *p_star_neighbors) {
       candidates.insert(neighbor);
@@ -361,11 +343,12 @@ GreedySearch2(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_
 
     if (candidates.size() > (long unsigned int)L) {
 
+
       std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
       for (auto candidate: candidates) {
         newCandidates.insert(candidate);
       }
-
+      
       candidates.clear();
 
       auto it = newCandidates.begin();

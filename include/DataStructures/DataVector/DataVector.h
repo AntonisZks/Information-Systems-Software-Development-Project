@@ -19,7 +19,6 @@ private:
 
 public:
 
-    
     /**
      * @brief Default Constructor of the DataVector. Exists just to avoid errors.
      * Sets the data to NULL and the dimension of the vector to 0.
@@ -33,7 +32,7 @@ public:
      * 
      * @param dimension_ the dimension of the vector.
     */
-    DataVector(unsigned int dimension_) : dimension(dimension_), graphIndex(0) {
+    DataVector(unsigned int dimension_, unsigned int index_=0) : dimension(dimension_), graphIndex(index_) {
         this->data = new dvector_t[dimension_];
     }
 
@@ -75,6 +74,7 @@ public:
         delete[] this->data;  // Free the existing resource
 
         this->dimension = other.dimension;
+        this->graphIndex = other.graphIndex;
         if (other.data) {
             this->data = new dvector_t[other.dimension];
             std::copy(other.data, other.data + other.dimension, this->data);
@@ -120,29 +120,6 @@ public:
     }
 
     /**
-     * @brief Overloading the == operator for the DataVector class.
-     * 
-     * @param other the other DataVector to compare against
-     * @return true if both vectors are equal, false otherwise
-     */
-    bool operator==(const DataVector& other) const {
-        // First, check if dimensions are the same
-        if (this->dimension != other.dimension) {
-            return false;
-        }
-
-        // Then, check each element for equality
-        for (unsigned int i = 0; i < this->dimension; ++i) {
-            if (this->data[i] != other.data[i]) {
-                return false; // Found a difference, so they are not equal
-            }
-        }
-
-        // If all checks pass, the vectors are equal
-        return true;
-    }
-
-    /**
      * @brief Calculates the Euclidean norm (magnitude) of the DataVector. Specifically it represents 
      * the vector's length in n-dimensional space. Useful for comparing vectors based on their magnitudes.
      * The Euclidean norm is calculated as:
@@ -172,17 +149,32 @@ public:
      *         of the other DataVector; otherwise, false.
      */
     bool operator<(const DataVector& other) const {
-        
-        // Check if the dimensions are not the same
+
         if (this->dimension != other.dimension) {
             std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
-        // Otherwise check according to their individual data
-        return this->magnitude() < other.magnitude();
+        // Compare magnitudes first
+        float thisMagnitude = this->magnitude();
+        float otherMagnitude = other.magnitude();
 
+        if (thisMagnitude != otherMagnitude) {
+            return thisMagnitude < otherMagnitude;
+        }
+
+        // If magnitudes are equal, perform lexicographical comparison
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return this->data[i] < other.data[i];
+            }
+        }
+
+        // If all elements are equal, return false
+        return false;
     }
+
+
 
     /**
      * @brief Overloads the greater-than operator to compare two DataVector objects based on their Euclidean 
@@ -194,16 +186,54 @@ public:
      */
     bool operator>(const DataVector& other) const {
         
-        // Check if the dimensions are not the same
         if (this->dimension != other.dimension) {
             std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
-        // Otherwise check according to their individual data
-        return this->magnitude() > other.magnitude();
+        // Compare magnitudes first
+        float thisMagnitude = this->magnitude();
+        float otherMagnitude = other.magnitude();
 
+        if (thisMagnitude != otherMagnitude) {
+            return thisMagnitude > otherMagnitude;
+        }
+
+        // If magnitudes are equal, perform lexicographical comparison
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return this->data[i] > other.data[i];
+            }
+        }
+
+        // If all elements are equal, return false
+        return false;
     }
+
+    /**
+     * @brief Overloading the == operator for the DataVector class.
+     * 
+     * @param other the other DataVector to compare against
+     * @return true if both vectors are equal (same dimension and same data), false otherwise
+     */
+    bool operator==(const DataVector& other) const {
+
+        // First, check if dimensions are the same
+        if (this->dimension != other.dimension) {
+            return false;
+        }
+
+        // Then, check each element for equality
+        for (unsigned int i = 0; i < this->dimension; ++i) {
+            if (this->data[i] != other.data[i]) {
+                return false; // Found a difference, so they are not equal
+            }
+        }
+
+        // If all checks pass, the vectors are equal
+        return true;
+    }
+
 
     /**
      * @brief Sets data at a specific index in the vector.
@@ -271,7 +301,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
             out << vector.getDataAtIndex(i);
             out << ", ";
         }
-        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]" << "(" << vector.getIndex() << ")";
+        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
 
     } else {
 
@@ -282,7 +312,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
                 out << ", ";
             }
         }
-        out << "] " << "(" << vector.getIndex() <<  ")";
+        out << "] ";
 
     }
 

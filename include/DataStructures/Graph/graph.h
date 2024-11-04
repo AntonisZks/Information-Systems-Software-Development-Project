@@ -44,7 +44,7 @@ public:
    * @param index Index of the node
    * @param data Data to assign to the node
    */
-  void setNodeData(unsigned int index, const graph_t data) {
+  void setNodeData(unsigned int index, const graph_t& data) {
     this->nodes[index].setData(data);
   }
 

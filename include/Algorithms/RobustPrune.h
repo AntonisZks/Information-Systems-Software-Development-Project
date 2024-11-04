@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <set>
+#include "../distance.h"
 #include "../DataStructures/Graph/graph.h"
 
 // RobustPrune function
@@ -74,6 +75,49 @@ robustPrune(Graph<T>& graph, const GraphNode<T>& start_node, float alpha, int R)
   }
 
   return {visited_nodes, pruned_neighbors};
+}
+
+
+template <typename graph_t>
+void RobustPrune2(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
+
+  graph_t p = p_node.getData();
+
+  std::vector<graph_t>* neighbors = p_node.getNeighbors();
+  for (auto neighbor : *neighbors) {
+    V.insert(neighbor);
+  }
+  V.erase(p);
+  p_node.clearNeighbors();
+
+  while (!V.empty()) {
+
+    graph_t p_star = getSetItemAtIndex(0, V);
+    float p_star_distance = euclideanDistance(p, p_star);
+
+    for (auto p_tone : V) {
+      float currentDistance = euclideanDistance(p, p_tone);
+      
+      if (currentDistance < p_star_distance) {
+        p_star_distance = currentDistance;
+        p_star = p_tone;
+      }
+    }
+
+    p_node.addNeighbor(p_star);
+
+    if (p_node.getNeighbors()->size() == (long unsigned int)R) {
+      break;
+    }
+
+    for (auto p_tone : V) {
+      if ((alpha * euclideanDistance(p_star, p_tone)) < euclideanDistance(p, p_tone)) {
+        V.erase(p_tone);
+      }
+    }
+
+  }
+
 }
 
 #endif

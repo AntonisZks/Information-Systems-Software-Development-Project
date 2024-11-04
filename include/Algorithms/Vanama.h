@@ -176,4 +176,77 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
 
 }
 
+/**
+ * @brief Generates a set of unique random indices, excluding a specific index.
+ * 
+ * @param max The maximum value for random index generation
+ * @param i The index to exclude from the random selection
+ * @param length The number of unique random indices to generate
+ * 
+ * @return A set of unique random indices of the specified length, excluding index i
+ */
+static std::set<int> generateRandomIndices(const unsigned int max, const unsigned int i, unsigned int length) {
+    // Initialize a set for the indices
+    std::set<int> indices;
+
+    // Static random number generator with a fixed seed
+    static std::mt19937 generator(42);  // Seed with a fixed value for consistent randomness
+    std::uniform_int_distribution<unsigned int> distribution(0, max - 1);
+
+    // Keep assigning random integer values to the set until we reach the given length
+    while (indices.size() < length) {
+        unsigned int randInd = distribution(generator);
+        if (randInd != i) {
+            indices.insert(randInd);
+        }
+    }
+
+    return indices;
+}
+
+/**
+ * @brief Creates a graph from a dataset of vectors, adding edges between nodes based on random selection.
+ * 
+ * @param base_vectors A vector of data vectors to populate the graph nodes
+ * @param max_edges The maximum number of edges per node
+ * 
+ * @return A graph with nodes connected by randomly assigned edges
+ */
+static Graph<DataVector<float>> createGraph(const std::vector<DataVector<float>>& base_vectors, unsigned int max_edges) {
+
+  // Initialize a graph and insert all the vectors from the base vectors dataset 
+  Graph<DataVector<float>> graph(base_vectors.size());
+  for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
+    graph.setNodeData(i, base_vectors.at(i));
+  }
+  
+  // Fill the graph randomly
+  for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
+      
+    // Generate a random range of indeces and apply those indeces as neighbors for the current node
+    std::set<int> indeces = generateRandomIndices(graph.getNodesCount(), i, max_edges);
+
+    for (unsigned int j = 0; j < indeces.size(); j++) {
+      std::set<int>::iterator it = indeces.begin();
+      std::advance(it, j);
+      auto currentIndex = *it;
+
+      graph.connectNodesByIndex(i, currentIndex);
+    }
+      
+  }
+
+  return graph;
+
+}
+
+template <typename graph_t>
+Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
+
+  Graph<graph_t> G = createGraph(P, R);
+
+  return G;
+
+}
+
 #endif /* VAMANA_H */
