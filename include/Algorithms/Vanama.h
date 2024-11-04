@@ -9,9 +9,10 @@
 #include <set>
 #include <algorithm>
 #include <random>
-#include "../DataStructures/Graph/graph.h"
 #include "GreedySearch.h"
 #include "RobustPrune.h"
+#include "../graphics.h"
+#include "../DataStructures/Graph/graph.h"
 
 // DECLARATIONS
 
@@ -125,18 +126,19 @@ Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
 
   // Initialize G to a random R-regular directed graph
   Graph<graph_t> G = createGraph(P, R);
-  GraphNode<graph_t>* s = G.getNode(0);
+  GraphNode<graph_t> s = findMedoid(G, 10000);
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
   for (unsigned int i = 0; i < n; i++) {
     
-    std::cout << "Node " << i << "..." << std::endl;
+    double percentage = (double)(100*i)/n;
+    printProgressBar(percentage, "Vamana Index Creation Progress: ");
     
     GraphNode<graph_t>* sigma_i_node = G.getNode(sigma.at(i));
     graph_t sigma_i = sigma_i_node->getData();
 
     // Run Greedy Search and Robust Prune
-    greedySearchResult = GreedySearch(G, *s, P.at(sigma.at(i)), 1, L);
+    greedySearchResult = GreedySearch(G, s, P.at(sigma.at(i)), 1, L);
     RobustPrune(G, *sigma_i_node, greedySearchResult.second, alpha, R);
 
     // Get the neighbors of the sigma[i] node and iterate over them
@@ -163,6 +165,8 @@ Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
     }
 
   }
+
+  printProgressBar(100, "Vamana Index Creation Progress: ");
 
   // Return the constructed Graph
   return G;

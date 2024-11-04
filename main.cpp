@@ -85,14 +85,15 @@ int main(int argc, char* argv[]) {
   Graph<DataVector<float>> G = Vamana(base_vectors, alpha, L, R);
 
   // Run the Greedy Search Algorithm in order to evaluate the results
-  GraphNode<DataVector<float>>* s = G.getNode(0);
+  GraphNode<DataVector<float>> s = findMedoid(G, 10000);
   std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
 
   // Evaluate the results using the recall evaluation function
-  greedyResult = GreedySearch(G, *s, query_vectors.at(query_number), k, L);
+  greedyResult = GreedySearch(G, s, query_vectors.at(query_number), k, L);
   float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
 
-  std::cout << "Recall: " << recall*100 << "%" << std::endl;
+  std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
+  std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
 
   return 0;
 
