@@ -44,6 +44,8 @@ vector<DataVector<float>> ReadVectorFile(const string& filename, int max_element
             dataVector.setDataAtIndex(value, i);  // Set the data at the respective index
         }
 
+        dataVector.setIndex(nb_vectors); // Set the index of the data vector for easy and fast accessing
+
         // Add the DataVector object to the vector
         dataVectors.push_back(dataVector);
         nb_vectors++;

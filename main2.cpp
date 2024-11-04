@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
   // Create the graph and get its first node
   GreedySearchGraph graph = createGraph(base_vectors, 10);
 
-  Create_Vamana_Index(graph, 1.5, 2, 3);
+  Create_Vamana_Index(graph, 2, 200, 60);
 
   std::cout << graph << std::endl;
 

@@ -15,6 +15,7 @@ template <typename dvector_t> class DataVector {
 private:
     dvector_t* data;
     unsigned int dimension;
+    unsigned int index; // Used to locate easily inside the graph
 
 public:
     
@@ -22,7 +23,7 @@ public:
      * @brief Default Constructor of the DataVector. Exists just to avoid errors.
      * Sets the data to NULL and the dimension of the vector to 0.
     */
-    DataVector(void) : data(nullptr), dimension(0) {}
+    DataVector(void) : data(nullptr), dimension(0), index(0) {}
 
     /**
      * @brief Constructor of the DataVector. Here all the properties of the Vector are
@@ -31,7 +32,7 @@ public:
      * 
      * @param dimension_ the dimension of the vector.
     */
-    DataVector(unsigned int dimension_) : dimension(dimension_) {
+    DataVector(unsigned int dimension_) : dimension(dimension_), index(0) {
         this->data = new dvector_t[dimension_];
     }
 
@@ -49,7 +50,7 @@ public:
      * 
      * @param other the other vector to copy the data to
     */
-    DataVector(const DataVector& other) : dimension(other.dimension) {
+    DataVector(const DataVector& other) : dimension(other.dimension), index(other.index) {
         if (other.data) {
             this->data = new dvector_t[other.dimension];
             std::copy(other.data, other.data + other.dimension, this->data);
@@ -90,7 +91,7 @@ public:
      * 
      * @param other the other vector to transfer the data from
     */
-    DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension) {
+    DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension), index(other.index) {
         other.data = nullptr;  // Prevent the original object from freeing the memory
         other.dimension = 0;
     }
@@ -228,6 +229,24 @@ public:
     */
     unsigned int getDimension() const {
         return dimension;
+    }
+
+    /**
+     * @brief Sets the index of thr DataVector.
+     * 
+     * @param index the index
+    */
+    void setIndex(const unsigned int index) {
+        this->index = index;
+    }
+
+    /**
+     * @brief Returns the index of the DataVector.
+     * 
+     * @return the index
+    */
+    unsigned int getIndex(void) const {
+        return this->index;
     }
     
 };
