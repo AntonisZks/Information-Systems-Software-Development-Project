@@ -3,7 +3,6 @@
 #include <algorithm>
 #include "../DataStructures/DataVector/DataVector.h"
 
-
 /**
  * @brief Calculates the recall between two sets of items. Recall is a measure of how many relevant items 
  * were retrieved out of the total relevant items.
@@ -28,8 +27,13 @@ double calculateRecallEvaluation(const std::set<graph_t>& X, const std::set<grap
 
   );
 
-  unsigned int k = G.size();
+// Compute the intersection of sets X and G, and insert the result into 'result'
+std::set_intersection(X.begin(), X.end(), G.begin(), G.end(), std::inserter(result, result.begin()));
 
-  return static_cast<double>(result.size()) / static_cast<double>(k);
+// Get the size of set G
+unsigned int k = G.size();
+
+// Return the ratio of the size of the intersection to the size of G
+return (double)result.size() / (double)k;
 
 }

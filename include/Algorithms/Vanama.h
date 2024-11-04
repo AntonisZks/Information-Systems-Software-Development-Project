@@ -137,7 +137,7 @@ Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
 
     // Run Greedy Search and Robust Prune
     greedySearchResult = GreedySearch(G, *s, P.at(sigma.at(i)), 1, L);
-    RobustPrune2(G, *sigma_i_node, greedySearchResult.second, alpha, R);
+    RobustPrune(G, *sigma_i_node, greedySearchResult.second, alpha, R);
 
     // Get the neighbors of the sigma[i] node and iterate over them
     std::vector<graph_t>* sigma_i_neighbors = sigma_i_node->getNeighbors();
@@ -154,7 +154,7 @@ Graph<graph_t> Vamana(std::vector<graph_t>& P, float alpha, int L, int R) {
 
       // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune
       if (outgoing.size() > (long unsigned int)R) {
-        RobustPrune2(G, *j_node, outgoing, alpha, R);
+        RobustPrune(G, *j_node, outgoing, alpha, R);
       }
       else {
         j_node->addNeighbor(sigma_i);

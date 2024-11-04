@@ -4,7 +4,8 @@
 #include <iostream>
 #include <vector>
 #include "graph_node.h"
-
+#include <numeric>  
+#include <random>
 /**
  * @brief Implements a directed, unweighted graph data structure. Each node in the graph contains 
  * data of any specified type and a list of its neighbors.
@@ -212,5 +213,74 @@ std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
   return output;
 
 }
+
+
+/**
+ * @brief Finds the medoid node in the graph using a sample of nodes.
+ *
+ * The medoid is the node with the minimum average distance to all other nodes in the sample.
+ * This function uses Euclidean distance to calculate the distances between nodes.
+ *
+ * @tparam T The type of data stored in the graph nodes.
+ * @param graph The graph from which to find the medoid.
+ * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
+ * @return The medoid node of the sampled nodes.
+ */
+template<typename T>
+GraphNode<T> findMedoid(const Graph<T>& graph, int sample_size = 100) {
+    const int node_count = graph.getNodesCount();  // Get the total number of nodes in the graph
+    sample_size = std::min(sample_size, node_count);  // Ensure the sample size doesn’t exceed the total node count
+
+    // Create a list of all node indices and shuffle it to select a random subset
+    std::vector<int> sampled_indices(node_count);  // Vector to hold indices from 0 to node_count - 1
+    std::iota(sampled_indices.begin(), sampled_indices.end(), 0);  // Fill the vector with sequential numbers (0, 1, ..., node_count - 1)
+    
+    // Randomly shuffle the indices to select a random subset of nodes
+    std::shuffle(sampled_indices.begin(), sampled_indices.end(), std::mt19937{std::random_device{}()});
+    
+    // Resize the vector to contain only `sample_size` elements, representing the sampled subset of nodes
+    sampled_indices.resize(sample_size);
+
+    // Initialize a distance matrix for the sampled nodes
+    // This matrix will store the pairwise distances between each pair of sampled nodes
+    std::vector<std::vector<float>> distance_matrix(sample_size, std::vector<float>(sample_size, 0.0));
+
+    // Compute pairwise distances between each pair of sampled nodes
+    for (int i = 0; i < sample_size; ++i) {
+        for (int j = i + 1; j < sample_size; ++j) {
+            // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
+            float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
+            
+            // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
+            // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
+            distance_matrix[i][j] = dist;
+            distance_matrix[j][i] = dist;
+        }
+    }
+
+    // Find the medoid node among the sampled nodes by calculating the average distance for each one
+    float min_average_distance = std::numeric_limits<float>::max();  // Initialize with a large value to find minimum
+    GraphNode<T>* medoid_node = nullptr;  // Pointer to the node with the minimum average distance (the medoid)
+
+    // Loop through each sampled node to calculate its average distance to other sampled nodes
+    for (int i = 0; i < sample_size; ++i) {
+        // Calculate the total distance from node `i` to all other nodes in the sample
+        float total_distance = std::accumulate(distance_matrix[i].begin(), distance_matrix[i].end(), 0.0f);
+        
+        // Compute the average distance by dividing the total distance by the number of other nodes (sample_size - 1)
+        float average_distance = total_distance / (sample_size - 1);
+
+        // Check if this node has a smaller average distance than the smallest found so far
+        if (average_distance < min_average_distance) {
+            // Update the minimum average distance and set this node as the current medoid candidate
+            min_average_distance = average_distance;
+            medoid_node = graph.getNode(sampled_indices[i]);
+        }
+    }
+
+
+    return *medoid_node;
+}
+
 
 #endif /* GRAPH_H */
