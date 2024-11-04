@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "../include/DataStructures/DataVector/DataVector.h"
+#include "../include/read_data.h"
 
 using namespace std;
 

@@ -123,7 +123,11 @@ int main(int argc, char* argv[]) {
   std::string groundtruth_file = argv[3];
   
   // Receive the data vectors from the dataset files
-
+  std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_file);
+  std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_file);  
+  std::vector<DataVector<int>> groundtruth_values = ReadGroundTruth(groundtruth_file);
+  
+  
 
   return 0;
 }
