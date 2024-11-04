@@ -15,15 +15,16 @@ template <typename dvector_t> class DataVector {
 private:
     dvector_t* data;
     unsigned int dimension;
-    unsigned int index; // Used to locate easily inside the graph
+    unsigned int graphIndex;
 
 public:
+
     
     /**
      * @brief Default Constructor of the DataVector. Exists just to avoid errors.
      * Sets the data to NULL and the dimension of the vector to 0.
     */
-    DataVector(void) : data(nullptr), dimension(0), index(0) {}
+    DataVector(void) : data(nullptr), dimension(0), graphIndex(0) {}
 
     /**
      * @brief Constructor of the DataVector. Here all the properties of the Vector are
@@ -32,7 +33,7 @@ public:
      * 
      * @param dimension_ the dimension of the vector.
     */
-    DataVector(unsigned int dimension_) : dimension(dimension_), index(0) {
+    DataVector(unsigned int dimension_) : dimension(dimension_), graphIndex(0) {
         this->data = new dvector_t[dimension_];
     }
 
@@ -50,7 +51,7 @@ public:
      * 
      * @param other the other vector to copy the data to
     */
-    DataVector(const DataVector& other) : dimension(other.dimension), index(other.index) {
+    DataVector(const DataVector& other) : dimension(other.dimension), graphIndex(other.graphIndex) {
         if (other.data) {
             this->data = new dvector_t[other.dimension];
             std::copy(other.data, other.data + other.dimension, this->data);
@@ -91,7 +92,7 @@ public:
      * 
      * @param other the other vector to transfer the data from
     */
-    DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension), index(other.index) {
+    DataVector(DataVector&& other) noexcept : data(other.data), dimension(other.dimension), graphIndex(other.graphIndex) {
         other.data = nullptr;  // Prevent the original object from freeing the memory
         other.dimension = 0;
     }
@@ -174,6 +175,7 @@ public:
         
         // Check if the dimensions are not the same
         if (this->dimension != other.dimension) {
+            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
@@ -194,6 +196,7 @@ public:
         
         // Check if the dimensions are not the same
         if (this->dimension != other.dimension) {
+            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
@@ -231,22 +234,12 @@ public:
         return dimension;
     }
 
-    /**
-     * @brief Sets the index of thr DataVector.
-     * 
-     * @param index the index
-    */
-    void setIndex(const unsigned int index) {
-        this->index = index;
+    void setIndex(const unsigned int& index) {
+        this->graphIndex = index;
     }
 
-    /**
-     * @brief Returns the index of the DataVector.
-     * 
-     * @return the index
-    */
     unsigned int getIndex(void) const {
-        return this->index;
+        return this->graphIndex;
     }
     
 };
@@ -278,7 +271,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
             out << vector.getDataAtIndex(i);
             out << ", ";
         }
-        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
+        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]" << "(" << vector.getIndex() << ")";
 
     } else {
 

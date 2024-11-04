@@ -133,14 +133,14 @@ int main(int argc, char* argv[]) {
   
 
 
-  DataVector<float> v1(2); v1.setDataAtIndex(1, 0); v1.setDataAtIndex(1, 1);
-  DataVector<float> v2(2); v2.setDataAtIndex(1, 0); v2.setDataAtIndex(3, 1);
-  DataVector<float> v3(2); v3.setDataAtIndex(2, 0); v3.setDataAtIndex(4, 1);
-  DataVector<float> v4(2); v4.setDataAtIndex(4, 0); v4.setDataAtIndex(2, 1);
-  DataVector<float> v5(2); v5.setDataAtIndex(4, 0); v5.setDataAtIndex(6, 1);
-  DataVector<float> v6(2); v6.setDataAtIndex(5, 0); v6.setDataAtIndex(3, 1);
-  DataVector<float> v7(2); v7.setDataAtIndex(6, 0); v7.setDataAtIndex(5, 1);
-  DataVector<float> v8(2); v8.setDataAtIndex(7, 0); v8.setDataAtIndex(1, 1);
+  DataVector<float> v1(2); v1.setDataAtIndex(1, 0); v1.setDataAtIndex(1, 1); v1.setIndex(0);
+  DataVector<float> v2(2); v2.setDataAtIndex(1, 0); v2.setDataAtIndex(3, 1); v2.setIndex(1);
+  DataVector<float> v3(2); v3.setDataAtIndex(2, 0); v3.setDataAtIndex(4, 1); v3.setIndex(2);
+  DataVector<float> v4(2); v4.setDataAtIndex(4, 0); v4.setDataAtIndex(2, 1); v4.setIndex(3);
+  DataVector<float> v5(2); v5.setDataAtIndex(4, 0); v5.setDataAtIndex(6, 1); v5.setIndex(4);
+  DataVector<float> v6(2); v6.setDataAtIndex(5, 0); v6.setDataAtIndex(3, 1); v6.setIndex(5);
+  DataVector<float> v7(2); v7.setDataAtIndex(6, 0); v7.setDataAtIndex(5, 1); v7.setIndex(6);
+  DataVector<float> v8(2); v8.setDataAtIndex(7, 0); v8.setDataAtIndex(1, 1); v8.setIndex(7);
 
   DataVector<float> q(2); q.setDataAtIndex(4, 0); q.setDataAtIndex(3, 1);
   
@@ -160,20 +160,20 @@ int main(int argc, char* argv[]) {
 
   std::cout << G << std::endl;
 
-  std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
-  greedyResult = GreedySearch2(G, *s, q, 3, 5);
+  // std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
+  // greedyResult = GreedySearch2(G, *s, q, 3, 5);
 
-  std::cout << "Candidates: ";
-  for (auto value : greedyResult.first) {
-    std::cout << value;
-  }
-  std::cout << std::endl;
+  // std::cout << "Candidates: ";
+  // for (auto value : greedyResult.first) {
+  //   std::cout << value;
+  // }
+  // std::cout << std::endl;
 
-  std::cout << "Visited: ";
-  for (auto value : greedyResult.second) {
-    std::cout << value;
-  }
-  std::cout << std::endl;
+  // std::cout << "Visited: ";
+  // for (auto value : greedyResult.second) {
+  //   std::cout << value;
+  // }
+  // std::cout << std::endl;
   
 
   return 0;
