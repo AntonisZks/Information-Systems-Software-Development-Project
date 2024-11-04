@@ -114,6 +114,8 @@
 Η εκτέλεση του **Vamana Indexing Algorithm** γίνεται σε τρεις φάσεις:
 
 ### Initialization Phase
+Στο Initialization phase, γίνεται η ανάγνωση και η αποθήκευση των δεδομένων μας από τις συναρτήσεις:
+- `ReadVectorFile()`
 
 ### Vamana Phase
 
