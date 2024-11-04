@@ -287,7 +287,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
 
     if (vector.getDimension() > 3) {
 
-        // Print the first 10 items inside the vector
+        // Print the first 3 items inside the vector
         out << "[";
         for (unsigned int i = 0; i < 3; i++) {
             out << vector.getDataAtIndex(i);
@@ -296,7 +296,7 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
 
         out << "... ";
 
-        // Print the last 10 items inside the vector
+        // Print the last 3 items inside the vector
         for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
             out << vector.getDataAtIndex(i);
             out << ", ";
@@ -304,7 +304,8 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
         out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
 
     } else {
-
+        
+        // Print the whole vector
         out << "[";
         for (unsigned int i = 0; i < vector.getDimension(); i++) {
             out << vector.getDataAtIndex(i);

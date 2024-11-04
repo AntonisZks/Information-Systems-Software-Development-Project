@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
   std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
 
   // Evaluate the results using the recall evaluation function
-  greedyResult = GreedySearch2(G, *s, query_vectors.at(0), 100, 120);
+  greedyResult = GreedySearch(G, *s, query_vectors.at(0), 100, 120);
   float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
 
   std::cout << "Recall: " << recall*100 << "%" << std::endl;
