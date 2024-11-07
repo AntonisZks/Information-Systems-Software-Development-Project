@@ -156,6 +156,22 @@ public:
 
   }
 
+  void test(
+    const unsigned int k, const unsigned int L, const std::vector<vamana_t>& query_vectors, 
+    const unsigned int& query_number, const std::set<vamana_t>& realNeighbors) 
+  {
+
+    using GreedyResult = std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>>;
+
+    GraphNode<DataVector<float>> s = findMedoid(this->G, 10000);
+    GreedyResult greedyResult = GreedySearch(this->G, s, query_vectors.at(query_number), k, L);
+    float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
+
+    std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
+    std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
+  
+  }
+
 };
 
 template <typename vamana_t>

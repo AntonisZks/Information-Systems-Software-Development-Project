@@ -85,15 +85,7 @@ int main(int argc, char* argv[]) {
 
   VamanaIndex<DataVector<float>> index;
   index.createGraph(base_vectors, alpha, L, R);
-
-  // GraphNode<DataVector<float>> s = findMedoid(index.getGraph(), 10000);
-  // std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
-
-  // greedyResult = GreedySearch(index.getGraph(), s, query_vectors.at(query_number), k, L);
-  // float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
-
-  // std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
-  // std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
+  index.test(k, L, query_vectors, 0, realNeighbors);
 
   return 0;
 
