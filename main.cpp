@@ -9,8 +9,9 @@
 #include "include/DataStructures/DataVector/DataVector.h"
 #include "include/Algorithms/GreedySearch.h"
 #include "include/Algorithms/GreedySearch.h"
-#include "include/Algorithms/Vanama.h"
+// #include "include/Algorithms/Vanama.h"
 #include "include/Evaluation/recall.h"
+#include "include/Algorithms/VamanaIndex.h"
 
 /**
  * @brief Retrieves the exact nearest neighbors for a specific query vector
@@ -81,19 +82,18 @@ int main(int argc, char* argv[]) {
   // Get the exact nearest neighbors
   std::set<DataVector<float>> realNeighbors = getExactNearestNeighbors(base_vectors, groundtruth_values, query_number);
 
-  // Creating the Vamana Indexing Graph
-  Graph<DataVector<float>> G = Vamana(base_vectors, alpha, L, R);
 
-  // Run the Greedy Search Algorithm in order to evaluate the results
-  GraphNode<DataVector<float>> s = findMedoid(G, 10000);
-  std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
+  VamanaIndex<DataVector<float>> index;
+  index.createGraph(base_vectors, alpha, L, R);
 
-  // Evaluate the results using the recall evaluation function
-  greedyResult = GreedySearch(G, s, query_vectors.at(query_number), k, L);
-  float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
+  // GraphNode<DataVector<float>> s = findMedoid(index.getGraph(), 10000);
+  // std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> greedyResult;
 
-  std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
-  std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
+  // greedyResult = GreedySearch(index.getGraph(), s, query_vectors.at(query_number), k, L);
+  // float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
+
+  // std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
+  // std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
 
   return 0;
 
