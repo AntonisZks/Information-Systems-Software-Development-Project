@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <fstream>
+#include <sstream>
 #include "../DataStructures/Graph/graph.h"
 #include "GreedySearch.h"
 #include "RobustPrune.h"
@@ -115,7 +117,7 @@ public:
     // // Initialize the graph to a random R-regular directed graph
     this->fillGraphNodes();
     this->createRandomEdges(R);
-    GraphNode<vamana_t> s = findMedoid(this->G, 10000);
+    GraphNode<vamana_t> s = findMedoid(this->G, 1000);
     std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
     for (unsigned int i = 0; i < n; i++) {
@@ -145,7 +147,8 @@ public:
         // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune
         if (outgoing.size() > (long unsigned int)R) {
           RobustPrune(this->G, *j_node, outgoing, alpha, R);
-        } else {
+        } 
+        else {
           j_node->addNeighbor(sigma_i);
         }
       }
@@ -156,6 +159,41 @@ public:
 
   }
 
+  void saveGraph(const std::string& filename) {
+
+    std::ofstream outFile(filename, std::ios::binary);
+    if (!outFile) {
+      std::cerr << "Error opening file for writing." << std::endl;
+      return;
+    }
+
+    // Save the nodes count of the graph, and its data
+    outFile << this->G.getNodesCount() << std::endl;
+    for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
+      
+      // Store the current node index and get its neighbors
+      outFile << i;
+      GraphNode<vamana_t>* currentNode = this->G.getNode(i);
+      std::vector<vamana_t>* neighbors = currentNode->getNeighbors();
+
+      // Store every neighbor of the current node
+      outFile << " " << neighbors->size();
+      for (const auto& neighbor : *neighbors) {
+        outFile << " " << neighbor;
+      }
+     
+      outFile << std::endl; // Newline to seperate each node's neighbors
+    
+    }
+
+  }
+
+  void loadGraph(const std::string& filename) {
+
+    // TODO: implement the loading functionality
+
+  }
+
   void test(
     const unsigned int k, const unsigned int L, const std::vector<vamana_t>& query_vectors, 
     const unsigned int& query_number, const std::set<vamana_t>& realNeighbors) 
@@ -163,7 +201,7 @@ public:
 
     using GreedyResult = std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>>;
 
-    GraphNode<DataVector<float>> s = findMedoid(this->G, 10000);
+    GraphNode<DataVector<float>> s = findMedoid(this->G, 1000);
     GreedyResult greedyResult = GreedySearch(this->G, s, query_vectors.at(query_number), k, L);
     float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
 
