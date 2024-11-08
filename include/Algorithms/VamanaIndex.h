@@ -172,16 +172,25 @@ public:
     for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
       
       // Store the current node index and get its neighbors
-      outFile << i;
       GraphNode<vamana_t>* currentNode = this->G.getNode(i);
-      std::vector<vamana_t>* neighbors = currentNode->getNeighbors();
+      outFile << *currentNode;
+      
+      outFile << std::endl; // Newline to seperate each node's neighbors
+    
+    }
 
-      // Store every neighbor of the current node
-      outFile << " " << neighbors->size();
-      for (const auto& neighbor : *neighbors) {
-        outFile << " " << neighbor;
+    for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
+    
+      GraphNode<vamana_t>* currentNode = this->G.getNode(i);
+      
+      std::vector<vamana_t>* neighbors = currentNode->getNeighbors();
+      unsigned int neighborsCount = neighbors->size();
+
+      outFile << neighborsCount;
+      for (unsigned int j = 0; j < neighborsCount; j++) {
+        outFile << " " << neighbors->at(j);
       }
-     
+
       outFile << std::endl; // Newline to seperate each node's neighbors
     
     }
@@ -202,19 +211,35 @@ public:
     
     this->G.setNodesCount(nodesCount);
 
-    unsigned int nodeIndex;
-    while (inFile >> nodeIndex) {
+    for (unsigned int i = 0; i < nodesCount; i++) {
+
+      double percentage = (double)(100*i)/nodesCount;
+      printProgressBar(percentage, "Loading vertices:               ");
+
+      vamana_t currentData;
+      inFile >> currentData;
+      currentData.setIndex(i);
+      this->G.setNodeData(i, currentData);
+    }
+    printProgressBar(100, "Loading vertices:               ");
+
+    for (unsigned int i = 0; i < nodesCount; i++) {
+
+      double percentage = (double)(100*i)/nodesCount;
+      printProgressBar(percentage, "Loading edges:                  ");
+
       unsigned int neighborsCount;
       inFile >> neighborsCount;
 
       for (unsigned int j = 0; j < neighborsCount; j++) {
-        vamana_t currentNeighbor;
-        inFile >> currentNeighbor;
-
-        this->G.setNodeData(nodeIndex, currentNeighbor);
-        
+        vamana_t currentData;
+        inFile >> currentData;
+        unsigned int neighborIndex = this->G.getNodeWithData(currentData)->getIndex();
+        this->G.connectNodesByIndex(i, neighborIndex);
       }
+
     }
+    printProgressBar(100, "Loading edges:                  ");
 
   }
 

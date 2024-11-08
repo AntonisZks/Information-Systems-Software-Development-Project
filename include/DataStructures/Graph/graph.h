@@ -69,6 +69,9 @@ public:
     this->nodesCount = nodesCount;
     delete [] this->nodes;
     this->nodes = new GraphNode<graph_t>[nodesCount];
+    for (unsigned int i = 0; i < nodesCount; i++) {
+      this->nodes[i].setIndex(i);
+    }
   }
 
   /**

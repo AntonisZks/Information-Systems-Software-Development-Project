@@ -153,7 +153,6 @@ public:
     bool operator<(const DataVector& other) const {
 
         if (this->dimension != other.dimension) {
-            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
@@ -189,7 +188,6 @@ public:
     bool operator>(const DataVector& other) const {
         
         if (this->dimension != other.dimension) {
-            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
