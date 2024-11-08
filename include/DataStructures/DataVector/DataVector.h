@@ -23,7 +23,9 @@ public:
      * @brief Default Constructor of the DataVector. Exists just to avoid errors.
      * Sets the data to NULL and the dimension of the vector to 0.
     */
-    DataVector(void) : data(nullptr), dimension(0), graphIndex(0) {}
+    DataVector(void) : data(nullptr), dimension(0), graphIndex(0) {
+        this->data = new dvector_t[0];
+    }
 
     /**
      * @brief Constructor of the DataVector. Here all the properties of the Vector are
@@ -151,7 +153,6 @@ public:
     bool operator<(const DataVector& other) const {
 
         if (this->dimension != other.dimension) {
-            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
@@ -187,7 +188,6 @@ public:
     bool operator>(const DataVector& other) const {
         
         if (this->dimension != other.dimension) {
-            std::cout << this->dimension << " " << other.dimension << std::endl;
             throw std::invalid_argument("Vectors must have the same dimension for comparison");
         }
 
@@ -264,6 +264,12 @@ public:
         return dimension;
     }
 
+    void setDimension(const unsigned int dimension) {
+        this->dimension = dimension;
+        delete [] this->data;
+        this->data = new dvector_t[dimension];
+    }
+
     void setIndex(const unsigned int& index) {
         this->graphIndex = index;
     }
@@ -283,42 +289,80 @@ public:
  * 
  * @return the putput stream
 */
-template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
+template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector) {
 
-    if (vector.getDimension() > 3) {
-
-        // Print the first 3 items inside the vector
-        out << "[";
-        for (unsigned int i = 0; i < 3; i++) {
-            out << vector.getDataAtIndex(i);
-            out << ", ";
-        }
-
-        out << "... ";
-
-        // Print the last 3 items inside the vector
-        for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
-            out << vector.getDataAtIndex(i);
-            out << ", ";
-        }
-        out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
-
-    } else {
-        
-        // Print the whole vector
-        out << "[";
-        for (unsigned int i = 0; i < vector.getDimension(); i++) {
-            out << vector.getDataAtIndex(i);
-            if (i < vector.getDimension() - 1) {
-                out << ", ";
-            }
-        }
-        out << "] ";
-
+    out << vector.getDimension() << " " << vector.getIndex();
+    for (unsigned int i = 0; i < vector.getDimension(); i++) {
+        out << " " << vector.getDataAtIndex(i);
     }
 
     return out;
 
 }
+
+template <typename dvector_t> std::istream& operator>>(std::istream& in, DataVector<dvector_t>& vector) {
+
+    unsigned int valuesCount, index;
+    in >> valuesCount >> index;
+
+    vector.setDimension(valuesCount);
+    vector.setIndex(index);
+
+    for (unsigned int i = 0; i < valuesCount; i++) {
+        dvector_t currentValue;
+        in >> currentValue;
+        vector.setDataAtIndex(currentValue, i);
+    }
+
+    return in;
+
+}
+
+// /**
+//  * @brief Operator << overloading for printing a DataVector object. Speicifically it prints the 
+//  * first and last 10 items of the vector.
+//  * 
+//  * @param out the output stream object
+//  * @param vector the DataVector object to print
+//  * 
+//  * @return the putput stream
+// */
+// template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
+
+//     if (vector.getDimension() > 3) {
+
+//         // Print the first 3 items inside the vector
+//         out << "[";
+//         for (unsigned int i = 0; i < 3; i++) {
+//             out << vector.getDataAtIndex(i);
+//             out << ", ";
+//         }
+
+//         out << "... ";
+
+//         // Print the last 3 items inside the vector
+//         for (unsigned int i = vector.getDimension() - 3; i < vector.getDimension() -1; i++) {
+//             out << vector.getDataAtIndex(i);
+//             out << ", ";
+//         }
+//         out << vector.getDataAtIndex(vector.getDimension() - 1) << "]";
+
+//     } else {
+        
+//         // Print the whole vector
+//         out << "[";
+//         for (unsigned int i = 0; i < vector.getDimension(); i++) {
+//             out << vector.getDataAtIndex(i);
+//             if (i < vector.getDimension() - 1) {
+//                 out << ", ";
+//             }
+//         }
+//         out << "] ";
+
+//     }
+
+//     return out;
+
+// }
 
 #endif /* DATA_VECTOR_H */

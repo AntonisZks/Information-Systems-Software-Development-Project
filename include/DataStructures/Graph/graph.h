@@ -23,6 +23,13 @@ private:
 public:
 
   /**
+   * @brief Default Constructor of the Grpah. Exists to avoid errors.
+   */
+  Graph(void) : nodesCount(0) {
+    this->nodes = new GraphNode<graph_t>[0];
+  }
+
+  /**
    * @brief Constructs a graph with a specified number of nodes and allocates memory for them.
    * 
    * @param nodesCount_ Number of nodes in the graph
@@ -49,6 +56,22 @@ public:
    */
   void setNodeData(unsigned int index, const graph_t& data) {
     this->nodes[index].setData(data);
+  }
+
+  /**
+   * @brief Sets the nodes count of the graph. Deletes the current memory
+   * allocated for the nodes array and creates a new one with the updates
+   * number of nodes.
+   * 
+   * @param nodesCount the number of nodes.
+   */
+  void setNodesCount(const unsigned int nodesCount) {
+    this->nodesCount = nodesCount;
+    delete [] this->nodes;
+    this->nodes = new GraphNode<graph_t>[nodesCount];
+    for (unsigned int i = 0; i < nodesCount; i++) {
+      this->nodes[i].setIndex(i);
+    }
   }
 
   /**
@@ -197,6 +220,10 @@ public:
  */
 template <typename graph_t> 
 std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
+  if (graph.getNodesCount() == 0) {
+    output << "Graph Empty";
+    return output;
+  }
 
   for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
     std::vector<graph_t>* neighbors = graph.getNodeNeighbors(i);
