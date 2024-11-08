@@ -234,7 +234,7 @@ public:
       for (unsigned int j = 0; j < neighborsCount; j++) {
         vamana_t currentData;
         inFile >> currentData;
-        unsigned int neighborIndex = this->G.getNodeWithData(currentData)->getIndex();
+        unsigned int neighborIndex = this->G.getNode(currentData.getIndex())->getIndex();
         this->G.connectNodesByIndex(i, neighborIndex);
       }
 

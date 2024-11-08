@@ -291,7 +291,7 @@ public:
 */
 template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector) {
 
-    out << vector.getDimension();
+    out << vector.getDimension() << " " << vector.getIndex();
     for (unsigned int i = 0; i < vector.getDimension(); i++) {
         out << " " << vector.getDataAtIndex(i);
     }
@@ -302,10 +302,12 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
 
 template <typename dvector_t> std::istream& operator>>(std::istream& in, DataVector<dvector_t>& vector) {
 
-    unsigned int valuesCount;
-    in >> valuesCount;
+    unsigned int valuesCount, index;
+    in >> valuesCount >> index;
 
     vector.setDimension(valuesCount);
+    vector.setIndex(index);
+
     for (unsigned int i = 0; i < valuesCount; i++) {
         dvector_t currentValue;
         in >> currentValue;

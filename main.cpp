@@ -101,10 +101,10 @@ int main(int argc, char* argv[]) {
   // std::vector<DataVector<float>> query_vectors = { q }; 
   // std::set<DataVector<float>> realNeighbors = { c1, c2, c3 };
   
-  // VamanaIndex<DataVector<float>> index;
-  // index.createGraph(base_vectors, alpha, L, R);
-  // index.test(k, L, query_vectors, query_number, realNeighbors);
-  // index.saveGraph("test.vig");
+  VamanaIndex<DataVector<float>> index;
+  index.createGraph(base_vectors, alpha, L, R);
+  index.test(k, L, query_vectors, query_number, realNeighbors);
+  index.saveGraph("test.vig");
 
   VamanaIndex<DataVector<float>> index2;
   index2.loadGraph("test.vig");
