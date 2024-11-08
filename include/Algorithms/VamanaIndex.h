@@ -190,7 +190,31 @@ public:
 
   void loadGraph(const std::string& filename) {
 
-    // TODO: implement the loading functionality
+    std::ifstream inFile(filename);
+    if (!inFile) {
+      std::cerr << "Error opening file for reading.\n";
+      return;
+    }
+
+
+    unsigned int nodesCount;
+    inFile >> nodesCount;
+    
+    this->G.setNodesCount(nodesCount);
+
+    unsigned int nodeIndex;
+    while (inFile >> nodeIndex) {
+      unsigned int neighborsCount;
+      inFile >> neighborsCount;
+
+      for (unsigned int j = 0; j < neighborsCount; j++) {
+        vamana_t currentNeighbor;
+        inFile >> currentNeighbor;
+
+        this->G.setNodeData(nodeIndex, currentNeighbor);
+        
+      }
+    }
 
   }
 

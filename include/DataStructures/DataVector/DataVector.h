@@ -23,7 +23,9 @@ public:
      * @brief Default Constructor of the DataVector. Exists just to avoid errors.
      * Sets the data to NULL and the dimension of the vector to 0.
     */
-    DataVector(void) : data(nullptr), dimension(0), graphIndex(0) {}
+    DataVector(void) : data(nullptr), dimension(0), graphIndex(0) {
+        this->data = new dvector_t[0];
+    }
 
     /**
      * @brief Constructor of the DataVector. Here all the properties of the Vector are
@@ -264,6 +266,12 @@ public:
         return dimension;
     }
 
+    void setDimension(const unsigned int dimension) {
+        this->dimension = dimension;
+        delete [] this->data;
+        this->data = new dvector_t[dimension];
+    }
+
     void setIndex(const unsigned int& index) {
         this->graphIndex = index;
     }
@@ -283,7 +291,7 @@ public:
  * 
  * @return the putput stream
 */
-template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t> vector) {
+template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector) {
 
     out << vector.getDimension();
     for (unsigned int i = 0; i < vector.getDimension(); i++) {
@@ -291,6 +299,22 @@ template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const 
     }
 
     return out;
+
+}
+
+template <typename dvector_t> std::istream& operator>>(std::istream& in, DataVector<dvector_t>& vector) {
+
+    unsigned int valuesCount;
+    in >> valuesCount;
+
+    vector.setDimension(valuesCount);
+    for (unsigned int i = 0; i < valuesCount; i++) {
+        dvector_t currentValue;
+        in >> currentValue;
+        vector.setDataAtIndex(currentValue, i);
+    }
+
+    return in;
 
 }
 

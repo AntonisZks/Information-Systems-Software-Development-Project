@@ -84,9 +84,10 @@ int main(int argc, char* argv[]) {
 
 
   VamanaIndex<DataVector<float>> index;
-  index.createGraph(base_vectors, alpha, L, R);
+  // index.createGraph(base_vectors, alpha, L, R);
+  index.loadGraph("test.vig");
   index.test(k, L, query_vectors, 0, realNeighbors);
-  index.saveGraph("test.vig");
+  // index.saveGraph("test.vig");
 
   return 0;
 
