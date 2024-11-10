@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include "../DataStructures/Graph/graph.h"
+#include "../Evaluation/recall.h"
 #include "GreedySearch.h"
 #include "RobustPrune.h"
 
@@ -105,6 +106,10 @@ public:
     return this->G;
   }
 
+  std::vector<vamana_t> getPoints(void) const {
+    return this->P;
+  }
+
   void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R) {
 
     using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
@@ -159,12 +164,12 @@ public:
 
   }
 
-  void saveGraph(const std::string& filename) {
+  bool saveGraph(const std::string& filename) {
 
     std::ofstream outFile(filename, std::ios::binary);
     if (!outFile) {
       std::cerr << "Error opening file for writing." << std::endl;
-      return;
+      return false;
     }
 
     // Save the nodes count of the graph, and its data
@@ -195,14 +200,16 @@ public:
     
     }
 
+    return true;
+
   }
 
-  void loadGraph(const std::string& filename) {
+  bool loadGraph(const std::string& filename) {
 
     std::ifstream inFile(filename);
     if (!inFile) {
       std::cerr << "Error opening file for reading.\n";
-      return;
+      return false;
     }
 
 
@@ -220,6 +227,8 @@ public:
       inFile >> currentData;
       currentData.setIndex(i);
       this->G.setNodeData(i, currentData);
+      this->P.push_back(currentData);
+
     }
     printProgressBar(100, "Loading vertices:               ");
 
@@ -240,6 +249,8 @@ public:
 
     }
     printProgressBar(100, "Loading edges:                  ");
+
+    return true;
 
   }
 

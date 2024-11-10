@@ -1,32 +1,44 @@
 #include <iostream>
-#include <cstdlib>
 #include <vector>
-#include <random>
 #include <set>
+#include <map>
+#include <string>
+#include <cstdlib>
 #include <ctime>
-#include "include/DataStructures/Graph/graph.h"
-#include "include/read_data.h"
 #include "include/DataStructures/DataVector/DataVector.h"
-#include "include/Algorithms/GreedySearch.h"
-#include "include/Algorithms/GreedySearch.h"
-// #include "include/Algorithms/Vanama.h"
-#include "include/Evaluation/recall.h"
 #include "include/Algorithms/VamanaIndex.h"
+#include "include/read_data.h"
 
 /**
- * @brief Retrieves the exact nearest neighbors for a specific query vector
- * based on ground truth values.
+ * @brief Retrieves the value of a specified parameter from a map.
  * 
+ * @param parameters A map containing parameter key-value pairs.
+ * @param key The key of the parameter to retrieve.
+ * @param value A reference to a string where the value of the parameter will be stored if found.
+ * @return true if the parameter is found and the value is retrieved, false otherwise.
+ */
+static bool getParameterValue(const std::map<std::string, std::string>& parameters, const std::string& key, std::string& value) {
+  if (parameters.find(key) != parameters.end()) {
+    value = parameters.at(key);
+    return true;
+  } else {
+    std::cout << key << " is required" << std::endl;
+    return false;
+  }
+}
+
+/**
+ * @brief Retrieves the exact nearest neighbors for a query vector.
  * 
  * @param base_vectors A vector of DataVector<float> objects representing the dataset.
  * @param groundtruth_values A vector of DataVector<int> objects containing the true
  * nearest neighbor indices for each query.
+ * @param query_number The index of the query vector.
  * 
  * @return A set containing the exact nearest neighbors for a query vector.
  */
-static std::set<DataVector<float>> 
-getExactNearestNeighbors(
-  std::vector<DataVector<float>>& base_vectors, std::vector<DataVector<int>>& groundtruth_values, const unsigned int query_number) {
+static std::set<DataVector<float>> getExactNearestNeighbors(
+  std::vector<DataVector<float>> base_vectors, std::vector<DataVector<int>>& groundtruth_values, const unsigned int query_number) {
 
   std::set<DataVector<float>> realNeighbors;
 
@@ -38,7 +50,133 @@ getExactNearestNeighbors(
   }
 
   return realNeighbors;
+}
 
+/**
+ * @brief Creates a configuration based on command-line arguments.
+ * 
+ * This function parses the command-line arguments to extract the necessary parameters
+ * for creating a Vamana index. It expects the following arguments:
+ * - `-base-file`: The path to the base file containing the dataset.
+ * - `-L`: The number of neighbors to consider in the graph.
+ * - `-R`: The maximum number of edges per node in the graph.
+ * - `-alpha`: The scaling factor for the graph construction.
+ * - `-save` (optional): The path to save the constructed graph.
+ * 
+ * @param argc The number of command-line arguments.
+ * @param argv The array of command-line arguments.
+ * 
+ * @return true if the configuration is successfully created, false otherwise.
+ */
+bool create(unsigned int argc, char* argv[]) {
+
+  std::map<std::string, std::string> parameters;
+  
+  std::string base_file, L, R, alpha;
+
+  // Insert all the arguments into the parameters map
+  for (unsigned int i = 2; i < argc; i+=2) {
+    if (i+1 >= argc) {
+      std::cerr << "Missing value for " << argv[i] << std::endl;
+      return false;
+    }
+    parameters[argv[i]] = argv[i+1];
+  }
+
+  // Get the values of all the arguments in the parameters map
+  if (!getParameterValue(parameters, "-base-file", base_file)) return false;
+  if (!getParameterValue(parameters, "-L", L)) return false;
+  if (!getParameterValue(parameters, "-R", R)) return false;
+  if (!getParameterValue(parameters, "-alpha", alpha)) return false;
+
+  // Read the base vectors from the file
+  std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_file);
+  if (base_vectors.empty()) {
+    std::cerr << "Error reading base file" << std::endl;
+    return false;
+  }
+
+  VamanaIndex<DataVector<float>> vamanaIndex = VamanaIndex<DataVector<float>>();
+  vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R));
+
+  // Save the graph if the save parameter is present
+  if (parameters.find("-save") != parameters.end()) {
+    if (!vamanaIndex.saveGraph(parameters["-save"])) {
+      std::cerr << "Error opening file for writing." << std::endl;
+      return false;
+    }
+    std::cout << "Vamana Index was saved successfully to `" << parameters["-save"] << "`" << std::endl;
+  }
+
+  return true;
+}
+
+/**
+ * @brief Tests the Vamana index using command-line arguments.
+ * 
+ * This function parses the command-line arguments to extract the necessary parameters
+ * for testing a Vamana index. It expects the following arguments:
+ * - `-load`: The path to the file containing the Vamana index to load.
+ * - `-k`: The number of nearest neighbors to search for.
+ * - `-L`: The number of neighbors to consider in the search.
+ * - `-gt-file`: The path to the groundtruth file containing the true nearest neighbors.
+ * - `-query-file`: The path to the file containing the query vectors.
+ * - `-query`: The index of the query vector to test.
+ * 
+ * @param argc The number of command-line arguments.
+ * @param argv The array of command-line arguments.
+ * 
+ * @return true if the test is successful, false otherwise.
+ */
+bool test(unsigned int argc, char* argv[]) {
+
+  std::map<std::string, std::string> parameters;
+  
+  std::string load_file, k, L, groundtruth_file, query_file, query_number;
+
+  // Insert all the arguments into the parameters map
+  for (unsigned int i = 2; i < argc; i+=2) {
+    if (i+1 >= argc) {
+      std::cerr << "Missing value for " << argv[i] << std::endl;
+      return false;
+    }
+    parameters[argv[i]] = argv[i+1];
+  }
+
+  // Get the values of all the arguments in the parameters map
+  if (!getParameterValue(parameters, "-load", load_file)) return false;
+  if (!getParameterValue(parameters, "-k", k)) return false;
+  if (!getParameterValue(parameters, "-L", L)) return false;
+  if (!getParameterValue(parameters, "-gt-file", groundtruth_file)) return false;
+  if (!getParameterValue(parameters, "-query-file", query_file)) return false;
+  if (!getParameterValue(parameters, "-query", query_number)) return false;
+
+  // Get the groundtruth vectors from the file
+  std::vector<DataVector<int>> groundtruth_values = ReadGroundTruth(groundtruth_file);
+  if (groundtruth_values.empty()) {
+    std::cerr << "Error reading groundtruth file" << std::endl;
+    return false;
+  }
+
+  // Get the query vectors from the file
+  std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_file);
+  if (query_vectors.empty()) {
+    std::cerr << "Error reading query file" << std::endl;
+    return false;
+  }
+
+  // Load the Vamana index from the file
+  VamanaIndex<DataVector<float>> vamanaIndex = VamanaIndex<DataVector<float>>();
+  if (!vamanaIndex.loadGraph(load_file)) {
+    std::cerr << "Error loading Vamana index from file" << std::endl;
+    return false;
+  }
+
+  // Perform the nearest neighbor search
+  std::set<DataVector<float>> exactNeighbors = getExactNearestNeighbors(vamanaIndex.getPoints(), groundtruth_values, std::stoi(query_number));
+  vamanaIndex.test(std::stoi(k), std::stoi(L), query_vectors, std::stoi(query_number), exactNeighbors);
+
+  return true;
 }
 
 /**
@@ -53,65 +191,21 @@ int main(int argc, char* argv[]) {
 
   srand(static_cast<unsigned int>(time(0)));
 
-  // Check for valid program execution
-  if (argc != 9) {
-    std::cout << "Usage: " << argv[0] << " [base_vectors_file]";
-    std::cout << " [query_vectors_file]" << " [groundtruth_file]";
-    std::cout << " [k]" <<  " [alpha]" << " [L]" << " [R]" << " [query_number]"<< std::endl;
+  // Get the first argument to determine the operation
+  std::string firstArgument = argv[1];
 
+  if (firstArgument == "--create") {
+    if (!create(argc, argv)) return 1;
+    return 0;
+  }
+  else if (firstArgument == "--test") {
+    if (!test(argc, argv)) return 1;
+    return 0;
+  }
+  else {
+    std::cerr << "Invalid operation" << std::endl;
     return 1;
   }
 
-  // Store the dataset files
-  std::string base_file = argv[1];
-  std::string query_file = argv[2];
-  std::string groundtruth_file = argv[3];
-
-  // Store the search parameters
-  unsigned int k = std::stoi(argv[4]);
-  float alpha = std::stof(argv[5]);
-  unsigned int L = std::stoi(argv[6]);
-  unsigned int R = std::stoi(argv[7]);
-  unsigned int query_number = std::stoi(argv[8]);
-  
-  // Receive the data vectors from the dataset files
-  std::vector<DataVector<float>> base_vectors = ReadVectorFile(base_file);
-  std::vector<DataVector<float>> query_vectors = ReadVectorFile(query_file);  
-  std::vector<DataVector<int>> groundtruth_values = ReadGroundTruth(groundtruth_file);
-
-  // Get the exact nearest neighbors
-  std::set<DataVector<float>> realNeighbors = getExactNearestNeighbors(base_vectors, groundtruth_values, query_number);
-
-  // DataVector<float> v2(2); v2.setDataAtIndex(1, 0); v2.setDataAtIndex(3, 1);
-  // DataVector<float> v3(2); v3.setDataAtIndex(2, 0); v3.setDataAtIndex(4, 1);
-  // DataVector<float> v4(2); v4.setDataAtIndex(4, 0); v4.setDataAtIndex(2, 1);
-  // DataVector<float> v5(2); v5.setDataAtIndex(4, 0); v5.setDataAtIndex(6, 1);
-  // DataVector<float> v6(2); v6.setDataAtIndex(5, 0); v6.setDataAtIndex(3, 1);
-  // DataVector<float> v7(2); v7.setDataAtIndex(6, 0); v7.setDataAtIndex(5, 1);
-  // DataVector<float> v8(2); v8.setDataAtIndex(7, 0); v8.setDataAtIndex(1, 1);
-  // DataVector<float> v1(2); v1.setDataAtIndex(1, 0); v1.setDataAtIndex(1, 1);
-  
-  // DataVector<float> q(2); q.setDataAtIndex(4, 0); q.setDataAtIndex(3, 1);
-
-  // DataVector<float> c1(2); c1.setDataAtIndex(4, 0); c1.setDataAtIndex(2, 1);
-  // DataVector<float> c2(2); c2.setDataAtIndex(5, 0); c2.setDataAtIndex(3, 1);
-  // DataVector<float> c3(2); c3.setDataAtIndex(1, 0); c3.setDataAtIndex(3, 1);
-  
-  // std::vector<DataVector<float>> base_vectors = { v1, v2, v3, v4, v5, v6, v7, v8 };
-  // std::vector<DataVector<float>> query_vectors = { q }; 
-  // std::set<DataVector<float>> realNeighbors = { c1, c2, c3 };
-  
-  VamanaIndex<DataVector<float>> index;
-  index.createGraph(base_vectors, alpha, L, R);
-  index.test(k, L, query_vectors, query_number, realNeighbors);
-  index.saveGraph("test.vig");
-
-  VamanaIndex<DataVector<float>> index2;
-  index2.loadGraph("test.vig");
-  index2.test(k, L, query_vectors, query_number, realNeighbors);
-  
-  // std::cout << index << std::endl;
-
   return 0;
-
 }
