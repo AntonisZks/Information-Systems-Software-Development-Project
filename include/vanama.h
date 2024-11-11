@@ -230,5 +230,5 @@ void Create_Vamana_Index(Graph<graph_t>& graph, const float alpha, const unsigne
   }
 
 }
-
+ // to test commit 
 #endif /* VAMANA_H */
