@@ -9,6 +9,10 @@
 #include "include/Algorithms/VamanaIndex.h"
 #include "include/read_data.h"
 
+using ParametersMap = std::map<std::string, std::string>;
+using BaseVectors = std::vector<DataVector<float>>;
+using GroundTruthValues = std::vector<DataVector<int>>;
+
 /**
  * @brief Retrieves the value of a specified parameter from a map.
  * 
@@ -17,7 +21,7 @@
  * @param value A reference to a string where the value of the parameter will be stored if found.
  * @return true if the parameter is found and the value is retrieved, false otherwise.
  */
-static bool getParameterValue(const std::map<std::string, std::string>& parameters, const std::string& key, std::string& value) {
+static bool getParameterValue(const ParametersMap& parameters, const std::string& key, std::string& value) {
   if (parameters.find(key) != parameters.end()) {
     value = parameters.at(key);
     return true;
@@ -31,15 +35,14 @@ static bool getParameterValue(const std::map<std::string, std::string>& paramete
  * @brief Retrieves the exact nearest neighbors for a query vector.
  * 
  * @param base_vectors A vector of DataVector<float> objects representing the dataset.
- * @param groundtruth_values A vector of DataVector<int> objects containing the true
- * nearest neighbor indices for each query.
+ * @param groundtruth_values A vector of DataVector<int> objects containing the true nearest neighbor indices for each query.
  * @param query_number The index of the query vector.
  * 
  * @return A set containing the exact nearest neighbors for a query vector.
  */
 static std::set<DataVector<float>> getExactNearestNeighbors(
-  std::vector<DataVector<float>> base_vectors, std::vector<DataVector<int>>& groundtruth_values, const unsigned int query_number) {
-
+  BaseVectors base_vectors, GroundTruthValues& groundtruth_values, const unsigned int query_number) 
+{
   std::set<DataVector<float>> realNeighbors;
 
   DataVector<int> realNearestIndeces = groundtruth_values.at(query_number);
@@ -53,15 +56,8 @@ static std::set<DataVector<float>> getExactNearestNeighbors(
 }
 
 /**
- * @brief Creates a configuration based on command-line arguments.
- * 
- * This function parses the command-line arguments to extract the necessary parameters
- * for creating a Vamana index. It expects the following arguments:
- * - `-base-file`: The path to the base file containing the dataset.
- * - `-L`: The number of neighbors to consider in the graph.
- * - `-R`: The maximum number of edges per node in the graph.
- * - `-alpha`: The scaling factor for the graph construction.
- * - `-save` (optional): The path to save the constructed graph.
+ * @brief Creates a configuration based on command-line arguments. This function parses the command-line arguments to extract 
+ * the necessary parameters for creating a Vamana index.
  * 
  * @param argc The number of command-line arguments.
  * @param argv The array of command-line arguments.
@@ -70,7 +66,7 @@ static std::set<DataVector<float>> getExactNearestNeighbors(
  */
 bool create(unsigned int argc, char* argv[]) {
 
-  std::map<std::string, std::string> parameters;
+  ParametersMap parameters;
   
   std::string base_file, L, R, alpha;
 
@@ -112,16 +108,8 @@ bool create(unsigned int argc, char* argv[]) {
 }
 
 /**
- * @brief Tests the Vamana index using command-line arguments.
- * 
- * This function parses the command-line arguments to extract the necessary parameters
- * for testing a Vamana index. It expects the following arguments:
- * - `-load`: The path to the file containing the Vamana index to load.
- * - `-k`: The number of nearest neighbors to search for.
- * - `-L`: The number of neighbors to consider in the search.
- * - `-gt-file`: The path to the groundtruth file containing the true nearest neighbors.
- * - `-query-file`: The path to the file containing the query vectors.
- * - `-query`: The index of the query vector to test.
+ * @brief Tests the Vamana index using command-line arguments. This function parses the command-line arguments to extract 
+ * the necessary parameters for testing a Vamana index.
  * 
  * @param argc The number of command-line arguments.
  * @param argv The array of command-line arguments.
@@ -130,7 +118,7 @@ bool create(unsigned int argc, char* argv[]) {
  */
 bool test(unsigned int argc, char* argv[]) {
 
-  std::map<std::string, std::string> parameters;
+  ParametersMap parameters;
   
   std::string load_file, k, L, groundtruth_file, query_file, query_number;
 
