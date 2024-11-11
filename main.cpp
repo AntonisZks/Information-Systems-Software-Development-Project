@@ -173,7 +173,9 @@ bool test(unsigned int argc, char* argv[]) {
   }
 
   // Perform the nearest neighbor search
-  std::set<DataVector<float>> exactNeighbors = getExactNearestNeighbors(vamanaIndex.getPoints(), groundtruth_values, std::stoi(query_number));
+  std::set<DataVector<float>> exactNeighbors = getExactNearestNeighbors(
+    vamanaIndex.getPoints(), groundtruth_values, std::stoi(query_number)
+  );
   vamanaIndex.test(std::stoi(k), std::stoi(L), query_vectors, std::stoi(query_number), exactNeighbors);
 
   return true;
