@@ -115,9 +115,12 @@ struct EuclideanDistanceOrder {
  * 
  * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
  */
+
+/*
+*/
 template <typename graph_t>
 std::pair<std::set<graph_t>, std::set<graph_t>>
-FilterGreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
+GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
   
   std::set<graph_t> candidates = {s.getData()};
   std::set<graph_t> visited = {};
@@ -188,4 +191,4 @@ FilterGreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const g
 
 }
 
-#endif /* GREEDY_SEARCH_H */
+#endif // GREEDY_SEARCH_H
