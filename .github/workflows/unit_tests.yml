@@ -1,0 +1,29 @@
+name: Run Unit Tests
+
+on:
+  push:
+    branches:
+      - 'main'
+    pull_request:
+      branches:
+        - 'main'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest, windows-latest, macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Compile Code
+        run:
+          make all
+
+      - name: Run Unit Tests
+        run:
+          ./scripts/run_all_tests.sh
+
+      - name: Clean up workspace
+        run:
+          make clean
