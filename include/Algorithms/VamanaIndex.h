@@ -12,9 +12,12 @@
 #include "RobustPrune.h"
 #include <map>
 #include <set>
+<<<<<<< HEAD
 #include "../DataStructures/DataVector/BQDataVectors.h"
 
 using namespace std;
+=======
+>>>>>>> af572ac (Progreesing on filtered Medoid)
 
 
 /**
@@ -405,8 +408,13 @@ public:
     getNodeSet(). returns DataVectors
     */
 
+<<<<<<< HEAD
     //Variables
     set<BaseDataVector<float>> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
+=======
+    //Variabless
+    set<DataVectors> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
+>>>>>>> af572ac (Progreesing on filtered Medoid)
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
