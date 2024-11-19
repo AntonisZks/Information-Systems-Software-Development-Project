@@ -10,6 +10,8 @@
 #include "../Evaluation/recall.h"
 #include "GreedySearch.h"
 #include "RobustPrune.h"
+#include <map>
+#include <set>
 
 
 /**
@@ -367,31 +369,27 @@ public:
   using namespace std;
   
   map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
-  map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
 
     /*
     method of the Graph class that returns the DataVectors as a sets
     getNodeSet(). returns DataVectors
-
-    method of the Graph class that returns the DataVectors as a sets
-    getNodeSet(). returns DataVectors
-
     */
 
     //Variabless
-    set<DataVectors> P = Graph.getNodesSet;
+    set<DataVectors> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
+    set<DataVectors> Pf;
+
     //Algorithm Loop
     for(int f : Filters){
-      //
-      //
 
     }
 
     return M;
   }
+
 
   /**
    * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
