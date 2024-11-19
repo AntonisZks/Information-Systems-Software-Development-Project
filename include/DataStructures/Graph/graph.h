@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include "graph_node.h"
 #include <numeric>  
 #include <random>
