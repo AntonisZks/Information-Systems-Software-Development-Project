@@ -42,5 +42,6 @@ vector<DataVector<int>> ReadGroundTruth(const string& filename);
 void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename);
 
 vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& filename);
+vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& filename);
 
 #endif // READ_DATA_H

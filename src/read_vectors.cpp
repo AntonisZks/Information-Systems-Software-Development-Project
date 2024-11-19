@@ -171,3 +171,42 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
     file.close();
     return dataVectors;
 }
+
+std::vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& filename) {
+
+    ifstream file(filename, ios::binary);
+
+    if (!file.is_open()) {
+        cerr << "Error opening file: " << filename << endl;
+        return {};
+    }
+
+    uint32_t num_vectors;
+    file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
+
+    vector<QueryDataVector<float>> dataVectors;
+    dataVectors.reserve(num_vectors);
+
+    for (uint32_t i = 0; i < num_vectors; ++i) {
+        float query_type, v, l, r;
+
+        file.read(reinterpret_cast<char*>(&query_type), sizeof(query_type));
+        file.read(reinterpret_cast<char*>(&v), sizeof(v));
+        file.read(reinterpret_cast<char*>(&l), sizeof(l));
+        file.read(reinterpret_cast<char*>(&r), sizeof(r));
+
+        QueryDataVector<float> dataVector(100, 0, query_type, v, l, r);
+
+        for (unsigned int j = 0; j < 100; ++j) {
+            float currentData;
+            file.read(reinterpret_cast<char*>(&currentData), sizeof(currentData));
+            dataVector.setDataAtIndex(currentData, j);
+        }
+
+        dataVectors.push_back(dataVector);
+    }
+
+    file.close();
+    return dataVectors;
+
+}
