@@ -367,8 +367,12 @@ public:
   using namespace std;
   
   map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
+  map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
 
     /*
+    method of the Graph class that returns the DataVectors as a sets
+    getNodeSet(). returns DataVectors
+
     method of the Graph class that returns the DataVectors as a sets
     getNodeSet(). returns DataVectors
 
@@ -381,6 +385,7 @@ public:
 
     //Algorithm Loop
     for(int f : Filters){
+      //
       //
 
     }
