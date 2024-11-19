@@ -370,7 +370,7 @@ public:
 
     /*
 
-    method of the Graph class that returns the noodeds as a set
+    method of the Graph class that returns the DataVectors as a sets
     
     */
 
@@ -380,7 +380,7 @@ public:
 
     //Algorithm Loop
     for(int f : Filters){
-
+      //P()
 
     }
 
