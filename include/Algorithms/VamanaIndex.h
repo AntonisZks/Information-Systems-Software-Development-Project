@@ -320,7 +320,7 @@ public:
 
   }
 
-  GraphNode<T> findMedoid(const Graph<T>& graph) {
+  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, const unsigned int maxIterations) {
     // Get the total number of nodes in the graph
     const int node_count = graph.getNodesCount();
 
@@ -328,13 +328,13 @@ public:
     float min_average_distance = std::numeric_limits<float>::max();
 
     // Pointer to store the node with the minimum average distance (medoid candidate)
-    GraphNode<T>* medoid_node = nullptr;
+    GraphNode<vamana_t>* medoid_node = nullptr;
 
     // Iterate over all nodes to find the medoid
     // A medoid is defined as the node with the minimum sum of distances to all other nodes
     for (int i = 0; i < node_count; ++i) {
         // Get the current node as a candidate for the medoid
-        GraphNode<T>* candidate_node = graph.getNode(i);
+        GraphNode<vamana_t>* candidate_node = graph.getNode(i);
 
         // Variable to accumulate the total distance from this candidate node to all other nodes
         float total_distance = 0.0;

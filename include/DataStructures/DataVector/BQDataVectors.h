@@ -86,14 +86,14 @@ class QueryDataVector : public DataVector<dvector_t>{
 private:
     unsigned int query_type; // Query type (e.g., 0, 1, 2, or 3, to represent different query categories)
     unsigned int v; // Categorical value associated with this query
-    unsigned int l; // Lower bound for timestamp range
-    unsigned int r; // Upper bound for timestamp range
+    float l; // Lower bound for timestamp range
+    float r; // Upper bound for timestamp range
 
 public:
     // Constructor to initialize the QueryDataVector with data and additional query attributes
-    QueryDataVector(dvector_t data, unsigned int q_type, unsigned int v_value,
-                    unsigned int l_value, unsigned int r_value)
-        : DataVector<dvector_t>(data), query_type(q_type), v(v_value), l(l_value), r(r_value) {}
+    QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, unsigned int v_value,
+                    float l_value, float r_value)
+        : DataVector<dvector_t>(dimension, index), query_type(q_type), v(v_value), l(l_value), r(r_value) {}
 
     // Getter for query type
     unsigned int getQueryType() const {
@@ -106,12 +106,12 @@ public:
     }
 
     // Getter for lower bound of timestamp range (l)
-    unsigned int getL() const {
+    float getL() const {
         return l;
     }
 
     // Getter for upper bound of timestamp range (r)
-    unsigned int getR() const {
+    float getR() const {
         return r;
     }
 
@@ -126,12 +126,12 @@ public:
     }
 
     // Setter for lower bound of timestamp range (l)
-    void setL(unsigned int l_value) {
+    void setL(float l_value) {
         l = l_value;
     }
 
     // Setter for upper bound of timestamp range (r)
-    void setR(unsigned int r_value) {
+    void setR(float r_value) {
         r = r_value;
     }
 };
