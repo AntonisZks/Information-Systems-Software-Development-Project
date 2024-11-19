@@ -36,12 +36,12 @@ template <typename dvector_t>
 class BaseDataVector : public DataVector<dvector_t>{
 private:
     unsigned int C; // Categorical attribute
-    unsigned int T; // Timestamp attribut
+    float T; // Timestamp attribut
 
 public:
     // Constructor to initialize the BaseDataVector with data, category, and timestamp
-    BaseDataVector(dvector_t data, unsigned int category, unsigned int timestamp)
-        : DataVector<dvector_t>(data), C(category), T(timestamp) {}
+    BaseDataVector(unsigned int dimension, unsigned int index, unsigned int category, float timestamp)
+        : DataVector<dvector_t>(dimension, index), C(category), T(timestamp) {}
 
     // Getter for the categorical attribute (C)
     unsigned int getC() const {
@@ -49,7 +49,7 @@ public:
     }
 
     // Getter for the timestamp attribute (T)
-    unsigned int getT() const {
+    float getT() const {
         return T;
     }
 
@@ -59,7 +59,7 @@ public:
     }
 
     // Setter for the timestamp attribute (T)
-    void setT(unsigned int timestamp) {
+    void setT(float timestamp) {
         T = timestamp;
     }
 };

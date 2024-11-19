@@ -8,6 +8,7 @@
 #include "include/DataStructures/DataVector/DataVector.h"
 #include "include/Algorithms/VamanaIndex.h"
 #include "include/read_data.h"
+#include "include/DataStructures/DataVector/BQDataVectors.h"
 
 using ParametersMap = std::map<std::string, std::string>;
 using BaseVectors = std::vector<DataVector<float>>;
