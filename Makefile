@@ -13,7 +13,7 @@ TST_DIR = tests
 all: code test
 
 # Compile only the main code
-code: build bin $(EXE_DIR)/main
+code: build bin $(EXE_DIR)/main $(EXE_DIR)/main2
 
 # Compile all test executables
 test: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_data_vectors $(EXE_DIR)/test_recall
@@ -38,6 +38,12 @@ $(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance
 
 $(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/DataStructures/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataStructures/DataVector/DataVector.h
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c main.cpp
+
+$(EXE_DIR)/main2: $(OBJ_DIR)/main2.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
+	$(CC) $(FLAGS) -o $(EXE_DIR)/main2 $(OBJ_DIR)/main2.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
+
+$(OBJ_DIR)/main2.o: main2.cpp $(INC_DIR)/DataStructures/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataStructures/DataVector/DataVector.h
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/main2.o -c main2.cpp
 
 # Rule to create read_vectors.o
 $(OBJ_DIR)/read_vectors.o: $(SRC_DIR)/read_vectors.cpp $(INC_DIR)/read_data.h $(INC_DIR)/DataStructures/DataVector/DataVector.h
