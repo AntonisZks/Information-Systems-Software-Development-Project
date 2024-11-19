@@ -366,21 +366,23 @@ public:
 
   using namespace std;
   
-  map<string, int> FilteredMedoid(const Graph<T>& P, int threshold){
+  map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
 
     /*
-
     method of the Graph class that returns the DataVectors as a sets
-    
+    getNodeSet(). returns DataVectors
+
     */
 
     //Variables
+
+    set<DataVectors> P = Graph.
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
     //Algorithm Loop
     for(int f : Filters){
-      //P()
+      //
 
     }
 
