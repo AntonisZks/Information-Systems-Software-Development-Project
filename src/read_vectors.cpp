@@ -138,3 +138,38 @@ void saveVectors(const vector<DataVector<float>>& dataVectors, const string& out
     cout << "Data saved to " << outputFilename << endl;
 }
 
+std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& filename) {
+    ifstream file(filename, ios::binary);
+
+    if (!file.is_open()) {
+        cerr << "Error opening file: " << filename << endl;
+        return {};
+    }
+
+    uint32_t num_vectors;
+    file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
+
+    vector<BaseDataVector<float>> dataVectors;
+    dataVectors.reserve(num_vectors);
+
+    for (uint32_t i = 0; i < num_vectors; ++i) {
+        float C, T;
+        file.read(reinterpret_cast<char*>(&C), sizeof(C));
+        file.read(reinterpret_cast<char*>(&T), sizeof(T));
+
+        vector<float> vectorData(100);
+        for (int j = 0; j < 100; ++j) {
+            file.read(reinterpret_cast<char*>(&vectorData[j]), sizeof(float));
+        }
+
+        BaseDataVector<float> dataVector(100, 0, C, T);
+        for (unsigned int j = 0; j < 100; j++) {
+            dataVector.setDataAtIndex(vectorData[j], j);
+        }
+
+        dataVectors.push_back(dataVector);
+    }
+
+    file.close();
+    return dataVectors;
+}

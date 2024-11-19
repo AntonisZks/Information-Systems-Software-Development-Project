@@ -8,6 +8,7 @@
 #include "include/DataStructures/DataVector/DataVector.h"
 #include "include/Algorithms/VamanaIndex.h"
 #include "include/read_data.h"
+#include "include/DataStructures/DataVector/BQDataVectors.h"
 
 using ParametersMap = std::map<std::string, std::string>;
 using BaseVectors = std::vector<DataVector<float>>;
@@ -181,20 +182,26 @@ int main(int argc, char* argv[]) {
 
   srand(static_cast<unsigned int>(time(0)));
 
-  // Get the first argument to determine the operation
-  std::string firstArgument = argv[1];
+  // // Get the first argument to determine the operation
+  // std::string firstArgument = argv[1];
 
-  if (firstArgument == "--create") {
-    if (!create(argc, argv)) return 1;
-    return 0;
-  }
-  else if (firstArgument == "--test") {
-    if (!test(argc, argv)) return 1;
-    return 0;
-  }
-  else {
-    std::cerr << "Invalid operation" << std::endl;
-    return 1;
+  // if (firstArgument == "--create") {
+  //   if (!create(argc, argv)) return 1;
+  //   return 0;
+  // }
+  // else if (firstArgument == "--test") {
+  //   if (!test(argc, argv)) return 1;
+  //   return 0;
+  // }
+  // else {
+  //   std::cerr << "Invalid operation" << std::endl;
+  //   return 1;
+  // }
+
+  std::vector<BaseDataVector<float>> base_vectors = ReadFilteredBaseVectorFile("data/Dummy/dummy-data.bin");
+
+  for (unsigned int i = 0; i < base_vectors.size(); i++) {
+    std::cout << base_vectors[i].getC() << " " << base_vectors[i].getT() << std::endl;
   }
 
   return 0;

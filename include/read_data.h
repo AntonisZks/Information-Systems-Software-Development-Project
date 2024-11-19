@@ -4,6 +4,8 @@
 #include <vector>           // Required for std::vector
 #include <string>           // Required for std::string
 #include "DataStructures/DataVector/DataVector.h"
+#include "DataStructures/DataVector/BQDataVectors.h"
+
 
 using namespace std;        // Optional: can avoid repeating std::
 
@@ -38,5 +40,7 @@ vector<DataVector<int>> ReadGroundTruth(const string& filename);
  * @param outputFilename The name of the output text file to save the vector data.
  */
 void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename);
+
+vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& filename);
 
 #endif // READ_DATA_H

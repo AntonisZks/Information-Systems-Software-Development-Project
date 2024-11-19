@@ -40,8 +40,8 @@ private:
 
 public:
     // Constructor to initialize the BaseDataVector with data, category, and timestamp
-    BaseDataVector(dvector_t data, unsigned int category, unsigned int timestamp)
-        : DataVector<dvector_t>(data), C(category), T(timestamp) {}
+    BaseDataVector(unsigned int dimension, unsigned int index, unsigned int category, unsigned int timestamp)
+        : DataVector<dvector_t>(dimension, index), C(category), T(timestamp) {}
 
     // Getter for the categorical attribute (C)
     unsigned int getC() const {
