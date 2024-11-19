@@ -18,6 +18,7 @@ template <typename graph_t> class Graph {
 
 private:
   GraphNode<graph_t>* nodes;
+  std::set<graph_t> nodesSet;
   unsigned int nodesCount;
 
 public:
@@ -35,10 +36,16 @@ public:
    * @param nodesCount_ Number of nodes in the graph
    */
   Graph(unsigned int nodesCount_) : nodesCount(nodesCount_) {
+
     this->nodes = new GraphNode<graph_t>[nodesCount_];
     for (unsigned int i = 0; i < nodesCount_; i++) {
       this->nodes[i].setIndex(i);
     }
+
+    for (unsigned int i = 0; i < this->nodesCount; i++) {
+      this->nodesSet.insert(this->nodes[i].getData());
+    }
+
   }
 
   /**
@@ -72,6 +79,15 @@ public:
     for (unsigned int i = 0; i < nodesCount; i++) {
       this->nodes[i].setIndex(i);
     }
+  }
+
+  /**
+   * @brief Retrieves the data from all nodes in the graph.
+   * 
+   * @return set of data from all nodes
+  */
+  std::set<graph_t> getNodesSet(void) const {
+    return this->nodesSet;
   }
 
   /**
