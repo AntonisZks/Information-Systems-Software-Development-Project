@@ -157,14 +157,12 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
         file.read(reinterpret_cast<char*>(&C), sizeof(C));
         file.read(reinterpret_cast<char*>(&T), sizeof(T));
 
-        vector<float> vectorData(100);
-        for (int j = 0; j < 100; ++j) {
-            file.read(reinterpret_cast<char*>(&vectorData[j]), sizeof(float));
-        }
-
         BaseDataVector<float> dataVector(100, 0, C, T);
-        for (unsigned int j = 0; j < 100; j++) {
-            dataVector.setDataAtIndex(vectorData[j], j);
+
+        for (unsigned int j = 0; j < 100; ++j) {
+            float currentData;
+            file.read(reinterpret_cast<char*>(&currentData), sizeof(currentData));
+            dataVector.setDataAtIndex(currentData, j);
         }
 
         dataVectors.push_back(dataVector);
