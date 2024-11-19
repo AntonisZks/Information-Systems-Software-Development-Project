@@ -36,7 +36,7 @@ template <typename dvector_t>
 class BaseDataVector : public DataVector<dvector_t>{
 private:
     unsigned int C; // Categorical attribute
-    float T; // Timestamp attribut
+    float T; // Timestamp attribute
 
 public:
     // Constructor to initialize the BaseDataVector with data, category, and timestamp
