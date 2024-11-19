@@ -85,13 +85,13 @@ template <typename dvector_t>
 class QueryDataVector : public DataVector<dvector_t>{
 private:
     unsigned int query_type; // Query type (e.g., 0, 1, 2, or 3, to represent different query categories)
-    unsigned int v; // Categorical value associated with this query
+    float v; // Categorical value associated with this query
     float l; // Lower bound for timestamp range
     float r; // Upper bound for timestamp range
 
 public:
     // Constructor to initialize the QueryDataVector with data and additional query attributes
-    QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, unsigned int v_value,
+    QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, float v_value,
                     float l_value, float r_value)
         : DataVector<dvector_t>(dimension, index), query_type(q_type), v(v_value), l(l_value), r(r_value) {}
 
@@ -101,7 +101,7 @@ public:
     }
 
     // Getter for categorical value (v)
-    unsigned int getV() const {
+    float getV() const {
         return v;
     }
 
@@ -121,7 +121,7 @@ public:
     }
 
     // Setter for categorical value (v)
-    void setV(unsigned int v_value) {
+    void setV(float v_value) {
         v = v_value;
     }
 

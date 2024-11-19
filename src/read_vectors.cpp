@@ -190,7 +190,6 @@ std::vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& fi
     for (uint32_t i = 0; i < num_vectors; ++i) {
         float query_type, v, l, r;
 
-
         file.read(reinterpret_cast<char*>(&query_type), sizeof(query_type));
         file.read(reinterpret_cast<char*>(&v), sizeof(v));
         file.read(reinterpret_cast<char*>(&l), sizeof(l));

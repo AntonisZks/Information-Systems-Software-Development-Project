@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   std::vector<QueryDataVector<float>> query_vectors = ReadFilteredQueryVectorFile("data/Dummy/dummy-queries.bin");
 
   for (unsigned int i = 0; i < query_vectors.size(); i++) {
-    if (i == 9999) {
+    if (i == 9998) {
       std::cout << "For node " << i << " the distances are: " << query_vectors[i] << std::endl;
       std::cout << "The query type value is: " << query_vectors[i].getQueryType() << std::endl;
       std::cout << "The L value is: " << query_vectors[i].getL() << std::endl;
