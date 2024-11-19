@@ -12,6 +12,9 @@
 #include "RobustPrune.h"
 #include <map>
 #include <set>
+#include "../DataStructures/DataVector/BQDataVectors.h"
+
+using namespace std;
 
 
 /**
@@ -394,18 +397,16 @@ public:
       return *medoid_node;
 
   }
-
-  using namespace std;
   
-  map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
+  map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
 
     /*
     method of the Graph class that returns the DataVectors as a sets
     getNodeSet(). returns DataVectors
     */
 
-    //Variabless
-    set<DataVectors> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
+    //Variables
+    set<BaseDataVector<float>> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
