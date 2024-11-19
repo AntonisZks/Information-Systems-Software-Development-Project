@@ -374,9 +374,8 @@ public:
 
     */
 
-    //Variables
-
-    set<DataVectors> P = Graph.
+    //Variabless
+    set<DataVectors> P = Graph.getNodesSet;
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
