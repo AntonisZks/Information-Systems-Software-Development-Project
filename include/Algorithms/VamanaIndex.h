@@ -320,6 +320,50 @@ public:
 
   }
 
+  GraphNode<T> findMedoid(const Graph<T>& graph) {
+    // Get the total number of nodes in the graph
+    const int node_count = graph.getNodesCount();
+
+    // Initialize a variable to track the minimum average distance found so far
+    float min_average_distance = std::numeric_limits<float>::max();
+
+    // Pointer to store the node with the minimum average distance (medoid candidate)
+    GraphNode<T>* medoid_node = nullptr;
+
+    // Iterate over all nodes to find the medoid
+    // A medoid is defined as the node with the minimum sum of distances to all other nodes
+    for (int i = 0; i < node_count; ++i) {
+        // Get the current node as a candidate for the medoid
+        GraphNode<T>* candidate_node = graph.getNode(i);
+
+        // Variable to accumulate the total distance from this candidate node to all other nodes
+        float total_distance = 0.0;
+
+        // Calculate the sum of distances from this candidate node to every other node
+        for (int j = 0; j < node_count; ++j) {
+            // Skip distance calculation if the nodes are the same (distance to itself is 0)
+            if (i != j) {
+              total_distance += euclideanDistance(candidate_node->getData(), graph.getNode(j)->getData());
+            }
+        }
+
+        // Compute the average distance for this candidate node
+        // This is done by dividing the total distance by the number of other nodes
+        float average_distance = total_distance / (node_count - 1);
+
+        // Check if this candidate node has a smaller average distance than the current minimum
+        // If so, update the minimum distance and set this node as the current medoid candidate
+        if (average_distance < min_average_distance) {
+          min_average_distance = average_distance;
+          medoid_node = candidate_node;
+        }
+      }
+
+    // Return the node with the smallest average distance, which is the medoid
+    // The medoid represents the node that minimizes the total distance to all other nodes
+    return *medoid_node;
+  }
+
   /**
    * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
    * a Vamana Index Graph, by searching inside the graph for the nearest neighbors of a given query point, and
