@@ -12,21 +12,10 @@
 #include "RobustPrune.h"
 #include <map>
 #include <set>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 #include "../DataStructures/DataVector/BQDataVectors.h"
 
 using namespace std;
-=======
->>>>>>> af572ac (Progreesing on filtered Medoid)
-=======
-#include "../DataStructures/DataVector/BQDataVectors.h"
 
-using namespace std;
->>>>>>> ca64dc6 (debugging compilation errors)
-=======
->>>>>>> 9867a14 (Resolving conflicts)
 
 
 /**
@@ -390,23 +379,8 @@ public:
     getNodeSet(). returns DataVectors
     */
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     //Variables
     set<BaseDataVector<float>> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
-=======
-    //Variabless
-    set<DataVectors> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
->>>>>>> af572ac (Progreesing on filtered Medoid)
-=======
-    //Variables
-    set<BaseDataVector<float>> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
->>>>>>> ca64dc6 (debugging compilation errors)
-=======
-    //Variabless
-    set<DataVectors> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
->>>>>>> 9867a14 (Resolving conflicts)
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
@@ -419,7 +393,6 @@ public:
 
     return M;
   }
-
 
   /**
    * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
