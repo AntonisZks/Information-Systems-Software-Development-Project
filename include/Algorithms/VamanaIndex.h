@@ -398,7 +398,6 @@ public:
       return *medoid_node;
 
   }
-  
 
 
   //####################################################################
@@ -407,23 +406,35 @@ public:
   
   map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
 
-    /*
-    method of the Graph class that returns the DataVectors as a sets
-    getNodeSet(). returns DataVectors
-    */
+    //                        VARIABLES
 
-    //Variables
-    set<BaseDataVector<float>> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
-    set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
-    map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
+    //get filtered Graph's nodes (as BaseDatavectors)
+    set<BaseDataVector<float>> P = Graph.getNodesSet;
 
+    //Map tha will fill with the medoids
+    map<string,int> M;
+
+    //This is the set of all the different filters (categorical attributes).
+    //it will work as a counter for the loop (for example it will be 1,2,3,4)
+    set<int> Filters; //we need to get this information from the BDataVectors
+
+    //This is the set of all the nodes with the same filter (cat. attribute).
+    //it will change in each iteration
     set<BaseDataVector<float>> Pf;
 
-    //Algorithm Loop
+    //the given threshold
+    int τ = threshold;
+
+    //this is a random collection of nodes of the same filter
+    //the number of nodes will be defined by the threshold τ
+    set<BaseDataVector<float>> Rf;
+
+    //                      ALGORITHM LOOP
     for(int f : Filters){
 
     }
 
+    //retutn the map of the medoids
     return M;
   }
 
