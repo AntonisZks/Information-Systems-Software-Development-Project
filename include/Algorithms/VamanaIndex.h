@@ -404,7 +404,7 @@ public:
   //this is the new filtered medoid, i will brief in later time
   //####################################################################
   
-  map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
+  map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
 
     /*
     method of the Graph class that returns the DataVectors as a sets
@@ -416,7 +416,7 @@ public:
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
-    set<DataVectors> Pf;
+    set<BaseDataVector<float>> Pf;
 
     //Algorithm Loop
     for(int f : Filters){
