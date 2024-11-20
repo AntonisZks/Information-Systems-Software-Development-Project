@@ -393,28 +393,6 @@ public:
 
   }
 
-  using namespace std;
-  
-  map<string, int> FilteredMedoid(const Graph<T>& P, int threshold){
-
-    /*
-
-    method of the Graph class that returns the noodeds as a set
-    
-    */
-
-    //Variables
-    set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
-    map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
-
-    //Algorithm Loop
-    for(int f : Filters){
-
-
-    }
-
-    return M;
-  }
 
   /**
    * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
