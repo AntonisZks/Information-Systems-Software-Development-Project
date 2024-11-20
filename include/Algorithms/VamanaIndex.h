@@ -14,6 +14,7 @@
 #include <set>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "../DataStructures/DataVector/BQDataVectors.h"
 
 using namespace std;
@@ -24,6 +25,8 @@ using namespace std;
 
 using namespace std;
 >>>>>>> ca64dc6 (debugging compilation errors)
+=======
+>>>>>>> 9867a14 (Resolving conflicts)
 
 
 /**
@@ -334,86 +337,60 @@ public:
 
   }
 
-  /**
-   * @brief Finds the medoid node in the graph using a sample of nodes.
-   *
-   * The medoid is the node with the minimum average distance to all other nodes in the sample.
-   * This function uses Euclidean distance to calculate the distances between nodes.
-   *
-   * @tparam T The type of data stored in the graph nodes.
-   * @param graph The graph from which to find the medoid.
-   * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
-   * @return The medoid node of the sampled nodes.
-   */
-  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, int sample_size = 100) {
+  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, const unsigned int maxIterations) {
+    // Get the total number of nodes in the graph
+    const int node_count = graph.getNodesCount();
 
-      const int node_count = graph.getNodesCount();  // Get the total number of nodes in the graph
-      sample_size = std::min(sample_size, node_count);  // Ensure the sample size doesn’t exceed the total node count
+    // Initialize a variable to track the minimum average distance found so far
+    float min_average_distance = std::numeric_limits<float>::max();
 
-      // Create a list of all node indices and shuffle it to select a random subset
-      std::vector<int> sampled_indices(node_count);  // Vector to hold indices from 0 to node_count - 1
-      std::iota(sampled_indices.begin(), sampled_indices.end(), 0);  // Fill the vector with sequential numbers (0, 1, ..., node_count - 1)
-      
-      // Randomly shuffle the indices to select a random subset of nodes
-      std::shuffle(sampled_indices.begin(), sampled_indices.end(), std::mt19937{std::random_device{}()});
-      
-      // Resize the vector to contain only `sample_size` elements, representing the sampled subset of nodes
-      sampled_indices.resize(sample_size);
+    // Pointer to store the node with the minimum average distance (medoid candidate)
+    GraphNode<vamana_t>* medoid_node = nullptr;
 
-      // Initialize a distance matrix for the sampled nodes
-      // This matrix will store the pairwise distances between each pair of sampled nodes
-      std::vector<std::vector<float>> distance_matrix(sample_size, std::vector<float>(sample_size, 0.0));
+    // Iterate over all nodes to find the medoid
+    // A medoid is defined as the node with the minimum sum of distances to all other nodes
+    for (int i = 0; i < node_count; ++i) {
+        // Get the current node as a candidate for the medoid
+        GraphNode<vamana_t>* candidate_node = graph.getNode(i);
 
-      // Compute pairwise distances between each pair of sampled nodes
-      for (int i = 0; i < sample_size; ++i) {
+        // Variable to accumulate the total distance from this candidate node to all other nodes
+        float total_distance = 0.0;
 
-        double percentage = (double)(100*i)/sample_size;
-        printProgressBar(percentage, "Computing the mediod point:     ");
-
-        for (int j = i + 1; j < sample_size; ++j) {
-          // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
-          float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
-          
-          // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
-          // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
-          distance_matrix[i][j] = dist;
-          distance_matrix[j][i] = dist;
+        // Calculate the sum of distances from this candidate node to every other node
+        for (int j = 0; j < node_count; ++j) {
+            // Skip distance calculation if the nodes are the same (distance to itself is 0)
+            if (i != j) {
+              total_distance += euclideanDistance(candidate_node->getData(), graph.getNode(j)->getData());
+            }
         }
-      }
 
-      // Find the medoid node among the sampled nodes by calculating the average distance for each one
-      float min_average_distance = std::numeric_limits<float>::max();  // Initialize with a large value to find minimum
-      GraphNode<vamana_t>* medoid_node = nullptr;  // Pointer to the node with the minimum average distance (the medoid)
+        // Compute the average distance for this candidate node
+        // This is done by dividing the total distance by the number of other nodes
+        float average_distance = total_distance / (node_count - 1);
 
-      // Loop through each sampled node to calculate its average distance to other sampled nodes
-      for (int i = 0; i < sample_size; ++i) {
-        // Calculate the total distance from node `i` to all other nodes in the sample
-        float total_distance = std::accumulate(distance_matrix[i].begin(), distance_matrix[i].end(), 0.0f);
-        
-        // Compute the average distance by dividing the total distance by the number of other nodes (sample_size - 1)
-        float average_distance = total_distance / (sample_size - 1);
-
-        // Check if this node has a smaller average distance than the smallest found so far
+        // Check if this candidate node has a smaller average distance than the current minimum
+        // If so, update the minimum distance and set this node as the current medoid candidate
         if (average_distance < min_average_distance) {
-          // Update the minimum average distance and set this node as the current medoid candidate
           min_average_distance = average_distance;
-          medoid_node = graph.getNode(sampled_indices[i]);
+          medoid_node = candidate_node;
         }
       }
 
-      printProgressBar(100, "Computing the mediod point:     ");
-
-      return *medoid_node;
-
+    // Return the node with the smallest average distance, which is the medoid
+    // The medoid represents the node that minimizes the total distance to all other nodes
+    return *medoid_node;
   }
+
+  using namespace std;
   
-  map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
+  map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
 
     /*
     method of the Graph class that returns the DataVectors as a sets
     getNodeSet(). returns DataVectors
     */
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     //Variables
@@ -426,6 +403,10 @@ public:
     //Variables
     set<BaseDataVector<float>> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
 >>>>>>> ca64dc6 (debugging compilation errors)
+=======
+    //Variabless
+    set<DataVectors> P = Graph.getNodesSet;  //get the set of the Filtered Graph's nodes
+>>>>>>> 9867a14 (Resolving conflicts)
     set<int> Filters;//this is the set of all the filters (i.e. categorical attributes)
     map<string,int> M; //this will be a map of Medoid for every filter's set of nodes
 
