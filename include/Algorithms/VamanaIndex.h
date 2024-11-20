@@ -399,6 +399,11 @@ public:
 
   }
   
+
+  //####################################################################
+  //this is the new filtered medoid, i will brief in later time
+  //####################################################################
+  
   map<string, int> FilteredMedoid(const Graph<T>& Graph, int threshold){
 
     /*
