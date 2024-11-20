@@ -69,3 +69,63 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
         }
     }
 }
+
+
+template <typename graph_t>
+void FilteredRobustPrune(
+    Graph<graph_t>& G, 
+    GraphNode<graph_t>& p_node,
+    std::set<graph_t>& V, 
+    float alpha,
+    int R) {
+    
+    // Get the data of the node p_node
+    graph_t p = p_node.getData();
+
+    // Retrieve all neighbors of p_node and insert them into set V
+    std::vector<graph_t>* neighbors = p_node.getNeighbors();
+    for (auto neighbor : *neighbors) {
+        V.insert(neighbor);
+    }
+
+    // Remove p_node itself from V
+    V.erase(p);
+
+    // Clear the neighbors of p_node
+    p_node.clearNeighbors();
+
+    // Continue pruning until V is empty or the desired number of neighbors is reached
+    while (!V.empty()) {
+
+        // Find the closest neighbor to p_node in V
+        graph_t p_star = getSetItemAtIndex(0, V);
+        float p_star_distance = euclideanDistance(p, p_star);
+
+        // Update p_star if a closer neighbor is found
+        for (auto p_tone : V) {
+            float currentDistance = euclideanDistance(p, p_tone);
+            if (currentDistance < p_star_distance) {
+                p_star_distance = currentDistance;
+                p_star = p_tone;
+            }
+        }
+
+        // Add the closest neighbor to p_node
+        p_node.addNeighbor(p_star);
+
+        // Check if the desired number of neighbors has been reached
+        if (p_node.getNeighbors()->size() == (long unsigned int)R) {
+            break;
+        }
+
+        // Filtering logic for V
+        std::set<graph_t> V_copy = V; // Create a copy of V
+        for (auto p_tone : V_copy) {
+            // Remove nodes that do NOT satisfy the filtering condition
+            if ((alpha * euclideanDistance(p_star, p_tone)) > euclideanDistance(p, p_tone)) {
+                V.erase(p_tone);
+            }
+        }
+    }
+}
+
