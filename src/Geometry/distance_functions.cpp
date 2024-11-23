@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "../include/distance.h"  //Includes function prototypes and DataVector class
+#include "../../include/distance.h"  //Includes function prototypes and DataVector class
 
 using namespace std;
 

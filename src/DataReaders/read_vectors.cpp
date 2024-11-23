@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../include/DataVector.h"
-#include "../include/read_data.h"
+#include "../../include/DataVector.h"
+#include "../../include/read_data.h"
 
 using namespace std;
 

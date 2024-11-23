@@ -1,5 +1,5 @@
-#include "../include/VamanaIndex.h"
-#include "../include/DataVector.h"
+#include "../../../include/VamanaIndex.h"
+#include "../../../include/DataVector.h"
 
 /**
  * @brief Generates a random permutation of integers in a specified range. This function creates a vector 

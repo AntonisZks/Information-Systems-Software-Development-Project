@@ -1,4 +1,4 @@
-#include "../include/GreedySearch.h"
+#include "../../../include/GreedySearch.h"
 
 /**
  * @brief Computes the difference between two sets, returning elements

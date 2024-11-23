@@ -1,5 +1,5 @@
-#include "../include/graph_node.h"
-#include "../include/DataVector.h"
+#include "../../include/graph_node.h"
+#include "../../include/DataVector.h"
 
 /**
  * @brief Constructs a GraphNode with specified data.

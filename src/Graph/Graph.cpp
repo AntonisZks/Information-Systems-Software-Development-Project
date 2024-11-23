@@ -1,5 +1,5 @@
-#include "../include/graph.h"
-#include "../include/DataVector.h"
+#include "../../include/graph.h"
+#include "../../include/DataVector.h"
 
 /**
  * @brief Default Constructor of the Grpah. Exists to avoid errors.
