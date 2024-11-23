@@ -64,6 +64,7 @@ $(OBJ_DIR)/%.o: $(TST_DIR)/%.cc
 
 # Compile the objects in the src directory by calling their Makefile
 $(OBJS):
+	@ mkdir -p $(OBJ_DIR)
 	$(MAKE) -C $(SRC_DIR)
 
 
