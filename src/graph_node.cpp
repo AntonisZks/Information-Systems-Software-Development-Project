@@ -1,4 +1,5 @@
 #include "../include/graph_node.h"
+#include "../include/DataVector.h"
 
 /**
  * @brief Constructs a GraphNode with specified data.
@@ -36,19 +37,9 @@ template <typename node_t> void GraphNode<node_t>::removeNeighbor(node_t data) {
 
 }
 
-/**
- * @brief Overloads the << operator to output the node's data to an output stream.
- * 
- * @param node_t The data type stored in the node
- * @param out The output stream to write to
- * @param node The GraphNode whose data will be output
- * 
- * @return The output stream with node data appended
- */
-template <typename node_t> 
-std::ostream& operator<<(std::ostream& out, const GraphNode<node_t> node) {
+template class GraphNode<int>;
+template class GraphNode<double>;
+template class GraphNode<std::string>;
 
-  out << node.getData();
-  return out;
-
-}
+template class GraphNode<DataVector<float>>;
+template class GraphNode<DataVector<double>>;

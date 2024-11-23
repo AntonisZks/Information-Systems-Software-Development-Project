@@ -174,18 +174,43 @@ public:
  * 
  * @return the putput stream
 */
-template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector);
+template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector) {
+
+  out << vector.getDimension() << " " << vector.getIndex();
+  for (unsigned int i = 0; i < vector.getDimension(); i++) {
+    out << " " << vector.getDataAtIndex(i);
+  }
+
+  return out;
+
+}
 
 /**
- * @brief Operator >> overloading for reading a DataVector object. Specifically it reads the 
+ * @brief Operator >> overloading for reading a DataVector object. Specifically it reads the
  * dimension, index and data of the vector from the input stream.
- * 
+ *
  * @param in the input stream object
  * @param vector the DataVector object to read into
- * 
+ *
  * @return the input stream
-*/
-template <typename dvector_t> std::istream& operator>>(std::istream& in, DataVector<dvector_t>& vector);
+ */
+template <typename dvector_t> std::istream& operator>>(std::istream& in, DataVector<dvector_t>& vector) {
+
+    unsigned int valuesCount, index;
+    in >> valuesCount >> index;
+
+    vector.setDimension(valuesCount);
+    vector.setIndex(index);
+
+    for (unsigned int i = 0; i < valuesCount; i++) {
+        dvector_t currentValue;
+        in >> currentValue;
+        vector.setDataAtIndex(currentValue, i);
+    }
+
+    return in;
+
+}
 
 
 #endif /* DATA_VECTOR_H */

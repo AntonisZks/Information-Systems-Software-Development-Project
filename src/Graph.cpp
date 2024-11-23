@@ -1,4 +1,5 @@
 #include "../include/graph.h"
+#include "../include/DataVector.h"
 
 /**
  * @brief Default Constructor of the Grpah. Exists to avoid errors.
@@ -185,41 +186,5 @@ template <typename graph_t> bool Graph<graph_t>::disconnectNodesByData(const gra
   return true;
 }
 
-/**
- * @brief Overloads the << operator to print the graph. Each node's data and its neighbors are printed.
- * 
- * @param graph_t Data type contained in the graph
- * @param output Output stream for printing
- * @param graph Graph to be printed
- * 
- * @return Reference to the output stream
- */
-template <typename graph_t> std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
-
-  if (graph.getNodesCount() == 0) {
-    output << "Graph Empty";
-    return output;
-  }
-
-  for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
-
-    std::vector<graph_t>* neighbors = graph.getNodeNeighbors(i);
-    output << graph.getNodeData(i) << ": [";
-    
-    for (unsigned int j = 0; j < neighbors->size(); j++) {
-      output << neighbors->at(j);
-      if (j < neighbors->size() - 1) {
-        output << ", ";
-      }
-    }
-
-    output << "]";
-    if (i < graph.getNodesCount() - 1) {
-      output << std::endl;
-    }
-
-  }
-
-  return output;
-
-}
+template class Graph<int>;
+template class Graph<DataVector<float>>;

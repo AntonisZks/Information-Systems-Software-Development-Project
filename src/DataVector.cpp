@@ -17,7 +17,7 @@ template <typename dvector_t> DataVector<dvector_t>::DataVector(void)
  * 
  * @param dimension_ the dimension of the vector.
 */
-template <typename dvector_t> DataVector<dvector_t>::DataVector(unsigned int dimension_, unsigned int index_=0) 
+template <typename dvector_t> DataVector<dvector_t>::DataVector(unsigned int dimension_, unsigned int index_) 
   : dimension(dimension_), graphIndex(index_) {
 
     this->data = new dvector_t[dimension_];
@@ -244,52 +244,11 @@ template <typename dvector_t> void DataVector<dvector_t>::setDimension(const uns
 
 }
 
-/**
- * @brief Operator << overloading for printing a DataVector object. Speicifically it prints the 
- * first and last 10 items of the vector.
- * 
- * @param out the output stream object
- * @param vector the DataVector object to print
- * 
- * @return the putput stream
-*/
-template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const DataVector<dvector_t>& vector) {
 
-  out << vector.getDimension() << " " << vector.getIndex();
-  for (unsigned int i = 0; i < vector.getDimension(); i++) {
-    out << " " << vector.getDataAtIndex(i);
-  }
+template class DataVector<int>;
+template class DataVector<float>;
+template class DataVector<double>;
 
-  return out;
-
-}
-
-/**
- * @brief Operator >> overloading for reading a DataVector object. Specifically it reads the 
- * dimension, index and data of the vector from the input stream.
- * 
- * @param in the input stream object
- * @param vector the DataVector object to read into
- * 
- * @return the input stream
-*/
-template <typename dvector_t> std::istream& operator>>(std::istream& in, DataVector<dvector_t>& vector) {
-
-    unsigned int valuesCount, index;
-    in >> valuesCount >> index;
-
-    vector.setDimension(valuesCount);
-    vector.setIndex(index);
-
-    for (unsigned int i = 0; i < valuesCount; i++) {
-        dvector_t currentValue;
-        in >> currentValue;
-        vector.setDataAtIndex(currentValue, i);
-    }
-
-    return in;
-
-}
 
 // /**
 //  * @brief Operator << overloading for printing a DataVector object. Speicifically it prints the 

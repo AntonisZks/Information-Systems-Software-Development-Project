@@ -9,96 +9,32 @@ OBJ_DIR = build
 EXE_DIR = bin
 TST_DIR = tests
 
-# make all builds everything
-all: code test
+TARGET = $(EXE_DIR)/main2
+TARGET_MAIN = $(EXE_DIR)/main
 
-# Compile only the main code
-code: build bin $(EXE_DIR)/main $(EXE_DIR)/main2
+OBJS = $(OBJ_DIR)/DataVector.o $(OBJ_DIR)/distance_functions.o $(OBJ_DIR)/graph_node.o $(OBJ_DIR)/Graph.o \
+			 $(OBJ_DIR)/RobustPrune.o $(OBJ_DIR)/recall.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/GreedySearch.o $(OBJ_DIR)/graphics.o $(OBJ_DIR)/VamanaIndex.o
 
-# Compile all test executables
-test: build bin $(EXE_DIR)/graph_node_test $(EXE_DIR)/graph_test $(EXE_DIR)/test_distance $(EXE_DIR)/test_data_vectors $(EXE_DIR)/test_recall
-	@echo "Running all tests:"
-	$(EXE_DIR)/graph_node_test
-	$(EXE_DIR)/graph_test
-	$(EXE_DIR)/test_distance
-	$(EXE_DIR)/test_data_vectors
-	$(EXE_DIR)/test_recall
+OBJS_MAIN = $(OBJ_DIR)/DataVector.o $(OBJ_DIR)/distance_functions.o $(OBJ_DIR)/graph_node.o $(OBJ_DIR)/Graph.o \
+			 $(OBJ_DIR)/RobustPrune.o $(OBJ_DIR)/recall.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/GreedySearch.o $(OBJ_DIR)/graphics.o $(OBJ_DIR)/VamanaIndex.o
 
-# Run tests with valgrind
-valgrind: test
-	valgrind --leak-check=full $(EXE_DIR)/graph_node_test
-	valgrind --leak-check=full $(EXE_DIR)/graph_test
-	valgrind --leak-check=full $(EXE_DIR)/test_distance
-	valgrind --leak-check=full $(EXE_DIR)/test_data_vectors
-	valgrind --leak-check=full $(EXE_DIR)/test_recall
+all: $(TARGET) $(TARGET_MAIN)
 
-# Define the rule for the main executable
-$(EXE_DIR)/main: $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/main $(OBJ_DIR)/main.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
+$(TARGET): $(OBJS) $(OBJ_DIR)/main2.o
+	$(CC) $(FLAGS) -I$(INC_DIR) $(OBJ_DIR)/main2.o $(OBJS) -o $(TARGET)
 
-$(OBJ_DIR)/main.o: main.cpp $(INC_DIR)/DataStructures/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataStructures/DataVector/DataVector.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/main.o -c main.cpp
+$(TARGET_MAIN): $(OBJS_MAIN) $(OBJ_DIR)/main.o
+	$(CC) $(FLAGS) -I$(INC_DIR) $(OBJ_DIR)/main.o $(OBJS_MAIN) -o $(TARGET_MAIN)
 
-$(EXE_DIR)/main2: $(OBJ_DIR)/main2.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/main2 $(OBJ_DIR)/main2.o $(OBJ_DIR)/read_vectors.o $(OBJ_DIR)/distance_functions.o
+$(OBJ_DIR)/main2.o: main2.cpp
+	$(CC) $(FLAGS) -I$(INC_DIR) -c main2.cpp -o $(OBJ_DIR)/main2.o
 
-$(OBJ_DIR)/main2.o: main2.cpp $(INC_DIR)/DataStructures/Graph/graph.h $(INC_DIR)/read_data.h $(INC_DIR)/DataStructures/DataVector/DataVector.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/main2.o -c main2.cpp
+$(OBJ_DIR)/main.o: main.cpp
+	$(CC) $(FLAGS) -I$(INC_DIR) -c main.cpp -o $(OBJ_DIR)/main.o
 
-# Rule to create read_vectors.o
-$(OBJ_DIR)/read_vectors.o: $(SRC_DIR)/read_vectors.cpp $(INC_DIR)/read_data.h $(INC_DIR)/DataStructures/DataVector/DataVector.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/read_vectors.o -c $(SRC_DIR)/read_vectors.cpp
+$(OBJS):
+	$(MAKE) -C $(SRC_DIR)
 
-# Rule to create distance_functions.o
-$(OBJ_DIR)/distance_functions.o: $(SRC_DIR)/distance_functions.cpp $(INC_DIR)/distance.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/distance_functions.o -c $(SRC_DIR)/distance_functions.cpp
-
-# Test executables and object file rules
-
-# Build graph_node_test executable
-$(EXE_DIR)/graph_node_test: $(OBJ_DIR)/graph_node_test.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_node_test $(OBJ_DIR)/graph_node_test.o
-
-$(OBJ_DIR)/graph_node_test.o: $(TST_DIR)/graph_node_test.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataStructures/Graph/graph_node.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_node_test.o -c $(TST_DIR)/graph_node_test.cc
-
-# Build graph_test executable
-$(EXE_DIR)/graph_test: $(OBJ_DIR)/graph_test.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/graph_test $(OBJ_DIR)/graph_test.o
-
-$(OBJ_DIR)/graph_test.o: $(TST_DIR)/graph_test.cc $(INC_DIR)/acutest.h $(INC_DIR)/DataStructures/Graph/graph.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/graph_test.o -c $(TST_DIR)/graph_test.cc
-
-# Build test_distance executable
-$(EXE_DIR)/test_distance: $(OBJ_DIR)/test_distance.o $(OBJ_DIR)/distance_functions.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/test_distance $(OBJ_DIR)/test_distance.o $(OBJ_DIR)/distance_functions.o
-
-$(OBJ_DIR)/test_distance.o: $(TST_DIR)/test_distance.cc $(INC_DIR)/acutest.h $(INC_DIR)/distance.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_distance.o -c $(TST_DIR)/test_distance.cc
-
-# Build test_data_vectors executable
-$(EXE_DIR)/test_data_vectors: $(OBJ_DIR)/test_data_vectors.o $(OBJ_DIR)/read_vectors.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/test_data_vectors $(OBJ_DIR)/test_data_vectors.o $(OBJ_DIR)/read_vectors.o
-
-$(OBJ_DIR)/test_data_vectors.o: $(TST_DIR)/test_data_vectors.cc $(INC_DIR)/acutest.h $(INC_DIR)/read_data.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_data_vectors.o -c $(TST_DIR)/test_data_vectors.cc
-
-# Build test_recall executable
-$(EXE_DIR)/test_recall: $(OBJ_DIR)/test_recall.o
-	$(CC) $(FLAGS) -o $(EXE_DIR)/test_recall $(OBJ_DIR)/test_recall.o
-
-$(OBJ_DIR)/test_recall.o: $(TST_DIR)/test_recall.cc $(INC_DIR)/acutest.h $(INC_DIR)/Evaluation/recall.h
-	$(CC) $(FLAGS) -o $(OBJ_DIR)/test_recall.o -c $(TST_DIR)/test_recall.cc
-
-# Directories creation
-build:
-	mkdir -p $(OBJ_DIR)
-
-bin:
-	mkdir -p $(EXE_DIR)
-
-# Clean command to clean the workspace
-.PHONY: clean
 clean:
-	rm -r -f $(EXE_DIR)
-	rm -r -f $(OBJ_DIR)
+	rm -f $(OBJ_DIR)/*.o
+	rm -f $(EXE_DIR)/*

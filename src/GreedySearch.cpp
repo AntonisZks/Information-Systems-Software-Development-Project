@@ -12,6 +12,7 @@
  */
 template <typename set_t> 
 static std::set<set_t> getSetDifference(const std::set<set_t>& set1, const std::set<set_t>& set2) {
+  
   std::set<set_t> result; // Resulting set to hold the difference
 
   // Compute difference and store in result
@@ -22,6 +23,7 @@ static std::set<set_t> getSetDifference(const std::set<set_t>& set1, const std::
   );
 
   return result;
+
 }
 
 /**
@@ -37,6 +39,7 @@ static std::set<set_t> getSetDifference(const std::set<set_t>& set1, const std::
  */
 template <typename set_t>
 static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>& set) {
+
   // Validate index
   if (index >= set.size()) {
     throw std::invalid_argument("Index is not valid");
@@ -47,6 +50,7 @@ static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>&
   std::advance(it, index);
 
   return *it; // Return the element at the specified index
+
 }
 
 /**
@@ -136,3 +140,6 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
   return {candidates, visited};
 
 }
+
+template std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> 
+GreedySearch(const Graph<DataVector<float>>& G, const GraphNode<DataVector<float>>& s, const DataVector<float>& xq, unsigned int k, unsigned int L);

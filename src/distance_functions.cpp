@@ -76,3 +76,5 @@ double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b)
     }
     return sum;
 }
+
+template struct EuclideanDistanceOrder<DataVector<float>>;

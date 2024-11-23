@@ -1,4 +1,33 @@
 #include "../include/RobustPrune.h"
+#include "../include/DataVector.h"
+#include "../include/distance.h"
+
+/**
+ * @brief Retrieves the element at a specific index in a set. This function enables index-based access in a set, 
+ * even though sets are not indexed containers.
+ * 
+ * @param set_t Type of elements in the set
+ * @param index The zero-based index of the desired element
+ * @param set The set from which to retrieve the element
+ * 
+ * @return The element at the specified index
+ * @throws std::invalid_argument if the index is out of range
+ */
+template <typename set_t>
+static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>& set) {
+
+  // Validate index
+  if (index >= set.size()) {
+    throw std::invalid_argument("Index is not valid");
+  }
+
+  // Advance an iterator to the indexed position
+  auto it = set.begin();
+  std::advance(it, index);
+
+  return *it; // Return the element at the specified index
+
+}
 
 /**
  * @brief Prunes the neighbors of a given node in a graph based on a robust pruning algorithm.
@@ -71,3 +100,6 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
     }
   }
 }
+
+template void RobustPrune<DataVector<float>>(
+  Graph<DataVector<float>>& G, GraphNode<DataVector<float>>& p_node, std::set<DataVector<float>>& V, float alpha, int R);

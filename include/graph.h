@@ -147,7 +147,34 @@ public:
  * 
  * @return Reference to the output stream
  */
-template <typename graph_t> 
-std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph);
+template <typename graph_t> std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
+
+  if (graph.getNodesCount() == 0) {
+    output << "Graph Empty";
+    return output;
+  }
+
+  for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
+
+    std::vector<graph_t>* neighbors = graph.getNodeNeighbors(i);
+    output << graph.getNodeData(i) << ": [";
+    
+    for (unsigned int j = 0; j < neighbors->size(); j++) {
+      output << neighbors->at(j);
+      if (j < neighbors->size() - 1) {
+        output << ", ";
+      }
+    }
+
+    output << "]";
+    if (i < graph.getNodesCount() - 1) {
+      output << std::endl;
+    }
+
+  }
+
+  return output;
+
+}
 
 #endif /* GRAPH_H */

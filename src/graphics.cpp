@@ -6,7 +6,7 @@
  * @param percentage The percentage of progress to display (0-100).
  * @param message Optional message to display before the progress bar.
  */
-void printProgressBar(const double percentage, const std::string message = "") {
+void printProgressBar(const double percentage, const std::string message) {
   const int barWidth = 50; // Width of the progress bar in characters
   unsigned int pos = static_cast<unsigned int>((percentage * barWidth) / 100); // Calculate position in bar
 

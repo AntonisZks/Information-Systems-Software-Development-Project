@@ -121,39 +121,39 @@ public:
   //this is the new filtered medoid, i will brief in later time
   //####################################################################
   
-  map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
+  // map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
 
-    //                        VARIABLES
+  //   //                        VARIABLES
 
-    //get filtered Graph's nodes (as BaseDatavectors)
-    set<BaseDataVector<float>> P = Graph.getNodesSet;
+  //   //get filtered Graph's nodes (as BaseDatavectors)
+  //   set<BaseDataVector<float>> P = Graph.getNodesSet;
 
-    //Map tha will fill with the medoids
-    map<string,int> M;
+  //   //Map tha will fill with the medoids
+  //   map<string,int> M;
 
-    //This is the set of all the different filters (categorical attributes).
-    //it will work as a counter for the loop (for example it will be 1,2,3,4)
-    set<int> Filters; //we need to get this information from the BDataVectors
+  //   //This is the set of all the different filters (categorical attributes).
+  //   //it will work as a counter for the loop (for example it will be 1,2,3,4)
+  //   set<int> Filters; //we need to get this information from the BDataVectors
 
-    //This is the set of all the nodes with the same filter (cat. attribute).
-    //it will change in each iteration
-    set<BaseDataVector<float>> Pf;
+  //   //This is the set of all the nodes with the same filter (cat. attribute).
+  //   //it will change in each iteration
+  //   set<BaseDataVector<float>> Pf;
 
-    //the given threshold
-    int τ = threshold;
+  //   //the given threshold
+  //   int τ = threshold;
 
-    //this is a random collection of nodes of the same filter
-    //the number of nodes will be defined by the threshold τ
-    set<BaseDataVector<float>> Rf;
+  //   //this is a random collection of nodes of the same filter
+  //   //the number of nodes will be defined by the threshold τ
+  //   set<BaseDataVector<float>> Rf;
 
-    //                      ALGORITHM LOOP
-    for(int f : Filters){
+  //   //                      ALGORITHM LOOP
+  //   for(int f : Filters){
 
-    }
+  //   }
 
-    //retutn the map of the medoids
-    return M;
-  }
+  //   //retutn the map of the medoids
+  //   return M;
+  // }
 
   /**
    * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
@@ -181,6 +181,16 @@ public:
  * 
  * @return the output stream
 */
-template <typename vamana_t> std::ostream& operator<<(std::ostream& out, const VamanaIndex<vamana_t>& index);
+template <typename vamana_t> std::ostream& operator<<(std::ostream& out, const VamanaIndex<vamana_t>& index) {
+
+  if (index.getGraph().getNodesCount() == 0) {
+    out << "Vamana Index Empty";
+    return out;
+  }
+
+  out << index.getGraph();
+  return out;
+
+}
 
 #endif /* VAMANA_INDEX_H */

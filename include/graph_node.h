@@ -121,6 +121,11 @@ public:
  * @return The output stream with node data appended
  */
 template <typename node_t> 
-std::ostream& operator<<(std::ostream& out, const GraphNode<node_t> node);
+std::ostream& operator<<(std::ostream& out, const GraphNode<node_t> node) {
+
+  out << node.getData();
+  return out;
+
+}
 
 #endif /* GRAPH_NODE_H */

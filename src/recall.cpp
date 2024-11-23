@@ -1,4 +1,5 @@
 #include "../include/recall.h"
+#include "../include/DataVector.h"
 
 /**
  * @brief Calculates the recall between two sets of items. Recall is a measure of how many relevant items 
@@ -33,3 +34,8 @@ template <typename set_t> double calculateRecallEvaluation(const std::set<set_t>
   return (double)result.size() / (double)k;
 
 }
+
+// Explicit template instantiation for int and float types
+template double calculateRecallEvaluation(const std::set<int>& X, const std::set<int>& G);
+template double calculateRecallEvaluation(const std::set<float>& X, const std::set<float>& G);
+template double calculateRecallEvaluation(const std::set<DataVector<float>>& X, const std::set<DataVector<float>>& G);

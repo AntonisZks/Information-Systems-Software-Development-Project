@@ -1,4 +1,5 @@
 #include "../include/VamanaIndex.h"
+#include "../include/DataVector.h"
 
 /**
  * @brief Generates a random permutation of integers in a specified range. This function creates a vector 
@@ -284,7 +285,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
  * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
  * @return The medoid node of the sampled nodes.
  */
-template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedoid(const Graph<vamana_t>& graph, int sample_size = 100) {
+template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedoid(const Graph<vamana_t>& graph, int sample_size) {
 
   const int node_count = graph.getNodesCount();  // Get the total number of nodes in the graph
   sample_size = std::min(sample_size, node_count);  // Ensure the sample size doesn’t exceed the total node count
@@ -377,22 +378,4 @@ template <typename vamana_t> void VamanaIndex<vamana_t>::test(const unsigned int
 
 }
 
-/**
- * @brief Overloading the operator << for the Vamana Index.
- * 
- * @param out the output stream
- * @param index the Vamana Index to be printed
- * 
- * @return the output stream
-*/
-template <typename vamana_t> std::ostream& operator<<(std::ostream& out, const VamanaIndex<vamana_t>& index) {
-
-  if (index.getGraph().getNodesCount() == 0) {
-    out << "Vamana Index Empty";
-    return out;
-  }
-
-  out << index.getGraph();
-  return out;
-
-}
+template class VamanaIndex<DataVector<float>>;
