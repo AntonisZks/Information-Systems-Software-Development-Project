@@ -3,8 +3,8 @@
 
 #include <vector>           // Required for std::vector
 #include <string>           // Required for std::string
-#include "DataStructures/DataVector/DataVector.h"
-#include "DataStructures/DataVector/BQDataVectors.h"
+#include "DataVector.h"
+#include "BQDataVectors.h"
 
 
 using namespace std;        // Optional: can avoid repeating std::
@@ -41,7 +41,28 @@ vector<DataVector<int>> ReadGroundTruth(const string& filename);
  */
 void saveVectors(const vector<DataVector<float>>& dataVectors, const string& outputFilename);
 
+/**
+ * @brief Function to read a file and convert its data into a vector of BaseDataVector<float> objects.
+ * The file is assumed to be in a binary format where each vector starts with its dimensionality (int),
+ * followed by the float values representing the vector data, and additional attributes for categorical
+ * and timestamp information.
+ * 
+ * @param filename The name of the input file to read vector data from.
+ * 
+ * @return A vector of BaseDataVector<float> objects containing the read data.
+ */
 vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& filename);
+
+/**
+ * @brief Function to read a file and convert its data into a vector of QueryDataVector<float> objects.
+ * The file is assumed to be in a binary format where each vector starts with its dimensionality (int),
+ * followed by the float values representing the vector data, and additional attributes for categorical
+ * and timestamp information.
+ * 
+ * @param filename The name of the input file to read vector data from.
+ * 
+ * @return A vector of QueryDataVector<float> objects containing the read data.
+ */
 vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& filename);
 
 #endif // READ_DATA_H

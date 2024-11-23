@@ -7,7 +7,7 @@
 #include "graph_node.h"
 #include <numeric>  
 #include <random>
-#include "../../graphics.h"
+#include "graphics.h"
 
 /**
  * @brief Implements a directed, unweighted graph data structure. Each node in the graph contains 
@@ -27,34 +27,19 @@ public:
   /**
    * @brief Default Constructor of the Grpah. Exists to avoid errors.
    */
-  Graph(void) : nodesCount(0) {
-    this->nodes = new GraphNode<graph_t>[0];
-  }
+  Graph(void);
 
   /**
    * @brief Constructs a graph with a specified number of nodes and allocates memory for them.
    * 
    * @param nodesCount_ Number of nodes in the graph
    */
-  Graph(unsigned int nodesCount_) : nodesCount(nodesCount_) {
-
-    this->nodes = new GraphNode<graph_t>[nodesCount_];
-    for (unsigned int i = 0; i < nodesCount_; i++) {
-      this->nodes[i].setIndex(i);
-    }
-
-    for (unsigned int i = 0; i < this->nodesCount; i++) {
-      this->nodesSet.insert(this->nodes[i].getData());
-    }
-
-  }
+  Graph(unsigned int nodesCount_);
 
   /**
    * @brief Destructor for the Graph. Releases the memory allocated for nodes.
    */
-  ~Graph(void) {
-    delete[] this->nodes;
-  }
+  ~Graph(void);
 
   /**
    * @brief Sets the data of a specific node by its index.
@@ -62,9 +47,7 @@ public:
    * @param index Index of the node
    * @param data Data to assign to the node
    */
-  void setNodeData(unsigned int index, const graph_t& data) {
-    this->nodes[index].setData(data);
-  }
+  void setNodeData(unsigned int index, const graph_t& data);
 
   /**
    * @brief Sets the nodes count of the graph. Deletes the current memory
@@ -73,23 +56,14 @@ public:
    * 
    * @param nodesCount the number of nodes.
    */
-  void setNodesCount(const unsigned int nodesCount) {
-    this->nodesCount = nodesCount;
-    delete [] this->nodes;
-    this->nodes = new GraphNode<graph_t>[nodesCount];
-    for (unsigned int i = 0; i < nodesCount; i++) {
-      this->nodes[i].setIndex(i);
-    }
-  }
+  void setNodesCount(const unsigned int nodesCount);
 
   /**
    * @brief Retrieves the data from all nodes in the graph.
    * 
    * @return set of data from all nodes
   */
-  std::set<graph_t> getNodesSet(void) const {
-    return this->nodesSet;
-  }
+  std::set<graph_t> getNodesSet(void) const { return this->nodesSet; }
 
   /**
    * @brief Retrieves the data from a specific node by its index.
@@ -97,9 +71,7 @@ public:
    * @param index Index of the node
    * @return Data stored in the node
    */
-  graph_t getNodeData(const unsigned int index) const {
-    return this->nodes[index].getData();
-  }
+  graph_t getNodeData(const unsigned int index) const;
 
   /**
    * @brief Retrieves a pointer to a node at a specified index.
@@ -107,14 +79,7 @@ public:
    * @param index Index of the node
    * @return Pointer to the node if index is valid, otherwise nullptr
    */
-  GraphNode<graph_t>* getNode(const unsigned int index) const {
-
-    if (index >= this->nodesCount) {
-      return nullptr;
-    }
-    return &this->nodes[index];
-
-  }
+  GraphNode<graph_t>* getNode(const unsigned int index) const;
 
   /**
    * @brief Finds and returns a pointer to the first node that contains the specified data.
@@ -122,16 +87,7 @@ public:
    * @param data Data to search for in the nodes
    * @return Pointer to the node containing the data, or nullptr if not found
    */
-  GraphNode<graph_t>* getNodeWithData(const graph_t data) const {
-
-    for (unsigned int i = 0; i < this->nodesCount; i++) {
-      if (this->nodes[i].getData() == data) {
-        return &this->nodes[i];
-      }
-    }
-    return nullptr;
-
-  }
+  GraphNode<graph_t>* getNodeWithData(const graph_t data) const;
 
   /**
    * @brief Retrieves the neighbors of a node by its index.
@@ -139,23 +95,14 @@ public:
    * @param index Index of the node
    * @return Pointer to a vector of the node's neighbors, or nullptr if the index is invalid
    */
-  std::vector<graph_t>* getNodeNeighbors(const unsigned int index) const {
-
-    if (index >= this->nodesCount) {
-      return nullptr;
-    }
-    return this->nodes[index].getNeighbors();
-
-  }
+  std::vector<graph_t>* getNodeNeighbors(const unsigned int index) const;
 
   /**
    * @brief Retrieves the total number of nodes in the graph.
    * 
    * @return Total node count
    */
-  unsigned int getNodesCount(void) const {
-    return this->nodesCount;
-  }
+  unsigned int getNodesCount(void) const { return this->nodesCount; }
 
   /**
    * @brief Connects two nodes in the graph by their data, creating a directed edge from the first 
@@ -166,24 +113,7 @@ public:
    * 
    * @return True if the connection was successful, false otherwise
    */
-  bool connectNodesByData(const graph_t firstNodeData, const graph_t secondNodeData) {
-
-    // Check if the data re not the same
-    if (firstNodeData == secondNodeData) {
-      return false;
-    }
-
-    GraphNode<graph_t>* firstNode = getNodeWithData(firstNodeData);
-    GraphNode<graph_t>* secondNode = getNodeWithData(secondNodeData);
-
-    if (!firstNode || !secondNode) {
-      return false;
-    }
-
-    firstNode->addNeighbor(secondNode->getData());
-    return true;
-
-  }
+  bool connectNodesByData(const graph_t firstNodeData, const graph_t secondNodeData);
 
   /**
    * @brief Connects two nodes by their indices, creating a directed edge from the first index to 
@@ -194,16 +124,7 @@ public:
    * 
    * @return True if the connection was successful, false otherwise
    */
-  bool connectNodesByIndex(const unsigned int index1, const unsigned int index2) {
-
-    if (index1 >= this->nodesCount || index2 >= this->nodesCount || index1 == index2) {
-      return false;
-    }
-
-    this->nodes[index1].addNeighbor(this->nodes[index2].getData());
-    return true;
-
-  }
+  bool connectNodesByIndex(const unsigned int index1, const unsigned int index2);
 
   /**
    * @brief Disconnects two nodes by removing the second node's data from the neighbors of the first.
@@ -213,16 +134,7 @@ public:
    * 
    * @return True if the disconnection was successful, false otherwise
    */
-  bool disconnectNodesByData(const graph_t firstNodeData, const graph_t secondNodeData) {
-
-    GraphNode<graph_t>* firstNode = getNodeWithData(firstNodeData);
-    if (!firstNode) {
-      return false;
-    }
-
-    firstNode->removeNeighbor(secondNodeData);
-    return true;
-  }
+  bool disconnectNodesByData(const graph_t firstNodeData, const graph_t secondNodeData);
 
 };
 
@@ -236,28 +148,6 @@ public:
  * @return Reference to the output stream
  */
 template <typename graph_t> 
-std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph) {
-  if (graph.getNodesCount() == 0) {
-    output << "Graph Empty";
-    return output;
-  }
-
-  for (unsigned int i = 0; i < graph.getNodesCount(); i++) {
-    std::vector<graph_t>* neighbors = graph.getNodeNeighbors(i);
-    output << graph.getNodeData(i) << ": [";
-    for (unsigned int j = 0; j < neighbors->size(); j++) {
-      output << neighbors->at(j);
-      if (j < neighbors->size() - 1) {
-        output << ", ";
-      }
-    }
-    output << "]";
-    if (i < graph.getNodesCount() - 1) {
-      output << std::endl;
-    }    
-  } 
-  return output;
-
-}
+std::ostream& operator<<(std::ostream& output, const Graph<graph_t>& graph);
 
 #endif /* GRAPH_H */

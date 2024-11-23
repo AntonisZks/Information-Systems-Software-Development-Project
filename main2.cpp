@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "include/DataStructures/DataVector/BQDataVectors.h"
+#include "include/BQDataVectors.h"
 #include "include/read_data.h"
 #include "include/distance.h"
 #include <fstream>

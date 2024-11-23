@@ -7,6 +7,29 @@
 using namespace std;
 
 /**
+ * @brief Comparison operator for ordering elements by Euclidean distance.
+ * 
+ * @param a The first element to compare
+ * @param b The second element to compare
+ * 
+ * @return True if the first element is closer to the target vector than the second element.
+ */
+template <typename point_t> bool EuclideanDistanceOrder<point_t>::operator()(const point_t& a, const point_t& b) {
+
+    double distanceA = euclideanDistance(a, xq);
+    double distanceB = euclideanDistance(b, xq);
+
+    // Primary comparison by distance
+    if (distanceA != distanceB) {
+        return distanceA < distanceB;
+    }
+
+    // Secondary comparison if distances are the same
+    return a < b;
+
+}
+
+/**
  * @brief Function to calculate Euclidean distance between two DataVector objects. It uses
  * the Euclidean Distance formula for vectors of dimension n and calculates their distance.
  * 

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../include/DataStructures/DataVector/DataVector.h"
+#include "../include/DataVector.h"
 #include "../include/read_data.h"
 
 using namespace std;
@@ -138,6 +138,16 @@ void saveVectors(const vector<DataVector<float>>& dataVectors, const string& out
     cout << "Data saved to " << outputFilename << endl;
 }
 
+/**
+ * @brief Function to read a file and convert its data into a vector of BaseDataVector<float> objects.
+ * The file is assumed to be in a binary format where each vector starts with its dimensionality (int),
+ * followed by the float values representing the vector data, and additional attributes for categorical
+ * and timestamp information.
+ * 
+ * @param filename The name of the input file to read vector data from.
+ * 
+ * @return A vector of BaseDataVector<float> objects containing the read data.
+ */
 std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& filename) {
     ifstream file(filename, ios::binary);
 
@@ -172,6 +182,16 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
     return dataVectors;
 }
 
+/**
+ * @brief Function to read a file and convert its data into a vector of QueryDataVector<float> objects.
+ * The file is assumed to be in a binary format where each vector starts with its dimensionality (int),
+ * followed by the float values representing the vector data, and additional attributes for categorical
+ * and timestamp information.
+ * 
+ * @param filename The name of the input file to read vector data from.
+ * 
+ * @return A vector of QueryDataVector<float> objects containing the read data.
+ */
 std::vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& filename) {
 
     ifstream file(filename, ios::binary);

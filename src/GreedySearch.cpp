@@ -1,25 +1,4 @@
-#ifndef GREEDY_SEARCH_H
-#define GREEDY_SEARCH_H
-
-#include <iostream>
-#include <vector>
-#include <set>
-#include <algorithm>
-#include <iterator>
-#include <stdexcept>
-#include "../DataStructures/Graph/graph.h"
-#include "../DataStructures/DataVector/DataVector.h"
-#include "../distance.h"
-#include <queue>
-#include <cmath>
-
-// Enum to define different filter types based on the query type
-enum FilterType {
-    NO_FILTER,          // For query_type = 0, no filter is applied (only the vector is used).
-    C_EQUALS_v,         // For query_type = 1, filter for C = v (categorical attribute).
-    l_LEQ_T_LEQ_r,      // For query_type = 2, filter for l ≤ T ≤ r (timestamp constraint).
-    C_EQUALS_v_AND_l_LEQ_T_LEQ_r // For query_type = 3, filter for both C = v and l ≤ T ≤ r (combined constraints).
-};
+#include "../include/GreedySearch.h"
 
 /**
  * @brief Computes the difference between two sets, returning elements
@@ -69,36 +48,6 @@ static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>&
 
   return *it; // Return the element at the specified index
 }
-
-/**
- * @brief Comparator structure for ordering elements by Euclidean distance.
- * 
- * This functor orders elements based on their Euclidean distance to a target vector.
- * If two elements have the same distance, they are compared lexicographically.
- */
-template <typename graph_t>
-struct EuclideanDistanceOrder {
-
-  graph_t xq; // Target vector for distance comparisons
-
-  // Constructor to initialize the target vector
-  EuclideanDistanceOrder(const graph_t& target) : xq(target) {}
-
-  // Comparison operator: compares two elements based on distance to the target vector
-  bool operator()(const graph_t& a, const graph_t& b) {
-    double distanceA = euclideanDistance(a, xq);
-    double distanceB = euclideanDistance(b, xq);
-
-    // Primary comparison by distance
-    if (distanceA != distanceB) {
-      return distanceA < distanceB;
-    }
-    
-    // Secondary comparison if distances are the same
-    return a < b;
-  }
-
-};
 
 /**
  * @brief Greedy search algorithm for finding the k nearest nodes in a graph relative to a query vector.
@@ -187,5 +136,3 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
   return {candidates, visited};
 
 }
-
-#endif // GREEDY_SEARCH_H
