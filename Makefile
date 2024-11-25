@@ -76,7 +76,7 @@ FLAGS += $(DEPFLAGS)
 # Execution Rules
 
 create_simple_vamana:
-	./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 200 -R 14 -alpha 1.0 -save 'index.bin'
+	./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 20 -R 14 -alpha 1.0 -save 'index.bin'
 
 create_simple_vamana_valgrind:
 	valgrind --leak-check=full ./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 10 -R 14 -alpha 1.0 -save 'index.bin'
