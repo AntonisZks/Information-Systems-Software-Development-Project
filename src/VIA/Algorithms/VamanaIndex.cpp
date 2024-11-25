@@ -1,6 +1,9 @@
 #include "../../../include/VamanaIndex.h"
 #include "../../../include/DataVector.h"
 
+#include <thread>
+#include <chrono>
+
 /**
  * @brief Generates a random permutation of integers in a specified range. This function creates a vector 
  * containing all integers from `start` to `end` and then shuffles them randomly to produce a random permutation.
@@ -104,7 +107,8 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
  * 
 */
 template <typename vamana_t> 
-void VamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R) {
+void VamanaIndex<vamana_t>::createGraph(
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
 
@@ -119,11 +123,8 @@ void VamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, const fl
   GraphNode<vamana_t> s = findMedoid(this->G, 1000);
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
-  for (unsigned int i = 0; i < n; i++) {
-
-    double percentage = (double)(100*i)/n;
-    printProgressBar(percentage, "Vamana Index Creation Progress: ");
-
+  withProgress(0, n, "Creating Vamana", [&](int i) {
+    
     GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
     vamana_t sigma_i = sigma_i_node->getData();
 
@@ -152,9 +153,13 @@ void VamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, const fl
       }
     }
 
-  }
+  });
 
-  printProgressBar(100, "Vamana Index Creation Progress: ");
+  // for (unsigned int i = 0; i < n; i++) {
+
+    
+
+  // }
 
 }
 
@@ -178,19 +183,18 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::saveGraph(const std::st
 
   // Save the nodes count of the graph, and its data
   outFile << this->G.getNodesCount() << std::endl;
-  for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
-    
+  withProgress(0, this->G.getNodesCount(), "Saving Nodes", [&](int i) {
+  
     // Store the current node index and get its neighbors
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
     outFile << *currentNode;
     
     outFile << std::endl; // Newline to seperate each node's neighbors
   
-  }
+  });
 
-  // Save every edge of the graph by storing the neighbors of each node in the graph
-  for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
-  
+  withProgress(0, this->G.getNodesCount(), "Saving Edges", [&](int i) {
+
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
     
     std::vector<vamana_t>* neighbors = currentNode->getNeighbors();
@@ -202,8 +206,8 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::saveGraph(const std::st
     }
 
     outFile << std::endl; // Newline to seperate each node's neighbors
-  
-  }
+
+  });
 
   return true;
 
@@ -234,26 +238,19 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
   this->G.setNodesCount(nodesCount); // Set the nodes count of the graph
 
   // Load the nodes of the graph and their data from the file and store them in the graph
-  for (unsigned int i = 0; i < nodesCount; i++) {
-
-    double percentage = (double)(100*i)/nodesCount;
-    printProgressBar(percentage, "Loading vertices:               ");
-
+  withProgress(0, nodesCount, "Nodes Loading", [&](int i) {
+    
     vamana_t currentData;
     inFile >> currentData;
     currentData.setIndex(i);
 
     this->G.setNodeData(i, currentData);
     this->P.push_back(currentData);
-
-  }
-  printProgressBar(100, "Loading vertices:               ");
+  
+  });
 
   // Load the edges of the graph from the file and connect the nodes accordingly
-  for (unsigned int i = 0; i < nodesCount; i++) {
-
-    double percentage = (double)(100*i)/nodesCount;
-    printProgressBar(percentage, "Loading edges:                  ");
+  withProgress(0, nodesCount, "Edges Loading", [&](int i) {
 
     unsigned int neighborsCount;
     inFile >> neighborsCount;
@@ -267,8 +264,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
       this->G.connectNodesByIndex(i, neighborIndex);
     }
 
-  }
-  printProgressBar(100, "Loading edges:                  ");
+  });
 
   return true;
 
@@ -305,10 +301,7 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
   std::vector<std::vector<float>> distance_matrix(sample_size, std::vector<float>(sample_size, 0.0));
 
   // Compute pairwise distances between each pair of sampled nodes
-  for (int i = 0; i < sample_size; ++i) {
-
-    double percentage = (double)(100*i)/sample_size;
-    printProgressBar(percentage, "Computing the mediod point:     ");
+  withProgress(0, sample_size, "Finding Medoid", [&](int i) {
 
     for (int j = i + 1; j < sample_size; ++j) {
       // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
@@ -319,7 +312,8 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
       distance_matrix[i][j] = dist;
       distance_matrix[j][i] = dist;
     }
-  }
+
+  });
 
   // Find the medoid node among the sampled nodes by calculating the average distance for each one
   float min_average_distance = std::numeric_limits<float>::max();  // Initialize with a large value to find minimum
@@ -340,8 +334,6 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
       medoid_node = graph.getNode(sampled_indices[i]);
     }
   }
-
-  printProgressBar(100, "Computing the mediod point:     ");
 
   return *medoid_node;
 
