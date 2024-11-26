@@ -44,24 +44,16 @@ public:
         : DataVector<dvector_t>(dimension, index), C(category), T(timestamp) {}
 
     // Getter for the categorical attribute (C)
-    unsigned int getC() const {
-        return C;
-    }
+    inline unsigned int getC() const { return C; }
 
     // Getter for the timestamp attribute (T)
-    float getT() const {
-        return T;
-    }
+    inline float getT() const { return T; }
 
     // Setter for the categorical attribute (C)
-    void setC(unsigned int category) {
-        C = category;
-    }
+    inline void setC(unsigned int category) { C = category; }
 
     // Setter for the timestamp attribute (T)
-    void setT(float timestamp) {
-        T = timestamp;
-    }
+    inline void setT(float timestamp) { T = timestamp; }
 };
 
 /**
@@ -91,49 +83,32 @@ private:
 
 public:
     // Constructor to initialize the QueryDataVector with data and additional query attributes
-    QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, float v_value,
-                    float l_value, float r_value)
+    QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, float v_value, float l_value, float r_value)
         : DataVector<dvector_t>(dimension, index), query_type(q_type), v(v_value), l(l_value), r(r_value) {}
 
     // Getter for query type
-    unsigned int getQueryType() const {
-        return query_type;
-    }
+    inline unsigned int getQueryType() const { return query_type; }
 
     // Getter for categorical value (v)
-    float getV() const {
-        return v;
-    }
+    inline float getV() const { return v; }
 
     // Getter for lower bound of timestamp range (l)
-    float getL() const {
-        return l;
-    }
+    inline float getL() const { return l; }
 
     // Getter for upper bound of timestamp range (r)
-    float getR() const {
-        return r;
-    }
+    inline float getR() const { return r; }
 
     // Setter for query type
-    void setQueryType(unsigned int q_type) {
-        query_type = q_type;
-    }
+    inline void setQueryType(unsigned int q_type) { query_type = q_type; }
 
     // Setter for categorical value (v)
-    void setV(float v_value) {
-        v = v_value;
-    }
+    inline void setV(float v_value) { v = v_value; }
 
     // Setter for lower bound of timestamp range (l)
-    void setL(float l_value) {
-        l = l_value;
-    }
+    inline void setL(float l_value) { l = l_value; }
 
     // Setter for upper bound of timestamp range (r)
-    void setR(float r_value) {
-        r = r_value;
-    }
+    inline void setR(float r_value) { r = r_value; }
 };
 
 #endif // DATAVECTOR_H

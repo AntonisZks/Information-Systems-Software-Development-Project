@@ -7,8 +7,8 @@
 
 /**
  * @brief Struct that represents a node in a graph. Each node contains data of a specified type 
- *        and a list of its neighbors within the graph. This struct is designed to support a variety
- *        of data types for flexible graph applications.
+ * and a list of its neighbors within the graph. This struct is designed to support a variety
+ * of data types for flexible graph applications.
  * 
  * @param node_t The data type for the node's data
  */
@@ -17,6 +17,7 @@ template <typename node_t> struct GraphNode {
 private:
   node_t data;
   std::vector<node_t> neighbors;
+  int index;
 
 public:
 
@@ -31,7 +32,7 @@ public:
    * 
    * @param data_ The data to be stored in the node
    */
-  GraphNode(node_t data_): data(data_) {}
+  GraphNode(node_t data_);
 
   /**
    * @brief Destructor for GraphNode. Cleans up node resources if necessary.
@@ -43,59 +44,40 @@ public:
    * 
    * @param data The data to assign to this node
    */
-  void setData(const node_t& data) {
-    this->data = data;
-  }
+  inline void setData(const node_t& data) { this->data = data; }
 
   /**
    * @brief Adds a neighbor to the node, if it does not already exist in the neighbors list.
    * 
    * @param data The data of the neighbor to add
    */
-  void addNeighbor(node_t data) {
-    // Add data to neighbors only if it is not already present.
-    if (std::count(this->neighbors.begin(), this->neighbors.end(), data) == 0) {
-      this->neighbors.push_back(data);
-    }
-  }
+  void addNeighbor(node_t data);
 
   /**
    * @brief Removes a specified neighbor from the node's neighbor list.
    * 
    * @param data The data of the neighbor to remove
    */
-  void removeNeighbor(node_t data) {
-    // Find and remove the neighbor data from the neighbors list.
-    auto it = std::find(this->neighbors.begin(), this->neighbors.end(), data);
-    if (it != this->neighbors.end()) {
-      this->neighbors.erase(it);
-    }
-  }
+  void removeNeighbor(node_t data);
 
   /**
    * @brief Retrieves the data stored in this node.
    * 
    * @return The data contained in the node
    */
-  node_t getData(void) const {
-    return this->data;
-  }
+  inline node_t getData(void) const { return this->data; }
 
   /**
    * @brief Retrieves the list of neighbors for this node.
    * 
    * @return A pointer to a vector containing the neighbors' data
    */
-  std::vector<node_t>* getNeighbors(void) {
-    return &this->neighbors;
-  }
+  inline std::vector<node_t>* getNeighbors(void) { return &this->neighbors; }
 
   /**
    * @brief Clears out all the neighbors of the node
   */
-  void clearNeighbors(void) {
-    this->neighbors.clear();
-  }
+  inline void clearNeighbors(void) { this->neighbors.clear(); }
 
   /**
    * @brief Less-than operator to allow ordering of nodes by data.
@@ -103,9 +85,7 @@ public:
    * @param other The other GraphNode to compare against
    * @return True if this node's data is less than the other node's data
    */
-  bool operator<(const GraphNode<node_t> other) const {
-    return this->data < other.data;
-  }
+  bool operator<(const GraphNode<node_t> other) const { return this->data < other.data; }
 
   /**
    * @brief Equality operator to compare nodes based on their data.
@@ -113,36 +93,21 @@ public:
    * @param other The other GraphNode to compare against
    * @return True if this node's data is equal to the other node's data
    */
-  bool operator==(const GraphNode& other) const {
-    return this->data == other.data;
-  }
+  bool operator==(const GraphNode& other) const { return this->data == other.data; }
 
-  /**
-   * @brief Retrieves the index of this node.
-   * 
-   * @return The index of the node
-   */
-private:
-  int index;
-
-public:
   /**
    * @brief Sets the index of the node.
    * 
    * @param idx The index to assign to this node
    */
-  void setIndex(int idx) {
-    this->index = idx;
-  }
+  inline void setIndex(int idx) { this->index = idx; }
 
   /**
    * @brief Retrieves the index of this node.
    * 
    * @return The index of the node
    */
-  int getIndex() const {
-    return index;
-  }
+  inline int getIndex() const { return index; }
   
 };
 
@@ -157,8 +122,10 @@ public:
  */
 template <typename node_t> 
 std::ostream& operator<<(std::ostream& out, const GraphNode<node_t> node) {
+
   out << node.getData();
   return out;
+
 }
 
 #endif /* GRAPH_NODE_H */

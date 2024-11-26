@@ -21,9 +21,13 @@ jobs:
         with:
           node-version: 16.18
 
-      - name: Compile Code and Run Unit Tests
+      - name: Compile Code
         run:
-          make test
+          make all
+
+      - name : Run Unit Tests
+        run:
+          make run_tests
 
       - name: Clean up workspace
         run:

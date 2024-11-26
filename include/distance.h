@@ -5,7 +5,37 @@
 #include <cmath>
 #include <utility>
 #include <vector>
-#include "DataStructures/DataVector/DataVector.h"
+#include "DataVector.h"
+
+/**
+ * @brief Comparator structure for ordering elements by Euclidean distance.
+ * 
+ * This functor orders elements based on their Euclidean distance to a target vector.
+ * If two elements have the same distance, they are compared lexicographically.
+ */
+template <typename point_t>
+struct EuclideanDistanceOrder {
+
+  point_t xq; // Target vector for distance comparisons
+
+  /**
+   * @brief Constructs a new EuclideanDistanceOrder object with a target vector.
+   * 
+   * @param target The target vector for distance comparisons.
+   */
+  EuclideanDistanceOrder(const point_t& target) : xq(target) {}
+
+  /**
+   * @brief Comparison operator for ordering elements by Euclidean distance.
+   * 
+   * @param a The first element to compare
+   * @param b The second element to compare
+   * 
+   * @return True if the first element is closer to the target vector than the second element.
+   */
+  bool operator()(const point_t& a, const point_t& b);
+
+};
 
 /**
  * @brief Function to calculate Euclidean distance between two DataVector objects. It uses
