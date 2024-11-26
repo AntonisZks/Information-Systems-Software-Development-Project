@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/DataStructures/Graph/graph.h"
+#include "../include/graph.h"
 #include "../include/acutest.h"
 
 /**
