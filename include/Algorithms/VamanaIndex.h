@@ -403,29 +403,45 @@ public:
   //####################################################################
   //this is the new filtered medoid, i will brief in later time
   //####################################################################
-  map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
-
-    //                           SETS
-    //----------------------------------------------------------
+  map<int, BaseDataVector<float>> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
+    //________________________________________________________
+    //
+    //                          DATA
+    //________________________________________________________
 
     //Set of all nodes (with there data).
-    //P
     set<BaseDataVector<float>> P = Graph.getNodesSet;
 
-    //Set of all categorical attributes.
-    //F
-    //We need a function that returns a set of all the categorical attributes
-    //that are in the graph
-    // set<int> GetGraphFilters(Graph<vamana_t>& Graph)
-    set<int> Filters;
-
     //the given threshold
-    //τ
     int τ = threshold;
 
-    //                      ALGORITHM LOOP
+    //IMPLEMENTATION
+    // # set<int> GetGraphFilters(Graph<vamana_t>& Graph)
+    //We need a function that returns a set of all the categorical attributes
+    //that are in the graph.
+    //--------------------------------------------------------------------------------------
+    //Set of all categorical attributes.
+    set<int> Filters; //= GetGraphFilters(Graph)
+
+    //The map that the function returns
+    //The key is the categorical attribute (int) the filter,
+    //and it correspods to a the value, which is a node (BaseDataVector<float>)
+    // f=1 -> starting node: BaseDataVector<float> p1
+    // f=2 -> starting node: BaseDataVector<float> p2
+    // ...
+    map<int, BaseDataVector<float>> M;
+
+    //True medoid point of Pf, p*
+    BaseDataVector<float> filtered_medoid_point;
+
+    //__________________________________________________________
+    //
+    //                    ALGORITHM LOOP
+    //__________________________________________________________
+
     for(int f : Filters){
       
+      //IMPLEMENTATION
       //# set<BaseDataVector<float>> GetNodesWithFilters(Graph<vamana_t>& Graph, int filter){}
       //We need a function that returns a subset of nodes of the set P
       //that correspond to the arguement f (nodes that have the same categorical attribute).
@@ -433,16 +449,16 @@ public:
       //Subset of P. Nodes with the same categorical attribute.
       set<BaseDataVector<float>> Pf; //= GetNodesWithFilters(P, f)
 
+      //IMPLEMENTATION
       //# set<BaseDataVector<float>> GetRandomNodesWithFilters(Graph<vamana_t>& Graph, int filter, int threshold){}
       //We need a function that returns a subset of τ random nodes of the set P
       //that correspond to the arguement f (nodes that have the same categorical attribute).
       //---------------------------------------------------------------------------------------
       //Subset of Pf. Set of τ randomly selected nodes of Pf.
       set<BaseDataVector<float>> Rf; //= GetRandomNodesWithFilters(P, f, τ)
-
+      
     }
 
-    
     return M;
   }
 
