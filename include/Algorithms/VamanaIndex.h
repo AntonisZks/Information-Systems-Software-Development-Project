@@ -6,15 +6,15 @@
 #include <set>
 #include <fstream>
 #include <sstream>
-#include "../DataStructures/Graph/graph.h"
-#include "../Evaluation/recall.h"
+#include "graph.h"
+#include "recall.h"
 #include "GreedySearch.h"
 #include "RobustPrune.h"
 
 //for filtered medoid
 #include <map>
 #include <set>
-#include "../DataStructures/DataVector/BQDataVectors.h"
+#include "BQDataVectors.h"
 
 using namespace std;
 
