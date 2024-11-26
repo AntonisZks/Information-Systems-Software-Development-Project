@@ -141,5 +141,83 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
 
 }
 
+template <typename graph_t>
+std::pair<std::set<graph_t>, std::set<graph_t>> 
+FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_t>>& S, const graph_t& xq,  
+                     const unsigned int k, const unsigned int L, const std::vector<FilterType>& queryFilters) {
+
+  std::set<graph_t> candidates = {S[0].getData()};
+  std::set<graph_t> visited = {};
+
+  // Calculate initial difference between candidates and visited sets
+  std::set<graph_t> candidates_minus_visited = getSetDifference(candidates, visited);
+  unsigned int cnt = 0;
+
+  // Main search loop: continue until there are no unvisited candidates
+  while (!candidates_minus_visited.empty()) {
+
+    // Select the closest candidate to the query vector xq
+    graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
+    float p_star_distance = euclideanDistance(p_star, xq);
+
+    // Compare each unvisited candidate's distance to find the nearest
+    for (auto xp : candidates_minus_visited) {
+      float currentDistance = euclideanDistance(xp, xq);
+      if (currentDistance < p_star_distance) {
+        p_star_distance = currentDistance;
+        p_star = xp;
+      }
+    }
+
+    // Apply the appropriate filter based on the FilterType for queryFilters
+    bool passFilter = false;
+    if (queryFilters.size() > cnt) {
+      switch (queryFilters[cnt]) {
+        case NO_FILTER:
+          passFilter = true; // No filter applied, always pass
+          break;
+        case C_EQUALS_v:
+          // Apply categorical filter: Check if category of p_star equals the query category (example)
+          passFilter = (p_star.getCategory() == xq.getCategory());
+          break;
+        default:
+          passFilter = false; // If no valid filter type, reject
+      }
+    }
+    // Only proceed if the candidate passes the filter
+    if (passFilter) {
+      // Retrieve neighbors of the closest node, p_star, and add them to candidates
+      GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
+      std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
+
+      for (auto neighbor : *p_star_neighbors) {
+        candidates.insert(neighbor);
+      }
+      visited.insert(p_star); // Mark the closest node as visited
+
+      // Limit the size of candidates to L by keeping the closest L elements to the query
+      if (candidates.size() > static_cast<size_t>(L)) {
+        std::set<graph_t, EuclideanDistanceOrder<graph_t>> newCandidates{EuclideanDistanceOrder<graph_t>(xq)};
+        for (auto candidate : candidates) {
+          newCandidates.insert(candidate);
+        }
+        
+        // Reassign only the closest L candidates back to candidates set
+        candidates.clear();
+        auto it = newCandidates.begin();
+        for (unsigned int i = 0; i < L && it != newCandidates.end(); i++, it++) {
+          candidates.insert(*it);
+        }
+      }
+    }
+
+    // Update candidates_minus_visited with the new difference after adding p_star to visited
+    candidates_minus_visited = getSetDifference(candidates, visited);
+    cnt++; // Increment loop counter for diagnostics if needed
+  }
+
+  return {candidates, visited}; // Return the set of candidates and visited nodes
+}
+
 template std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> 
 GreedySearch(const Graph<DataVector<float>>& G, const GraphNode<DataVector<float>>& s, const DataVector<float>& xq, unsigned int k, unsigned int L);

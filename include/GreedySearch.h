@@ -40,5 +40,10 @@ template <typename graph_t>
 std::pair<std::set<graph_t>, std::set<graph_t>>
 GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L);
 
+template <typename graph_t>
+std::pair<std::set<graph_t>, std::set<graph_t>> 
+FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_t>>& S,  const graph_t& xq,  
+                     const unsigned int k,  const unsigned int L,  const std::vector<FilterType>& queryFilters);
+                     
 
 #endif // GREEDY_SEARCH_H
