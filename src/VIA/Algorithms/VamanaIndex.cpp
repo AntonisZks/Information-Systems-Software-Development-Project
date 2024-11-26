@@ -155,12 +155,6 @@ void VamanaIndex<vamana_t>::createGraph(
 
   });
 
-  // for (unsigned int i = 0; i < n; i++) {
-
-    
-
-  // }
-
 }
 
 /**
@@ -267,6 +261,94 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
   });
 
   return true;
+
+}
+
+template <typename vamana_t>
+map<int, BaseDataVector<float>> VamanaIndex<vamana_t>::FilteredMedoid(const Graph<vamana_t>& Graph, int threshold) {
+
+  // //________________________________________________________
+  // //
+  // //                          DATA
+  // //________________________________________________________
+
+  // //Set of all nodes (with there data).
+  // set<BaseDataVector<float>> P = Graph.getNodesSet;
+
+  // //the given threshold
+  // int τ = threshold;
+
+  // //IMPLEMENTATION
+  // // # set<int> GetGraphFilters(Graph<vamana_t>& Graph)
+  // //We need a function that returns a set of all the categorical attributes
+  // //that are in the graph.
+  // //--------------------------------------------------------------------------------------
+  // //Set of all categorical attributes.
+  // set<int> Filters; //= GetGraphFilters(Graph)
+
+  // //The map that the function returns
+  // //The key is the categorical attribute (int) the filter,
+  // //and it correspods to a the value, which is a node (BaseDataVector<float>)
+  // // f=1 -> starting node: BaseDataVector<float> p1
+  // // f=2 -> starting node: BaseDataVector<float> p2
+  // // ...
+  // map<int, BaseDataVector<float>> M;
+
+  // //The map that takes the key (a node), and connects it
+  // //to an integer (number of times this node was considered
+  // //to be the filtered medoid point)
+  // map<BaseDataVector<float>,int> T;
+  // //Initialize T to an zero map
+  // for (BaseDataVector<float> nodes : P){
+  //   T[nodes] = 0;
+  // }
+
+  // //True medoid point of Pf, p*
+  // BaseDataVector<float> point_asterisk;
+
+  // //__________________________________________________________
+  // //
+  // //                    ALGORITHM LOOP
+  // //__________________________________________________________
+
+  // for(int f : Filters){
+    
+  //   //IMPLEMENTATION
+  //   //# set<BaseDataVector<float>> GetNodesWithFilters(Graph<vamana_t>& Graph, int filter){}
+  //   //We need a function that returns a subset of nodes of the set P
+  //   //that correspond to the arguement f (nodes that have the same categorical attribute).
+  //   //--------------------------------------------------------------------------------------
+  //   //Subset of P. Nodes with the same categorical attribute.
+  //   set<BaseDataVector<float>> Pf; //= GetNodesWithFilters(P, f)
+
+  //   //IMPLEMENTATION
+  //   //# set<BaseDataVector<float>> GetRandomNodesWithFilters(set<BaseDataVector<float>> Set, int threshold){}
+  //   //We need a function that returns a subset of τ random nodes of the set P
+  //   //that correspond to the arguement f (nodes that have the same categorical attribute).
+  //   //---------------------------------------------------------------------------------------
+  //   //Subset of Pf. Set of τ randomly selected nodes of Pf.
+  //   set<BaseDataVector<float>> Rf; //= GetRandomNodesWithFilters(Pf, τ)
+
+  //   //This is the arg_min method. (it does not really make sense...)
+  //   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  //   point_asterisk = *Rf.begin();
+  //   int min_value = T[point_asterisk];
+
+  //   //this is gonna run τ times
+  //   for(BaseDataVector<float> p : Rf){
+  //     if(T[p] < min_value){
+  //       point_asterisk = p;
+  //       min_value = T[node];
+  //     }
+  //   }
+  //   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  //   //Update...
+  //   M[f] = point_asterisk;
+  //   T[point_asterisk]++; 
+  // }
+
+  // return M;
 
 }
 

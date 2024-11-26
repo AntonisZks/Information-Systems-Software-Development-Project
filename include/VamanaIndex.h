@@ -104,6 +104,11 @@ public:
   */
   bool loadGraph(const std::string& filename);
 
+  //####################################################################
+  //this is the new filtered medoid, i will brief in later time
+  //####################################################################
+  map<int, BaseDataVector<float>> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold);
+
   /**
    * @brief Finds the medoid node in the graph using a sample of nodes.
    *
