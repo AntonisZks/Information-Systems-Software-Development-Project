@@ -264,8 +264,8 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
 
 }
 
-template <typename vamana_t>
-map<int, BaseDataVector<float>> VamanaIndex<vamana_t>::FilteredMedoid(const Graph<vamana_t>& Graph, int threshold) {
+//template <typename vamana_t>
+//map<int, BaseDataVector<float>> VamanaIndex<vamana_t>::FilteredMedoid(const Graph<vamana_t>& Graph, int threshold) {
 
   // //________________________________________________________
   // //
@@ -350,7 +350,7 @@ map<int, BaseDataVector<float>> VamanaIndex<vamana_t>::FilteredMedoid(const Grap
 
   // return M;
 
-}
+//}
 
 /**
  * @brief Finds the medoid node in the graph using a sample of nodes.
