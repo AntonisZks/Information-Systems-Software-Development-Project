@@ -431,8 +431,17 @@ public:
     // ...
     map<int, BaseDataVector<float>> M;
 
+    //The map that takes the key (a node), and connects it
+    //to an integer (number of times this node was considered
+    //to be the filtered medoid point)
+    map<BaseDataVector<float>,int> T;
+    //Initialize T to an zero map
+    for (BaseDataVector<float> nodes : P){
+      T[nodes] = 0;
+    }
+
     //True medoid point of Pf, p*
-    BaseDataVector<float> filtered_medoid_point;
+    BaseDataVector<float> point_asterisk;
 
     //__________________________________________________________
     //
@@ -450,15 +459,31 @@ public:
       set<BaseDataVector<float>> Pf; //= GetNodesWithFilters(P, f)
 
       //IMPLEMENTATION
-      //# set<BaseDataVector<float>> GetRandomNodesWithFilters(Graph<vamana_t>& Graph, int filter, int threshold){}
+      //# set<BaseDataVector<float>> GetRandomNodesWithFilters(set<BaseDataVector<float>> Set, int threshold){}
       //We need a function that returns a subset of τ random nodes of the set P
       //that correspond to the arguement f (nodes that have the same categorical attribute).
       //---------------------------------------------------------------------------------------
       //Subset of Pf. Set of τ randomly selected nodes of Pf.
-      set<BaseDataVector<float>> Rf; //= GetRandomNodesWithFilters(P, f, τ)
-      
-    }
+      set<BaseDataVector<float>> Rf; //= GetRandomNodesWithFilters(Pf, τ)
 
+      //This is the arg_min method. (it does not really make sense...)
+      //---------------------------------------
+      point_asterisk = *Rf.begin();
+      int min_value = T[point_asterisk];
+
+      //this is gonna run τ times
+      for(BaseDataVector<float> p : Rf){
+        if(T[p] < min_value){
+          point_asterisk = p;
+          min_value = T[node];
+        }
+      }
+      //---------------------------------------
+
+      //Update...
+      M[f] = point_asterisk;
+      T[point_asterisk]++; 
+    }
     return M;
   }
 
