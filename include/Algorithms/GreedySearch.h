@@ -191,7 +191,7 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
 }
 
 template <typename graph_t>
-std::pair<std::set<graph_t>, std::set<graph_t>> FilteredFilterGreedySearch(
+std::pair<std::set<graph_t>, std::set<graph_t>> GreedySearch(
       const Graph<graph_t>& G,
       const std::vector<GraphNode<graph_t>>& S, 
       const graph_t& xq, 
@@ -275,7 +275,7 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredFilterGreedySearch(
 
 
 template <typename graph_t>
-std::pair<std::set<graph_t>, std::set<graph_t>> FilteredFilterGreedySearch(
+std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
       const Graph<graph_t>& G,
       const std::vector<GraphNode<graph_t>>& S, 
       const graph_t& xq, 
