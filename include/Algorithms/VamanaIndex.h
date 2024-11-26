@@ -467,7 +467,7 @@ public:
       set<BaseDataVector<float>> Rf; //= GetRandomNodesWithFilters(Pf, τ)
 
       //This is the arg_min method. (it does not really make sense...)
-      //---------------------------------------
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       point_asterisk = *Rf.begin();
       int min_value = T[point_asterisk];
 
@@ -478,7 +478,7 @@ public:
           min_value = T[node];
         }
       }
-      //---------------------------------------
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       //Update...
       M[f] = point_asterisk;
