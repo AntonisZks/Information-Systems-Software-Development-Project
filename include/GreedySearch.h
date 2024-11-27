@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include "graph.h"
 #include "DataVector.h"
+#include "BQDataVectors.h"
 #include "distance.h"
 #include <queue>
 #include <cmath>

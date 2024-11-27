@@ -1,5 +1,6 @@
 #include "../../include/graph.h"
 #include "../../include/DataVector.h"
+#include "../../include/BQDataVectors.h"
 
 /**
  * @brief Default Constructor of the Grpah. Exists to avoid errors.
@@ -188,3 +189,4 @@ template <typename graph_t> bool Graph<graph_t>::disconnectNodesByData(const gra
 
 template class Graph<int>;
 template class Graph<DataVector<float>>;
+template class Graph<BaseDataVector<float>>;

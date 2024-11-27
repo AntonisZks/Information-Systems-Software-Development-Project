@@ -26,7 +26,7 @@ using namespace std;
 */
 template <typename vamana_t> class VamanaIndex {
 
-private:
+protected:
   
   Graph<vamana_t> G;
   std::vector<vamana_t> P;

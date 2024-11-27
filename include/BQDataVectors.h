@@ -39,6 +39,9 @@ private:
     float T; // Timestamp attribute
 
 public:
+
+    BaseDataVector() : DataVector<dvector_t>() {}
+
     // Constructor to initialize the BaseDataVector with data, category, and timestamp
     BaseDataVector(unsigned int dimension, unsigned int index, unsigned int category, float timestamp)
         : DataVector<dvector_t>(dimension, index), C(category), T(timestamp) {}
@@ -82,6 +85,9 @@ private:
     float r; // Upper bound for timestamp range
 
 public:
+
+    QueryDataVector() : DataVector<dvector_t>() {}
+
     // Constructor to initialize the QueryDataVector with data and additional query attributes
     QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, float v_value, float l_value, float r_value)
         : DataVector<dvector_t>(dimension, index), query_type(q_type), v(v_value), l(l_value), r(r_value) {}

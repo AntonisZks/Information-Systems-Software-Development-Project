@@ -221,3 +221,6 @@ FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_
 
 template std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> 
 GreedySearch(const Graph<DataVector<float>>& G, const GraphNode<DataVector<float>>& s, const DataVector<float>& xq, unsigned int k, unsigned int L);
+
+template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>>
+GreedySearch(const Graph<BaseDataVector<float>>& G, const GraphNode<BaseDataVector<float>>& s, const BaseDataVector<float>& xq, unsigned int k, unsigned int L);

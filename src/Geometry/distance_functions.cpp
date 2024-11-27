@@ -2,7 +2,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "../../include/distance.h"  //Includes function prototypes and DataVector class
+#include "../../include/distance.h"
+#include "../../include/BQDataVectors.h" 
 
 using namespace std;
 
@@ -78,3 +79,4 @@ double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b)
 }
 
 template struct EuclideanDistanceOrder<DataVector<float>>;
+template struct EuclideanDistanceOrder<BaseDataVector<float>>;

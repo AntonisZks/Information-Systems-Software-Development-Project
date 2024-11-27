@@ -154,5 +154,8 @@ void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node,std::set<
   }
 }
 
-template void RobustPrune<DataVector<float>>(Graph<DataVector<float>>& G, GraphNode<DataVector<float>>& p_node, 
-                                             std::set<DataVector<float>>& V, float alpha, int R);
+template void RobustPrune<DataVector<float>>(
+  Graph<DataVector<float>>& G, GraphNode<DataVector<float>>& p_node, std::set<DataVector<float>>& V, float alpha, int R);
+
+template void RobustPrune<BaseDataVector<float>>(
+  Graph<BaseDataVector<float>>& G, GraphNode<BaseDataVector<float>>& p_node, std::set<BaseDataVector<float>>& V, float alpha, int R);

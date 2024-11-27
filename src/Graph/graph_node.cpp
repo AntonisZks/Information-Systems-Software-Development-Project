@@ -1,5 +1,6 @@
 #include "../../include/graph_node.h"
 #include "../../include/DataVector.h"
+#include "../../include/BQDataVectors.h"
 
 /**
  * @brief Constructs a GraphNode with specified data.
@@ -43,3 +44,6 @@ template class GraphNode<std::string>;
 
 template class GraphNode<DataVector<float>>;
 template class GraphNode<DataVector<double>>;
+template class GraphNode<BaseDataVector<float>>;
+template class GraphNode<BaseDataVector<double>>;
+

@@ -4,6 +4,7 @@
 #include "../include/BQDataVectors.h"
 #include "../include/read_data.h"
 #include "../include/distance.h"
+#include "../include/FilteredVamanaIndex.h"
 #include <fstream>
 
 /**
@@ -141,12 +142,15 @@ int main(int argc, char* argv[]) {
   std::vector<BaseDataVector<float>> base_vectors = ReadFilteredBaseVectorFile("data/Dummy/dummy-data.bin");
   std::vector<QueryDataVector<float>> query_vectors = ReadFilteredQueryVectorFile("data/Dummy/dummy-queries.bin");
 
-  // Compute the distance vector, and save the computed distances to a file
-  std::vector<std::vector<float>> distances = computeGroundtruth(base_vectors, query_vectors, 1000);
-  saveGroundtruthToFile(distances, "data/Dummy/dummy-groundtruth.bin");
+  // // Compute the distance vector, and save the computed distances to a file
+  // std::vector<std::vector<float>> distances = computeGroundtruth(base_vectors, query_vectors, 1000);
+  // saveGroundtruthToFile(distances, "data/Dummy/dummy-groundtruth.bin");
 
-  // Example usage of readGroundtruthFromFile
-  std::vector<std::vector<float>> read_distances = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
+  // // Example usage of readGroundtruthFromFile
+  // std::vector<std::vector<float>> read_distances = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
+
+  FilteredVamanaIndex<BaseDataVector<float>> index;
+  index.createGraph(base_vectors, 0.5, 10, 10);
 
   return 0;
 
