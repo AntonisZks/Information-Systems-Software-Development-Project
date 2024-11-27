@@ -162,20 +162,27 @@ int main(int argc, char* argv[]) {
   FilteredVamanaIndex<BaseDataVector<float>> index;
   index.createGraph(base_vectors, 0.5, 10, 10);
 
-  // Print all the base vectors
-  std::cout << "Base vectors:" << std::endl;
-  for (auto vector : base_vectors) {
-    std::cout << vector.getC() << std::endl;
+  // Print all the nodes in the index
+  std::vector<GraphNode<BaseDataVector<float>>> nodes = index.getNodes();
+  for (auto node : nodes) {
+    std::cout << node.getData() << std::endl;
   }
 
-  // Get the nodes with a specific filter
+  // // Print the categorical filters for all base vectors
+  // std::vector<GraphNode<BaseDataVector<float>>> indexVectors = index.getNodes();
+  // for (unsigned int i = 0; i < indexVectors.size(); i++) {
+  //   std::cout << "Index Node " << i << ": " << indexVectors[i].getData().getC() << " ";
+  //   std::cout << "Base Node " << i << ": " << base_vectors[i].getC() << std::endl;
+  // }
+
+  // Get the nodes with a second filter
   std::cout << "Finding filtered nodes" << std::endl;
   std::vector<GraphNode<BaseDataVector<float>>> filteredNodes = index.getNodesWithCategoricalValueFilter(*filters.begin());
 
-  // Print all the filtered nodes
-  for (auto node : filteredNodes) {
-    std::cout << node.getData() << std::endl;
-  }
+  // // Print all the filtered nodes
+  // for (auto node : filteredNodes) {
+  //   std::cout << node.getData() << std::endl;
+  // }
 
   return 0;
 
