@@ -5,6 +5,7 @@
 #include "../include/read_data.h"
 #include "../include/distance.h"
 #include "../include/FilteredVamanaIndex.h"
+#include "../include/Filter.h"
 #include <fstream>
 
 /**
@@ -149,8 +150,32 @@ int main(int argc, char* argv[]) {
   // // Example usage of readGroundtruthFromFile
   // std::vector<std::vector<float>> read_distances = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
 
+  // Initialize all the filters
+  // IMPORTANT: This version of the application only supports CategoricalAttributeFilter
+  std::set<CategoricalAttributeFilter> filters;
+  for (auto vector : base_vectors) {
+    CategoricalAttributeFilter filter(vector.getC());
+    filters.insert(filter);
+  }
+
+  // Initialize and create the filtered Vamana index
   FilteredVamanaIndex<BaseDataVector<float>> index;
   index.createGraph(base_vectors, 0.5, 10, 10);
+
+  // Print all the base vectors
+  std::cout << "Base vectors:" << std::endl;
+  for (auto vector : base_vectors) {
+    std::cout << vector.getC() << std::endl;
+  }
+
+  // Get the nodes with a specific filter
+  std::cout << "Finding filtered nodes" << std::endl;
+  std::vector<GraphNode<BaseDataVector<float>>> filteredNodes = index.getNodesWithCategoricalValueFilter(*filters.begin());
+
+  // Print all the filtered nodes
+  for (auto node : filteredNodes) {
+    std::cout << node.getData() << std::endl;
+  }
 
   return 0;
 

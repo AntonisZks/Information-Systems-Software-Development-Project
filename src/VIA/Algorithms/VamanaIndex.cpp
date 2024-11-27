@@ -112,10 +112,11 @@ void VamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
-
   GreedyResult greedyResult;
-  this->P = P;
+
+  // Initialize graph memory
   unsigned int n = P.size();
+  this->P = P;
   this->G.setNodesCount(n);
 
   // Initialize the graph to a random R-regular directed graph with n vertices and R edges per vertex

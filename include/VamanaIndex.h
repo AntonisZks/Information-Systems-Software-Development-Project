@@ -65,6 +65,10 @@ public:
   */
   inline std::vector<vamana_t> getPoints(void) const { return this->P; }
 
+  inline std::vector<vamana_t> getNodes(void) const { 
+    // TODO: Needs implementation
+  }
+
   /**
    * @brief Creates a Vamana Index Graph according to the provided dataset points and the given parameters.
    * Specifically this method follows the Vamana algorithm found on the paper:

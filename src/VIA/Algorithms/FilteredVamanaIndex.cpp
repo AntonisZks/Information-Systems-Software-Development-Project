@@ -7,13 +7,33 @@ FilteredVamanaIndex<vamana_t>::FilteredVamanaIndex(void) : VamanaIndex<vamana_t>
 }
 
 template <typename vamana_t>
+std::vector<GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const CategoricalAttributeFilter& filter) {
+
+  std::vector<GraphNode<vamana_t>> filteredNodes;
+  std::vector<GraphNode<vamana_t>> graphNodes = this->getNodes(); // TODO: Implement getNodes() function
+
+  for (GraphNode<vamana_t> node : graphNodes) {
+    if (node.getData().getC() == filter.getC()) {
+      filteredNodes.push_back(node);
+    }
+  }
+
+  return filteredNodes;
+
+}
+
+template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R) {
   
-  this->fillGraphNodes();
-  std::cout << "Creating Filtered Vamana Index Graph" << std::endl;
+  // Initialize graph memory
+  unsigned int n = P.size();
+  this->P = P;
+  this->G.setNodesCount(n);
 
-  
+  // Initialize G to an empty graph and get the medoid node
+  this->fillGraphNodes();
+  GraphNode<vamana_t> s = this->findMedoid(this->G, 1000);
 
 }
 
