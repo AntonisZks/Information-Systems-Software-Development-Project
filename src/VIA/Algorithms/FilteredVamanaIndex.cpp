@@ -1,11 +1,58 @@
 #include "../../../include/FilteredVamanaIndex.h"
+#include "../../../include/Filter.h"
+#include <map>
 
 
+/**
+ * @brief Generates a random permutation of integers in a specified range. This function creates a vector 
+ * containing all integers from `start` to `end` and then shuffles them randomly to produce a random permutation.
+ * 
+ * @param start The starting integer of the range (inclusive)
+ * @param end The ending integer of the range (inclusive)
+ * 
+ * @return A vector containing a shuffled sequence of integers from `start` to `end`
+ */
+static std::vector<int> generateRandomPermutation(const unsigned int start, const unsigned int end) {
+
+  // Initialize a vector to hold the sequence of integers from start to end
+  std::vector<int> permutation;
+  for (unsigned int i = start; i <= end; i++) {
+    permutation.push_back(i);
+  }
+
+  // Use a more unpredictable seed
+  std::mt19937 gen(std::random_device{}());  // Seed with random device for true randomness
+  std::shuffle(permutation.begin(), permutation.end(), gen);
+
+  return permutation;
+
+}
+
+/**
+ * @brief Default constructor for FilteredVamanaIndex.
+ */
 template <typename vamana_t> 
 FilteredVamanaIndex<vamana_t>::FilteredVamanaIndex(void) : VamanaIndex<vamana_t>() {}
 
+/**
+ * @brief Constructor for FilteredVamanaIndex with filters.
+ * 
+ * @param filters A set of CategoricalAttributeFilter to initialize the index with.
+ */
 template <typename vamana_t>
-std::vector<GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const CategoricalAttributeFilter& filter) {
+FilteredVamanaIndex<vamana_t>::FilteredVamanaIndex(std::set<CategoricalAttributeFilter> filters) : VamanaIndex<vamana_t>() {
+  this->F = filters;
+}
+
+/**
+ * @brief Get nodes that match a specific categorical value filter.
+ * 
+ * @param filter The CategoricalAttributeFilter to match nodes against.
+ * @return A vector of GraphNode that match the filter.
+ */
+template <typename vamana_t>
+std::vector<GraphNode<vamana_t>> 
+FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const CategoricalAttributeFilter& filter) {
 
   std::vector<GraphNode<vamana_t>> filteredNodes;
   std::vector<GraphNode<vamana_t>> graphNodes = this->getNodes();
@@ -20,9 +67,19 @@ std::vector<GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::getNodesWithCate
 
 }
 
+/**
+ * @brief Create the graph with the given parameters.
+ * 
+ * @param P A vector of vamana_t elements.
+ * @param alpha A float parameter.
+ * @param L An unsigned int parameter.
+ * @param R An unsigned int parameter.
+ */
 template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R) {
+
+  using Filter = CategoricalAttributeFilter;
   
   // Initialize graph memory
   unsigned int n = P.size();
@@ -32,6 +89,29 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   // Initialize G to an empty graph and get the medoid node
   this->fillGraphNodes();
   GraphNode<vamana_t> s = this->findMedoid(this->G, 1000);
+
+  // Let st(f) be the start node for filter label f for every f in F
+  std::map<Filter, GraphNode<vamana_t>> st;
+  for (auto filter : this->F) {
+    std::vector<GraphNode<vamana_t>> nodes = this->getNodesWithCategoricalValueFilter(filter);
+    GraphNode<vamana_t> startNode = nodes[0];
+
+    st[filter] = startNode;
+  }
+
+  // Let sigma be a random permutation of the indices of [n]
+  std::vector<int> sigma = generateRandomPermutation(0, n-1);
+
+  // Let Fx be the label-set for every x in P
+  std::map<vamana_t, Filter> Fx;
+  for (auto node : P) {
+    Fx[node] = CategoricalAttributeFilter(node.getC());
+  }
+
+  // Print the Fx
+  for (auto node : Fx) {
+    std::cout << node.first << " => " << node.second.getC() << std::endl;
+  }
 
 }
 

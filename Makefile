@@ -102,6 +102,7 @@ run_tests:
 	./bin/test_distance
 	./bin/test_data_vectors
 	./bin/test_recall
+	./bin/filtered_vamana_test
 
 run_tests_valgrind:
 	valgrind --leak-check=full ./bin/graph_node_test
@@ -109,3 +110,4 @@ run_tests_valgrind:
 	valgrind --leak-check=full ./bin/test_distance
 	valgrind --leak-check=full ./bin/test_data_vectors
 	valgrind --leak-check=full ./bin/test_recall
+	valgrind --leak-check=full ./bin/filtered_vamana_test

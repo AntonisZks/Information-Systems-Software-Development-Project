@@ -159,14 +159,8 @@ int main(int argc, char* argv[]) {
   }
 
   // Initialize and create the filtered Vamana index
-  FilteredVamanaIndex<BaseDataVector<float>> index;
+  FilteredVamanaIndex<BaseDataVector<float>> index(filters);
   index.createGraph(base_vectors, 0.5, 10, 10);
-
-  // Get the nodes for each filter and print the number of nodes corresponding to each filter
-  for (auto filter : filters) {
-    std::vector<GraphNode<BaseDataVector<float>>> nodes = index.getNodesWithCategoricalValueFilter(filter);
-    std::cout << "Filter: " << filter.getC() << " - Nodes: " << nodes.size() << std::endl;
-  }
 
   return 0;
 
