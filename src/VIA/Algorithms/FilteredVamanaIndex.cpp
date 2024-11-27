@@ -2,9 +2,7 @@
 
 
 template <typename vamana_t> 
-FilteredVamanaIndex<vamana_t>::FilteredVamanaIndex(void) : VamanaIndex<vamana_t>() {
-  std::cout << "Filtered Vamana Index created" << std::endl;
-}
+FilteredVamanaIndex<vamana_t>::FilteredVamanaIndex(void) : VamanaIndex<vamana_t>() {}
 
 template <typename vamana_t>
 std::vector<GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const CategoricalAttributeFilter& filter) {
@@ -12,10 +10,8 @@ std::vector<GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::getNodesWithCate
   std::vector<GraphNode<vamana_t>> filteredNodes;
   std::vector<GraphNode<vamana_t>> graphNodes = this->getNodes();
 
-  std::cout << graphNodes.size() << std::endl;
-
   for (auto node : graphNodes) {
-    if (node.getData().getC() == 1) {
+    if (node.getData().getC() == filter.getC()) {
       filteredNodes.push_back(node);
     }
   }

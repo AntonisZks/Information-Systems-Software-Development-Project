@@ -43,6 +43,8 @@ template <typename graph_t> Graph<graph_t>::~Graph(void) {
  */
 template <typename graph_t> void Graph<graph_t>::setNodeData(unsigned int index, const graph_t& data) {
   this->nodes[index].setData(data);
+  this->nodesSet.insert(data);
+  this->nodesVector[index].setData(data);
 }
 
 /**
@@ -57,10 +59,12 @@ template <typename graph_t> void Graph<graph_t>::setNodesCount(const unsigned in
   this->nodesCount = nodesCount;
   delete [] this->nodes;
 
+  this->nodesSet.clear();
+  this->nodesVector.clear();
+
   this->nodes = new GraphNode<graph_t>[nodesCount];
   for (unsigned int i = 0; i < nodesCount; i++) {
     this->nodes[i].setIndex(i);
-    this->nodesSet.insert(this->nodes[i].getData());
     this->nodesVector.push_back(this->nodes[i]);
   }
 
