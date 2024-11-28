@@ -10,6 +10,7 @@
 #include "graph.h"
 #include "DataVector.h"
 #include "BQDataVectors.h"
+#include "Filter.h"
 #include "distance.h"
 #include <queue>
 #include <cmath>
@@ -43,8 +44,8 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
 
 template <typename graph_t>
 std::pair<std::set<graph_t>, std::set<graph_t>> 
-FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_t>>& S,  const graph_t& xq,  
-                     const unsigned int k,  const unsigned int L,  const std::vector<FilterType>& queryFilters);
+FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_t>>& S, const graph_t& xq,  
+                     const unsigned int k,  const unsigned int L,  const std::vector<CategoricalAttributeFilter>& queryFilters);
                      
 
 #endif // GREEDY_SEARCH_H

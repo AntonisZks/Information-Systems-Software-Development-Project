@@ -1,4 +1,5 @@
 #include "../../../include/FilteredVamanaIndex.h"
+#include "../../../include/GreedySearch.h"
 #include "../../../include/Filter.h"
 #include <map>
 
@@ -80,6 +81,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R) {
 
   using Filter = CategoricalAttributeFilter;
+  using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   
   // Initialize graph memory
   unsigned int n = P.size();
@@ -108,9 +110,29 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
     Fx[node] = CategoricalAttributeFilter(node.getC());
   }
 
-  // Print the Fx
-  for (auto node : Fx) {
-    std::cout << node.first << " => " << node.second.getC() << std::endl;
+  // Foreach i in [n] do
+  for (unsigned int i = 0; i < n; i++) {
+
+    // Let S_F_x_sigma[i] = { st(f) : f in F_X_sigma[i] }
+    std::vector<GraphNode<vamana_t>> S_F_x_sigma_i;
+    vamana_t x = P[sigma[i]];
+    Filter F_x_sigma_i = Fx[x];
+    S_F_x_sigma_i.push_back(st[F_x_sigma_i]);
+
+    // Run Filtered Greedy Search with S = S_F_x_sigma[i], query = x_sigm[i], 
+    // and query filters = F_x_sigma[i]
+    std::vector<Filter> queryFilters;
+    queryFilters.push_back(F_x_sigma_i);
+
+    GreedyResult greedyResult = FilteredGreedySearch(
+      this->G, S_F_x_sigma_i, this->P[sigma[i]], 0, L, queryFilters
+    );
+
+    // Construct the V_F_x_sigma[i] based on the second greedy result item
+    std::set<vamana_t> V_F_x_sigma_i = greedyResult.second;
+
+    break;
+
   }
 
 }
