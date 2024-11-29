@@ -123,7 +123,7 @@ template <typename graph_t> std::vector<graph_t>* Graph<graph_t>::getNodeNeighbo
   if (index >= this->nodesCount) {
     return nullptr;
   }
-  return this->nodes[index].getNeighbors();
+  return this->nodes[index].getNeighborsVector();
 
 }
 

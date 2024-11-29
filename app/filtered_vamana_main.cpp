@@ -160,7 +160,20 @@ int main(int argc, char* argv[]) {
 
   // Initialize and create the filtered Vamana index
   FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-  index.createGraph(base_vectors, 0.5, 10, 10);
+  index.createGraph(base_vectors, 1.0, 50, 14);
+
+  // Store the start nodes for each filter inside a vector
+  std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
+  for (auto filter : filters) {
+    start_nodes.push_back(index.getNodesWithCategoricalValueFilter(filter)[0]);
+  }
+
+  // Initialize the query vector and its filters vector
+  QueryDataVector<float> xq = query_vectors[0];
+  std::vector<CategoricalAttributeFilter> Fx;
+  Fx.push_back(CategoricalAttributeFilter(xq.getV()));
+  
+  FilteredGreedySearch(index.getGraph(), start_nodes, query_vectors[0], 100, 50, Fx);
 
   return 0;
 

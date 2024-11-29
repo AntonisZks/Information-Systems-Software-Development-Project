@@ -56,7 +56,7 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
   graph_t p = p_node.getData();
 
   // Retrieve all neighbors of p_node and insert them into set V
-  std::vector<graph_t>* neighbors = p_node.getNeighbors();
+  std::vector<graph_t>* neighbors = p_node.getNeighborsVector();
   for (auto neighbor : *neighbors) {
     V.insert(neighbor);
   }
@@ -86,7 +86,7 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
     p_node.addNeighbor(p_star);
 
     // Check if the desired number of neighbors has been reached
-    if (p_node.getNeighbors()->size() == (long unsigned int)R) {
+    if (p_node.getNeighborsVector()->size() == (long unsigned int)R) {
       break;
     }
 
@@ -108,7 +108,7 @@ void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set
   graph_t p = p_node.getData();
 
   // Retrieve all neighbors of p_node and insert them into set V
-  std::vector<graph_t>* neighbors = p_node.getNeighbors();
+  std::vector<graph_t>* neighbors = p_node.getNeighborsVector();
   for (auto neighbor : *neighbors) {
     V.insert(neighbor);
   }
@@ -139,7 +139,7 @@ void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set
     p_node.addNeighbor(p_star);
 
     // Check if the desired number of neighbors has been reached
-    if (p_node.getNeighbors()->size() == (long unsigned int)R) {
+    if (p_node.getNeighborsVector()->size() == (long unsigned int)R) {
       break;
     }
 

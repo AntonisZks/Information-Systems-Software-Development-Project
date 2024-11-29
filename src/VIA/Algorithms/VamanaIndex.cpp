@@ -135,13 +135,13 @@ void VamanaIndex<vamana_t>::createGraph(
     RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
 
     // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
-    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighbors();
+    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
     for (auto j : *sigma_i_neighbors) {
       std::set<vamana_t> outgoing;
       GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
 
       // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
-      for (auto neighbor : *j_node->getNeighbors()) {
+      for (auto neighbor : *j_node->getNeighborsVector()) {
         outgoing.insert(neighbor);
       }
       outgoing.insert(sigma_i);
@@ -193,7 +193,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::saveGraph(const std::st
 
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
     
-    std::vector<vamana_t>* neighbors = currentNode->getNeighbors();
+    std::vector<vamana_t>* neighbors = currentNode->getNeighborsVector();
     unsigned int neighborsCount = neighbors->size();
 
     outFile << neighborsCount;

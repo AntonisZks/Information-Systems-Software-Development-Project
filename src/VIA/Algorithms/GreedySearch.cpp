@@ -97,7 +97,7 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
 
     // Retrieve neighbors of the closest node, p_star, and add them to candidates
     GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
-    std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
+    std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighborsVector();
 
     for (auto neighbor : *p_star_neighbors) {
       candidates.insert(neighbor);
@@ -192,7 +192,7 @@ FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_
 
     // Retrieve neighbors of the closest node, p_star
     GraphNode<graph_t>* p_star_node = G.getNode(p_star.getIndex());
-    std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighbors();
+    std::vector<graph_t>* p_star_neighbors = p_star_node->getNeighborsVector();
 
     // Filter neighbors based on query filters and their existence in the visited set
     for (auto p_tone : *p_star_neighbors) {

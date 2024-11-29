@@ -111,8 +111,8 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
     Fx[node] = CategoricalAttributeFilter(node.getC());
   }
 
-  // Foreach i in [n] do
-  for (unsigned int i = 0; i < n; i++) {
+  // Execute the main for loop execution of the algorithm, but with the addition of a progress bar
+  withProgress(0, n, "Creating Filtered Vamana", [&](int i) {
 
     // Let S_F_x_sigma[i] = { st(f) : f in F_X_sigma[i] }
     std::vector<GraphNode<vamana_t>> S_F_x_sigma_i;
@@ -132,15 +132,29 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
     // Construct the V_F_x_sigma[i] based on the second greedy result item
     std::set<vamana_t> V_F_x_sigma_i = greedyResult.second;
 
-    // FIXME: In the command V <- V union V_F_x_sigma[i], set V is missing in the pseudocode
+    // NOTE: In the command V <- V union V_F_x_sigma[i], set V is missing in the pseudocode
 
     // Run Filtered Robust Prune to update out-neighbors of sigma[i]
     GraphNode<vamana_t>* sigma_i = this->G.getNode(this->P[sigma[i]].getIndex());
     FilteredRobustPrune(this->G, *sigma_i, V_F_x_sigma_i, alpha, R);
 
-    // TODO: Build the rest of the Filtered Vamana Index algorithm
+    // Receive neighbors of sigma_i
+    std::vector<vamana_t>* neighbors = sigma_i->getNeighborsVector();
+    for (auto j : *neighbors) {
+    
+      // Add sigma_i to the neighbors of the current j
+      GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
+      j_node->addNeighbor(this->P[sigma[i]]);
 
-  }
+      // Checking if the neighbors of j is greater than R. If so run Filtered Robust Prune
+      std::set<vamana_t> j_neighbors = j_node->getNeighborsSet();
+      if (j_neighbors.size() > R) {
+        FilteredRobustPrune(this->G, *j_node, j_neighbors, alpha, R);
+      }
+
+    }
+
+  });
 
 }
 
