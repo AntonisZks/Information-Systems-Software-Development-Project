@@ -76,14 +76,14 @@ FLAGS += $(DEPFLAGS)
 # Execution Rules
 
 create_simple_vamana:
-	./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 420 -R 14 -alpha 1.0 -save 'index.bin'
+	./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 20 -R 14 -alpha 1.0 -save 'index.bin'
 
 create_simple_vamana_valgrind:
 	valgrind --leak-check=full ./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 10 -R 14 -alpha 1.0 -save 'index.bin'
 
 
 test_simple_vamana:
-	./bin/simple_vamana --test -load 'index.bin' -k 100 -L 420 -gt-file 'data/siftsmall/siftsmall_groundtruth.ivecs' -query-file 'data/siftsmall/siftsmall_query.fvecs' -query 0
+	./bin/simple_vamana --test -load 'index.bin' -k 100 -L 20 -gt-file 'data/siftsmall/siftsmall_groundtruth.ivecs' -query-file 'data/siftsmall/siftsmall_query.fvecs' -query 0
 
 test_simple_vamana_valgrind:
 	valgrind --leak-check=full ./bin/simple_vamana --test -load 'index.bin' -k 100 -L 10 -gt-file 'data/siftsmall/siftsmall_groundtruth.ivecs' -query-file 'data/siftsmall/siftsmall_query.fvecs' -query 0

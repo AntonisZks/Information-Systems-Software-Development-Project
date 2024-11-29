@@ -38,14 +38,22 @@ enum FilterType {
  * 
  * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
  */
-template <typename graph_t>
-std::pair<std::set<graph_t>, std::set<graph_t>>
-GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L);
+template <typename graph_t> std::pair<std::set<graph_t>, std::set<graph_t>> GreedySearch(
+    const Graph<graph_t>& G, 
+    const GraphNode<graph_t>& s, 
+    const graph_t& xq, 
+    unsigned int k, 
+    unsigned int L
+);
 
-template <typename graph_t>
-std::pair<std::set<graph_t>, std::set<graph_t>> 
-FilteredGreedySearch(const Graph<graph_t>& G, const std::vector<GraphNode<graph_t>>& S, const graph_t& xq,  
-                     const unsigned int k,  const unsigned int L,  const std::vector<CategoricalAttributeFilter>& queryFilters);
+template <typename graph_t, typename query_t> std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
+    const Graph<graph_t>& G, 
+    const std::vector<GraphNode<graph_t>>& S, 
+    const query_t& xq,  
+    const unsigned int k, 
+    const unsigned int L,  
+    const std::vector<CategoricalAttributeFilter>& queryFilters
+);
                      
 
 #endif // GREEDY_SEARCH_H

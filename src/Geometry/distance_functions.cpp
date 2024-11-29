@@ -15,7 +15,7 @@ using namespace std;
  * 
  * @return True if the first element is closer to the target vector than the second element.
  */
-template <typename point_t> bool EuclideanDistanceOrder<point_t>::operator()(const point_t& a, const point_t& b) {
+template <typename base_t, typename query_t> bool EuclideanDistanceOrder<base_t, query_t>::operator()(const base_t& a, const base_t& b) {
 
     double distanceA = euclideanDistance(a, xq);
     double distanceB = euclideanDistance(b, xq);
@@ -78,5 +78,6 @@ double manhattanDistance(const DataVector<float>& a, const DataVector<float>& b)
     return sum;
 }
 
-template struct EuclideanDistanceOrder<DataVector<float>>;
-template struct EuclideanDistanceOrder<BaseDataVector<float>>;
+template struct EuclideanDistanceOrder<DataVector<float>, DataVector<float>>;
+template struct EuclideanDistanceOrder<BaseDataVector<float>, BaseDataVector<float>>;
+template struct EuclideanDistanceOrder<BaseDataVector<float>, QueryDataVector<float>>;

@@ -140,6 +140,8 @@ std::vector<std::vector<float>> readGroundtruthFromFile(const std::string& filen
 
 int main(int argc, char* argv[]) {
 
+  using GreedyResult = std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>>;
+
   std::vector<BaseDataVector<float>> base_vectors = ReadFilteredBaseVectorFile("data/Dummy/dummy-data.bin");
   std::vector<QueryDataVector<float>> query_vectors = ReadFilteredQueryVectorFile("data/Dummy/dummy-queries.bin");
 
@@ -160,7 +162,7 @@ int main(int argc, char* argv[]) {
 
   // Initialize and create the filtered Vamana index
   FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-  index.createGraph(base_vectors, 1.0, 50, 14);
+  index.createGraph(base_vectors, 1.0, 10, 14);
 
   // Store the start nodes for each filter inside a vector
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
@@ -173,7 +175,14 @@ int main(int argc, char* argv[]) {
   std::vector<CategoricalAttributeFilter> Fx;
   Fx.push_back(CategoricalAttributeFilter(xq.getV()));
   
-  FilteredGreedySearch(index.getGraph(), start_nodes, query_vectors[0], 100, 50, Fx);
+  GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, query_vectors[0], 100, 50, Fx);
+
+  // Print the results of the filtered greedy search
+  std::cout << "Candidates: ";
+  for (auto candidate : greedyResult.first) {
+    std::cout << candidate << std::endl;
+  }
+  std::cout << std::endl;
 
   return 0;
 
