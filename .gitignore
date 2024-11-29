@@ -7,3 +7,4 @@ test.txt
 test.vig
 data/Dummy/dummy-groundtruth.bin
 *.bin
+.idea

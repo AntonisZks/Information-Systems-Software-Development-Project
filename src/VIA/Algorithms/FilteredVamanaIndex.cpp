@@ -1,5 +1,6 @@
 #include "../../../include/FilteredVamanaIndex.h"
 #include "../../../include/GreedySearch.h"
+#include "../../../include/RobustPrune.h"
 #include "../../../include/Filter.h"
 #include <map>
 
@@ -131,7 +132,13 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
     // Construct the V_F_x_sigma[i] based on the second greedy result item
     std::set<vamana_t> V_F_x_sigma_i = greedyResult.second;
 
-    break;
+    // FIXME: In the command V <- V union V_F_x_sigma[i], set V is missing in the pseudocode
+
+    // Run Filtered Robust Prune to update out-neighbors of sigma[i]
+    GraphNode<vamana_t>* sigma_i = this->G.getNode(this->P[sigma[i]].getIndex());
+    FilteredRobustPrune(this->G, *sigma_i, V_F_x_sigma_i, alpha, R);
+
+    // TODO: Build the rest of the Filtered Vamana Index algorithm
 
   }
 
