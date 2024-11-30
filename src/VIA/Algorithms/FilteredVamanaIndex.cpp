@@ -93,7 +93,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   this->fillGraphNodes();
   GraphNode<vamana_t> s = this->findMedoid(this->G, 1000);
 
-  // Let st(f) be the start node for filter label f for every f in F
+  // Let st(f) be the start node for filter label f for every f in F. TODO: Use filtered Medoid instead of the first node
   std::map<Filter, GraphNode<vamana_t>> st;
   for (auto filter : this->F) {
     std::vector<GraphNode<vamana_t>> nodes = this->getNodesWithCategoricalValueFilter(filter);

@@ -15,14 +15,6 @@
 #include <queue>
 #include <cmath>
 
-// Enum to define different filter types based on the query type
-enum FilterType {
-    NO_FILTER,          // For query_type = 0, no filter is applied (only the vector is used).
-    C_EQUALS_v,         // For query_type = 1, filter for C = v (categorical attribute).
-    l_LEQ_T_LEQ_r,      // For query_type = 2, filter for l ≤ T ≤ r (timestamp constraint).
-    C_EQUALS_v_AND_l_LEQ_T_LEQ_r // For query_type = 3, filter for both C = v and l ≤ T ≤ r (combined constraints).
-};
-
 /**
  * @brief Greedy search algorithm for finding the k nearest nodes in a graph relative to a query vector.
  * 
