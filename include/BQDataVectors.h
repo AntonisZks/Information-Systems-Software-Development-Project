@@ -39,9 +39,31 @@ private:
     float T; // Timestamp attribute
 
 public:
+
+    BaseDataVector() : DataVector<dvector_t>() {}
+
     // Constructor to initialize the BaseDataVector with data, category, and timestamp
     BaseDataVector(unsigned int dimension, unsigned int index, unsigned int category, float timestamp)
         : DataVector<dvector_t>(dimension, index), C(category), T(timestamp) {}
+
+    // Copy Constructor
+    BaseDataVector(const BaseDataVector& other) : DataVector<dvector_t>(other) {
+        C = other.C;
+        T = other.T;
+    }
+
+    // operator =
+    BaseDataVector& operator=(const BaseDataVector& other) {
+        DataVector<dvector_t>::operator=(other);
+        C = other.C;
+        T = other.T;
+        return *this;
+    }
+
+    // Operator ==
+    bool operator==(const BaseDataVector& other) const {
+        return DataVector<dvector_t>::operator==(other) && C == other.C && T == other.T;
+    }
 
     // Getter for the categorical attribute (C)
     inline unsigned int getC() const { return C; }
@@ -82,9 +104,20 @@ private:
     float r; // Upper bound for timestamp range
 
 public:
+
+    QueryDataVector() : DataVector<dvector_t>() {}
+
     // Constructor to initialize the QueryDataVector with data and additional query attributes
     QueryDataVector(unsigned int dimension, unsigned int index, unsigned int q_type, float v_value, float l_value, float r_value)
         : DataVector<dvector_t>(dimension, index), query_type(q_type), v(v_value), l(l_value), r(r_value) {}
+
+    // Copy Constructor
+    QueryDataVector(const QueryDataVector& other) : DataVector<dvector_t>(other) {
+        query_type = other.query_type;
+        v = other.v;
+        l = other.l;
+        r = other.r;
+    }
 
     // Getter for query type
     inline unsigned int getQueryType() const { return query_type; }
@@ -110,5 +143,12 @@ public:
     // Setter for upper bound of timestamp range (r)
     inline void setR(float r_value) { r = r_value; }
 };
+
+// Operator << for BaseDataVector
+template <typename dvector_t> std::ostream& operator<<(std::ostream& os, const BaseDataVector<dvector_t>& bdv) {
+    os << "BaseDataVector: " << bdv.getIndex() << " [C: " << bdv.getC() << ", T: " << bdv.getT() << "] ";
+    os << static_cast<DataVector<dvector_t>>(bdv);
+    return os;
+}
 
 #endif // DATAVECTOR_H

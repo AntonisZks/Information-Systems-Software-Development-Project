@@ -20,6 +20,7 @@ template <typename graph_t> class Graph {
 private:
   GraphNode<graph_t>* nodes;
   std::set<graph_t> nodesSet;
+  std::vector<GraphNode<graph_t>> nodesVector;
   unsigned int nodesCount;
 
 public:
@@ -64,6 +65,13 @@ public:
    * @return set of data from all nodes
   */
   std::set<graph_t> getNodesSet(void) const { return this->nodesSet; }
+
+  /**
+   * @brief Retrieves the data from all nodes in the graph.
+   * 
+   * @return vector of data from all nodes
+   */
+  std::vector<GraphNode<graph_t>> getNodesVector(void) const { return this->nodesVector; }
 
   /**
    * @brief Retrieves the data from a specific node by its index.

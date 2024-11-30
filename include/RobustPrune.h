@@ -1,5 +1,7 @@
 #include <iostream>
 #include "graph.h"
+#include "DataVector.h"
+#include "BQDataVectors.h"
 
 /**
  * @brief Prunes the neighbors of a given node in a graph based on a robust pruning algorithm.

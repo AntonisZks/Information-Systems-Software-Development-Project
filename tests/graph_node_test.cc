@@ -51,7 +51,7 @@ void test_node_add_neighbors(void) {
     node1.addNeighbor(3);
     node1.addNeighbor(4);
     
-    computedNeighbors = node1.getNeighbors();
+    computedNeighbors = node1.getNeighborsVector();
     correctNeighbors.push_back(2);
     correctNeighbors.push_back(3);
     correctNeighbors.push_back(4);
@@ -83,7 +83,7 @@ void test_node_integer_neighbors_fetching(void) {
     correctNeighbors.push_back(3);
     correctNeighbors.push_back(4);
 
-    computedNeighbors = node1.getNeighbors();
+    computedNeighbors = node1.getNeighborsVector();
     TEST_CHECK(*computedNeighbors == correctNeighbors);
 
     // --- LARGE AMOUNT OF NEIGHBORS ---
@@ -96,9 +96,9 @@ void test_node_integer_neighbors_fetching(void) {
         correctNeighbors.push_back(i);
     }
 
-    computedNeighbors = node2.getNeighbors();
+    computedNeighbors = node2.getNeighborsVector();
     TEST_CHECK(*computedNeighbors == correctNeighbors);
-    TEST_CHECK(node1.getNeighbors() != node2.getNeighbors());
+    TEST_CHECK(node1.getNeighborsVector() != node2.getNeighborsVector());
 
 }
 
@@ -126,7 +126,7 @@ void test_node_string_neighbors_fetching(void) {
     wrongNeighbors.push_back("Harry");
     wrongNeighbors.push_back("Bob");
     
-    computedNeighbors = node1.getNeighbors();
+    computedNeighbors = node1.getNeighborsVector();
     TEST_CHECK(*computedNeighbors == correctNeighbors);
     TEST_CHECK(*computedNeighbors != wrongNeighbors);
 
@@ -150,7 +150,7 @@ void test_node_remove_neighbor(void) {
     correctNeighbors.push_back(2);
     correctNeighbors.push_back(4);
 
-    computedNeighbors = node1.getNeighbors();
+    computedNeighbors = node1.getNeighborsVector();
 
     TEST_CHECK(*computedNeighbors == correctNeighbors);
 

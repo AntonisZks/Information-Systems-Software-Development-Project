@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm> 
 #include <vector>
+#include <set>
 
 /**
  * @brief Struct that represents a node in a graph. Each node contains data of a specified type 
@@ -72,7 +73,18 @@ public:
    * 
    * @return A pointer to a vector containing the neighbors' data
    */
-  inline std::vector<node_t>* getNeighbors(void) { return &this->neighbors; }
+  inline std::vector<node_t>* getNeighborsVector(void) { return &this->neighbors; }
+
+  /**
+   * @brief Retrieves the set of neighbors for this node.
+   * 
+   * @return A set containing the neighbors' data
+   * 
+   * TODO: This functions should be replaced with a more efficient implementation
+   */
+  inline std::set<node_t> getNeighborsSet(void) { 
+    return std::set<node_t>(this->neighbors.begin(), this->neighbors.end()); 
+  }
 
   /**
    * @brief Clears out all the neighbors of the node

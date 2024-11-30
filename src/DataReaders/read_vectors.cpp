@@ -167,7 +167,7 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
         file.read(reinterpret_cast<char*>(&C), sizeof(C));
         file.read(reinterpret_cast<char*>(&T), sizeof(T));
 
-        BaseDataVector<float> dataVector(100, 0, C, T);
+        BaseDataVector<float> dataVector(100, i, C, T);
 
         for (unsigned int j = 0; j < 100; ++j) {
             float currentData;
@@ -215,7 +215,7 @@ std::vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& fi
         file.read(reinterpret_cast<char*>(&l), sizeof(l));
         file.read(reinterpret_cast<char*>(&r), sizeof(r));
 
-        QueryDataVector<float> dataVector(100, 0, query_type, v, l, r);
+        QueryDataVector<float> dataVector(100, i, query_type, v, l, r);
 
         for (unsigned int j = 0; j < 100; ++j) {
             float currentData;

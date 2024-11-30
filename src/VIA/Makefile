@@ -9,7 +9,7 @@ OBJ_DIR = ../../build
 
 
 # Define the targets for the executables
-all: $(OBJ_DIR)/GreedySearch.o $(OBJ_DIR)/RobustPrune.o $(OBJ_DIR)/VamanaIndex.o $(OBJ_DIR)/recall.o
+all: $(OBJ_DIR)/GreedySearch.o $(OBJ_DIR)/RobustPrune.o $(OBJ_DIR)/VamanaIndex.o $(OBJ_DIR)/recall.o $(OBJ_DIR)/FilteredVamanaIndex.cpp
 
 
 # Compile the source files in the current directory
@@ -24,3 +24,6 @@ $(OBJ_DIR)/VamanaIndex.o: Algorithms/VamanaIndex.cpp
 
 $(OBJ_DIR)/recall.o: Evaluation/recall.cpp
 	$(CC) $(FLAGS) -o $(OBJ_DIR)/recall.o -c Evaluation/recall.cpp -I$(INC_DIR)
+
+$(OBJ_DIR)/FilteredVamanaIndex.cpp: Algorithms/FilteredVamanaIndex.cpp
+	$(CC) $(FLAGS) -o $(OBJ_DIR)/FilteredVamanaIndex.o -c Algorithms/FilteredVamanaIndex.cpp -I$(INC_DIR)
