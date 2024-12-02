@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 #include "../include/BQDataVectors.h"
 #include "../include/read_data.h"
 #include "../include/distance.h"
@@ -10,19 +11,121 @@
 #include "../include/groundtruth.h"
 
 
-int main(int argc, char* argv[]) {
+/**
+ * @brief Parse the command line arguments and store them in a map for easy access.
+ * 
+ * @param argc Number of arguments
+ * @param argv Array of arguments
+ * 
+ * @return A map containing the parsed arguments
+ */
+std::unordered_map<std::string, std::string> parseArguments(int argc, char* argv[]) {
+  
+  std::unordered_map<std::string, std::string> args;
 
-  using GreedyResult = std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>>;
+  // Iterate over the arguments and store them in a map for easy access
+  for (unsigned int i = 2; i < (unsigned int)argc; i += 2) {
+    std::string key = argv[i];
 
-  std::vector<BaseDataVector<float>> base_vectors = ReadFilteredBaseVectorFile("data/Dummy/dummy-data.bin");
-  std::vector<QueryDataVector<float>> query_vectors = ReadFilteredQueryVectorFile("data/Dummy/dummy-queries.bin");
+    // Check if the key is valid (starts with '-')
+    if (key[0] != '-') {
+      throw std::invalid_argument("Invalid argument: " + key);
+    }
+
+    // Check if the key has a value associated with it
+    if (i + 1 >= (unsigned int)argc) {
+      throw std::invalid_argument("Missing value for argument: " + key);
+    }
+    std::string value = argv[i + 1];
+    args[key] = value;
+  }
+
+  return args;
+}
+
+/**
+ * @brief Compute the groundtruth for a set of base and query vectors. This function handles the case of 
+ * computing the groundtruth execution mode of the application. It reads the base and query vectors from 
+ * the binary files, computes the groundtruth distances, and saves the computed distances to a file.
+ * 
+ * @param args A map containing the parsed arguments
+ * 
+ */
+void ComputeGroundtruth(std::unordered_map<std::string, std::string> args) {
+
+  std::string baseFile, queryFile, groundtruthFile;
+  unsigned int maxDistances = 1000;
+
+  // Check if the required arguments are provided
+  if (args.find("-base-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -base-file");
+  } else {
+    baseFile = args["-base-file"];
+  }
+
+  if (args.find("-query-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -query-file");
+  } else {
+    queryFile = args["-query-file"];
+  }
+
+  if (args.find("-gt-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -gt-file");
+  } else {
+    groundtruthFile = args["-gt-file"];
+  }
+
+  if (args.find("-max-distances") != args.end()) {
+    maxDistances = std::stoi(args["-max-distances"]);
+  }
+
+  // TODO: Reject any other argument by terminating the program
+
+
+  // Create some aliases for the vector types
+  using BaseVectorVector = std::vector<BaseDataVector<float>>;
+  using QueryVectorVector = std::vector<QueryDataVector<float>>;
+  
+  // Read the base and query vectors from the binary files
+  BaseVectorVector base_vectors = ReadFilteredBaseVectorFile(baseFile);
+  QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
 
   // Compute the distance vector, and save the computed distances to a file
-  std::vector<std::vector<int>> base_indexes = computeGroundtruth(base_vectors, query_vectors, 1000);
-  saveGroundtruthToFile(base_indexes, "data/Dummy/dummy-groundtruth.bin");
+  std::vector<std::vector<int>> base_indexes = computeGroundtruth(base_vectors, query_vectors, maxDistances);
+  saveGroundtruthToFile(base_indexes, groundtruthFile);
 
-  // Example usage of readGroundtruthFromFile
-  std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
+}
+
+
+int main(int argc, char* argv[]) {
+
+  // Receive the execution mode and arguments, that is the first argument of the command line
+  std::string executeMode = argv[1];
+  std::unordered_map<std::string, std::string> args;
+
+  // Trye to parse the arguments and catch any invalid argument exceptions
+  try {
+
+    args = parseArguments(argc, argv);
+
+    // Check the execution mode and call the appropriate function
+    if (executeMode == "--compute-gt") {
+      ComputeGroundtruth(args);
+    } 
+    else {
+      std::cerr << "Invalid execution mode: " << executeMode << std::endl;
+      return 1;
+    }
+
+  }
+  catch (std::invalid_argument& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  }
+  
+
+  // // Example usage of readGroundtruthFromFile
+  // std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
 
   // // Initialize all the filters
   // // IMPORTANT: This version of the application only supports CategoricalAttributeFilter
