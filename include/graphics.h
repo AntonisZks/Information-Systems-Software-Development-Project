@@ -29,19 +29,6 @@ const std::string brightWhite = "\033[1;37m";
 
 
 /**
- * @brief Function to print a progress bar with a percentage.
- * 
- * Loading Symbol: #
- * 
- * @param percentage The percentage of progress to display (0-100).
- * @param message Optional message to display before the progress bar.
- */
-void printProgressBar(
-  const double percentage, 
-  const std::string message = ""
-);
-
-/**
  * @brief Function to display a progress bar with a percentage.
  * 
  * Loading Symbol: =>
@@ -58,7 +45,7 @@ void displayProgressBar(
   const int total, 
   const std::string& message,
   const std::chrono::steady_clock::time_point& startTime,
-  const unsigned int barWidth = 40
+  const unsigned int barWidth = 30
 );
 
 /**
@@ -75,7 +62,7 @@ void withProgress(
   const unsigned int end, 
   const std::string message,
   std::function<void(int)> func, 
-  const unsigned int barWidth = 40
+  const unsigned int barWidth = 30
 );
 
 #endif /* GRAPHICS_H */
