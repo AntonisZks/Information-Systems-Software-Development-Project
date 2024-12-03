@@ -18,7 +18,7 @@
 - <ins>Γλώσσα Υλοποίησης:</ins> C++
 - <ins>Μεταγλώττιση:</ins> **g++** (έγινε modularization των αρχείων σε directories και χρήση του [make](https://www.gnu.org/software/make/manual/make.html))
 - <ins>Επαλήθευση Ορθότητας Κώδικα:</ins> **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (η εκτέλεση των test γίνεται μέσω ένος [shell script](https://www.shellscript.sh/))
-- <ins>Mέσω της χρήσης [Github Actions](https://github.com/features/actions) εξασφαλίσαμε σε κάθε στάδιο ανάπτυξης του δεύτερου μέρους του Project την ορθή λειτουργία του κώδικα που γινόταν pushed στο main branch.
+- <ins>Επαλήθευση Pull Request:</ins>Mέσω της χρήσης [Github Actions](https://github.com/features/actions) εξασφαλίσαμε σε κάθε στάδιο ανάπτυξης του δεύτερου μέρους του Project την ορθή λειτουργία του κώδικα που γινόταν pushed στο main branch.
 
 ### Μεταγλώττιση και Εκτέλεση
 - Για την Μεταγλώττιση του Κώδικα:
