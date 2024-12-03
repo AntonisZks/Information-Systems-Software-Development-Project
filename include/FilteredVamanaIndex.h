@@ -57,6 +57,17 @@ public:
    */
   void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R);
 
+  /**
+   * @brief Load a graph from a file. Specifically this method is used to receive the contents of a Vamana Index Graph
+   * stored inside a file and create the Vamana Index object based on those contents. It is used to save time of the 
+   * production making it easy to use an index with specific parameters just by loading it instead of creating it again.
+   * 
+   * @param filename the full path of the file containing the graph
+   * 
+   * @return true if the graph was loaded successfully, false otherwise
+  */
+  bool loadGraph(const std::string& filename);
+
 };
 
 #endif /* FILTERED_VAMANA_INDEX_H */

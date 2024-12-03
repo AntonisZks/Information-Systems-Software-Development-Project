@@ -53,8 +53,20 @@ std::unordered_map<std::string, std::string> parseArguments(int argc, char* argv
  */
 void ComputeGroundtruth(std::unordered_map<std::string, std::string> args) {
 
+  // Create some aliases for the vector types
+  using BaseVectorVector = std::vector<BaseDataVector<float>>;
+  using QueryVectorVector = std::vector<QueryDataVector<float>>;
+
   std::string baseFile, queryFile, groundtruthFile;
   unsigned int maxDistances = 1000;
+
+  // Check if the command line arguments of the execution mode are valid
+  std::vector<std::string> validArguments = {"-base-file", "-query-file", "-gt-file", "-max-distances"};
+  for (auto arg : args) {
+    if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
+      throw std::invalid_argument("Invalid argument: " + arg.first);
+    }
+  }
 
   // Check if the required arguments are provided
   if (args.find("-base-file") == args.end()) {
@@ -78,13 +90,6 @@ void ComputeGroundtruth(std::unordered_map<std::string, std::string> args) {
   if (args.find("-max-distances") != args.end()) {
     maxDistances = std::stoi(args["-max-distances"]);
   }
-
-  // TODO: Reject any other argument by terminating the program
-
-
-  // Create some aliases for the vector types
-  using BaseVectorVector = std::vector<BaseDataVector<float>>;
-  using QueryVectorVector = std::vector<QueryDataVector<float>>;
   
   // Read the base and query vectors from the binary files
   BaseVectorVector base_vectors = ReadFilteredBaseVectorFile(baseFile);
@@ -97,7 +102,180 @@ void ComputeGroundtruth(std::unordered_map<std::string, std::string> args) {
 }
 
 
+void Create(std::unordered_map<std::string, std::string> args) {
+
+  // Create some aliases for the vector types
+  using BaseVectorVector = std::vector<BaseDataVector<float>>;
+  
+  std::string baseFile, L, R, alpha, outputFile;
+  bool save = false;
+
+  // Check if the command line arguments of the execution mode are valid
+  std::vector<std::string> validArguments = {"-base-file", "-L", "-R", "-alpha", "-save"};
+  for (auto arg : args) {
+    if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
+      throw std::invalid_argument("Invalid argument: " + arg.first);
+    }
+  }
+
+  // Check if the required arguments are provided
+  if (args.find("-base-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -base-file");
+  } else {
+    baseFile = args["-base-file"];
+  }
+
+  if (args.find("-L") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -L");
+  } else {
+    L = args["-L"];
+  }
+
+  if (args.find("-R") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -R");
+  } else {
+    R = args["-R"];
+  }
+
+  if (args.find("-alpha") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -alpha");
+  } else {
+    alpha = args["-alpha"];
+  }
+
+  if (args.find("-save") != args.end()) {
+    if (args["-save"] == "") {
+      throw std::invalid_argument("Missing value for argument: -save");
+    }
+    outputFile = args["-save"];
+    save = true;
+  }
+
+  // Read the base vectors from the binary file
+  BaseVectorVector base_vectors = ReadFilteredBaseVectorFile(baseFile);
+
+  // Initialize all the filters
+  // IMPORTANT: This version of the application only supports CategoricalAttributeFilter
+  std::set<CategoricalAttributeFilter> filters;
+  for (auto vector : base_vectors) {
+    CategoricalAttributeFilter filter(vector.getC());
+    filters.insert(filter);
+  }
+
+  // Initialize and create the filtered Vamana index
+  FilteredVamanaIndex<BaseDataVector<float>> index(filters);
+  index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R));
+
+  // Save the graph to a file if the save flag is set
+  if (save) {
+    index.saveGraph(outputFile);
+  }
+
+}
+
+
+void Test(std::unordered_map<std::string, std::string> args) {
+
+  // Create some aliases for the vector types
+  using QueryVectorVector = std::vector<QueryDataVector<float>>;
+  using GreedyResult = std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>>;
+
+  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber;
+
+  // Check if the command line arguments of the execution mode are valid
+  std::vector<std::string> validArguments = {"-load", "-k", "-L", "-gt-file", "-query-file", "-query"};
+  for (auto arg : args) {
+    if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
+      throw std::invalid_argument("Invalid argument: " + arg.first);
+    }
+  }
+
+  // Check if the required arguments are provided
+  if (args.find("-load") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -load");
+  } else {
+    indexFile = args["-load"];
+  }
+
+  if (args.find("-k") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -k");
+  } else {
+    k = args["-k"];
+  }
+
+  if (args.find("-L") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -L");
+  } else {
+    L = args["-L"];
+  }
+
+  if (args.find("-gt-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -gt-file");
+  } else {
+    groundtruthFile = args["-gt-file"];
+  }
+
+  if (args.find("-query-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -query-file");
+  } else {
+    queryFile = args["-query-file"];
+  }
+
+  if (args.find("-query") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -query");
+  } else {
+    queryNumber = args["-query"];
+  }
+
+  // Read the query vectors from the binary file, and check if the query type is supported by the application
+  QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
+  QueryDataVector<float> xq = query_vectors[std::stoi(queryNumber)];
+  if (xq.getQueryType() > 1) {
+    return;
+  }
+
+  FilteredVamanaIndex<BaseDataVector<float>> index;
+  index.loadGraph(indexFile);
+  std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile(groundtruthFile);
+
+
+  // Store the start nodes for each filter inside a vector
+  std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
+  for (auto filter : index.getFilters()) {
+    start_nodes.push_back(index.getNodesWithCategoricalValueFilter(filter)[0]); // TODO: Use filtered Medoid instead of the first node
+  }
+
+  std::vector<CategoricalAttributeFilter> Fx;
+  if (xq.getQueryType() == 1) {
+    Fx.push_back(CategoricalAttributeFilter(xq.getV()));
+  }
+
+  std::vector<GraphNode<BaseDataVector<float>>> P = index.getNodes();
+  std::set<BaseDataVector<float>> exactNeighbors;
+
+  for (auto index : groundtruth[std::stoi(queryNumber)]) {
+    exactNeighbors.insert(P[index].getData());
+    if ((int)exactNeighbors.size() >= std::stoi(k)) {
+      break;
+    }
+  }
+
+  GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, std::stoi(k), std::stoi(L), Fx);
+  std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
+  
+  double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
+  std::cout << "Recall: " << recall*100 << "%" << std::endl;
+
+}
+
+
 int main(int argc, char* argv[]) {
+
+  // Check if an execution mode was provided in the command line
+  if (argc < 2) {
+    std::cerr << "Usage: " << argv[0] << " <execution-mode> [arguments]" << std::endl;
+    return 1;
+  }
 
   // Receive the execution mode and arguments, that is the first argument of the command line
   std::string executeMode = argv[1];
@@ -111,9 +289,19 @@ int main(int argc, char* argv[]) {
     // Check the execution mode and call the appropriate function
     if (executeMode == "--compute-gt") {
       ComputeGroundtruth(args);
-    } 
+    }
+    else if (executeMode == "--create") {
+      Create(args);
+    }
+    else if (executeMode == "--test") {
+      Test(args);  
+    }
     else {
-      std::cerr << "Invalid execution mode: " << executeMode << std::endl;
+      std::cerr << "Invalid execution mode: " << executeMode << ". Available execution modes are:" << std::endl;
+      std::cerr << "1)  --compute-gt" << std::endl;
+      std::cerr << "2)  --create" << std::endl;
+      std::cerr << "3)  --test" << std::endl;
+      
       return 1;
     }
 
@@ -123,27 +311,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   
-
-  // // Example usage of readGroundtruthFromFile
-  // std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
-
-  // // Initialize all the filters
-  // // IMPORTANT: This version of the application only supports CategoricalAttributeFilter
-  // std::set<CategoricalAttributeFilter> filters;
-  // for (auto vector : base_vectors) {
-  //   CategoricalAttributeFilter filter(vector.getC());
-  //   filters.insert(filter);
-  // }
-
-  // // Initialize and create the filtered Vamana index
-  // FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-  // index.createGraph(base_vectors, 1.1, 150, 12);
-
-  // // Store the start nodes for each filter inside a vector
-  // std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
-  // for (auto filter : filters) {
-  //   start_nodes.push_back(index.getNodesWithCategoricalValueFilter(filter)[0]); // TODO: Use filtered Medoid instead of the first node
-  // }
 
   // // Initialize the query vector and its filters vector
   // for (unsigned int query_number = 0; query_number < 100; query_number++) {

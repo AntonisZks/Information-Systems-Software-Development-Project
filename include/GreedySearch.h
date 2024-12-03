@@ -30,10 +30,10 @@
  * 
  * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
  */
-template <typename graph_t> std::pair<std::set<graph_t>, std::set<graph_t>> GreedySearch(
+template <typename graph_t, typename query_t> std::pair<std::set<graph_t>, std::set<graph_t>> GreedySearch(
     const Graph<graph_t>& G, 
     const GraphNode<graph_t>& s, 
-    const graph_t& xq, 
+    const query_t& xq, 
     unsigned int k, 
     unsigned int L
 );

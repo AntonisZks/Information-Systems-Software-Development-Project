@@ -158,4 +158,33 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
 
 }
 
+/**
+ * @brief Load a graph from a file. Specifically this method is used to receive the contents of a Vamana Index Graph
+ * stored inside a file and create the Vamana Index object based on those contents. It is used to save time of the 
+ * production making it easy to use an index with specific parameters just by loading it instead of creating it again.
+ * 
+ * @param filename the full path of the file containing the graph
+ * 
+ * @return true if the graph was loaded successfully, false otherwise
+*/
+template <typename vamana_t> bool FilteredVamanaIndex<vamana_t>::loadGraph(const std::string& filename) {
+
+  // Load the graph from the file using the VamanaIndex loadGraph method
+  if (!VamanaIndex<vamana_t>::loadGraph(filename)) {
+    return false;
+  }
+
+  // Initialize the filters from the graph nodes
+  // IMPORTANT: This version of the application only supports CategoricalAttributeFilter
+  std::set<CategoricalAttributeFilter> filters;
+  for (auto vector : this->P) {
+    CategoricalAttributeFilter filter(vector.getC());
+    filters.insert(filter);
+  }
+  this->setFilters(filters);
+
+  return true;
+
+}
+
 template class FilteredVamanaIndex<BaseDataVector<float>>;
