@@ -26,7 +26,7 @@ using namespace std;
 */
 template <typename vamana_t> class VamanaIndex {
 
-private:
+protected:
   
   Graph<vamana_t> G;
   std::vector<vamana_t> P;
@@ -64,6 +64,13 @@ public:
    * @return the points vector
   */
   inline std::vector<vamana_t> getPoints(void) const { return this->P; }
+
+  /**
+   * @brief Returns the nodes of the Vamana Index entity as a vector.
+   * 
+   * @return the nodes vector
+   */
+  inline std::vector<GraphNode<vamana_t>> getNodes(void) const { return this->G.getNodesVector(); }
 
   /**
    * @brief Creates a Vamana Index Graph according to the provided dataset points and the given parameters.

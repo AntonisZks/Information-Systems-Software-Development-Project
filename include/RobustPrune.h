@@ -1,5 +1,7 @@
 #include <iostream>
 #include "graph.h"
+#include "DataVector.h"
+#include "BQDataVectors.h"
 
 /**
  * @brief Prunes the neighbors of a given node in a graph based on a robust pruning algorithm.
@@ -23,3 +25,6 @@
  */
 template <typename graph_t>
 void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R);
+
+template <typename graph_t>
+void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node,std::set<graph_t>& V, float alpha,int R);

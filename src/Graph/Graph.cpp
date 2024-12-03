@@ -1,5 +1,6 @@
 #include "../../include/graph.h"
 #include "../../include/DataVector.h"
+#include "../../include/BQDataVectors.h"
 
 /**
  * @brief Default Constructor of the Grpah. Exists to avoid errors.
@@ -22,6 +23,7 @@ template <typename graph_t> Graph<graph_t>::Graph(unsigned int nodesCount_) : no
 
   for (unsigned int i = 0; i < this->nodesCount; i++) {
     this->nodesSet.insert(this->nodes[i].getData());
+    this->nodesVector.push_back(this->nodes[i]);
   }
 
 }
@@ -41,6 +43,8 @@ template <typename graph_t> Graph<graph_t>::~Graph(void) {
  */
 template <typename graph_t> void Graph<graph_t>::setNodeData(unsigned int index, const graph_t& data) {
   this->nodes[index].setData(data);
+  this->nodesSet.insert(data);
+  this->nodesVector[index].setData(data);
 }
 
 /**
@@ -55,9 +59,13 @@ template <typename graph_t> void Graph<graph_t>::setNodesCount(const unsigned in
   this->nodesCount = nodesCount;
   delete [] this->nodes;
 
+  this->nodesSet.clear();
+  this->nodesVector.clear();
+
   this->nodes = new GraphNode<graph_t>[nodesCount];
   for (unsigned int i = 0; i < nodesCount; i++) {
     this->nodes[i].setIndex(i);
+    this->nodesVector.push_back(this->nodes[i]);
   }
 
 }
@@ -115,7 +123,7 @@ template <typename graph_t> std::vector<graph_t>* Graph<graph_t>::getNodeNeighbo
   if (index >= this->nodesCount) {
     return nullptr;
   }
-  return this->nodes[index].getNeighbors();
+  return this->nodes[index].getNeighborsVector();
 
 }
 
@@ -188,3 +196,4 @@ template <typename graph_t> bool Graph<graph_t>::disconnectNodesByData(const gra
 
 template class Graph<int>;
 template class Graph<DataVector<float>>;
+template class Graph<BaseDataVector<float>>;

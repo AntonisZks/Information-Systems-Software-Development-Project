@@ -63,7 +63,7 @@ void displayProgressBar(
 
   // Display action message
   std::cout << cyan << "Action: ";
-  std::cout << brightCyan << std::setw(15) << std::setfill(' ') << std::left << message << reset;
+  std::cout << brightCyan << std::setw(24) << std::setfill(' ') << std::left << message << reset;
 
   // Display progress bar
   std::cout << " | " << green << "Progress: [";
@@ -72,7 +72,7 @@ void displayProgressBar(
     else if (i == position) std::cout << ">";
     else std::cout << black << ".";
   }
-  std::cout << "] " << brightGreen << std::setw(6) << std::setfill(' ') << std::right << std::fixed << std::setprecision(2);
+  std::cout << green << "] " << brightGreen << std::setw(6) << std::setfill(' ') << std::right << std::fixed << std::setprecision(2);
   std::cout << float(progress * 100.0) << "%" << reset;
 
   // Display remaining time

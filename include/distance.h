@@ -13,17 +13,17 @@
  * This functor orders elements based on their Euclidean distance to a target vector.
  * If two elements have the same distance, they are compared lexicographically.
  */
-template <typename point_t>
+template <typename base_t, typename query_t>
 struct EuclideanDistanceOrder {
 
-  point_t xq; // Target vector for distance comparisons
+  query_t xq; // Target vector for distance comparisons
 
   /**
    * @brief Constructs a new EuclideanDistanceOrder object with a target vector.
    * 
    * @param target The target vector for distance comparisons.
    */
-  EuclideanDistanceOrder(const point_t& target) : xq(target) {}
+  EuclideanDistanceOrder(const query_t& target) : xq(target) {}
 
   /**
    * @brief Comparison operator for ordering elements by Euclidean distance.
@@ -33,7 +33,7 @@ struct EuclideanDistanceOrder {
    * 
    * @return True if the first element is closer to the target vector than the second element.
    */
-  bool operator()(const point_t& a, const point_t& b);
+  bool operator()(const base_t& a, const base_t& b);
 
 };
 

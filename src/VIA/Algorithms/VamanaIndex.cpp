@@ -1,5 +1,6 @@
 #include "../../../include/VamanaIndex.h"
 #include "../../../include/DataVector.h"
+#include "../../../include/BQDataVectors.h"
 
 #include <thread>
 #include <chrono>
@@ -111,10 +112,11 @@ void VamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
-
   GreedyResult greedyResult;
-  this->P = P;
+
+  // Initialize graph memory
   unsigned int n = P.size();
+  this->P = P;
   this->G.setNodesCount(n);
 
   // Initialize the graph to a random R-regular directed graph with n vertices and R edges per vertex
@@ -133,13 +135,13 @@ void VamanaIndex<vamana_t>::createGraph(
     RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
 
     // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
-    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighbors();
+    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
     for (auto j : *sigma_i_neighbors) {
       std::set<vamana_t> outgoing;
       GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
 
       // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
-      for (auto neighbor : *j_node->getNeighbors()) {
+      for (auto neighbor : *j_node->getNeighborsVector()) {
         outgoing.insert(neighbor);
       }
       outgoing.insert(sigma_i);
@@ -191,7 +193,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::saveGraph(const std::st
 
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
     
-    std::vector<vamana_t>* neighbors = currentNode->getNeighbors();
+    std::vector<vamana_t>* neighbors = currentNode->getNeighborsVector();
     unsigned int neighborsCount = neighbors->size();
 
     outFile << neighborsCount;
@@ -438,10 +440,10 @@ template <typename vamana_t> void VamanaIndex<vamana_t>::test(const unsigned int
   const unsigned int& query_number, const std::set<vamana_t>& realNeighbors) 
 {
 
-  using GreedyResult = std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>>;
+  using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
 
   // Find the medoid node of the graph and run Greedy Search to find the k nearest neighbors
-  GraphNode<DataVector<float>> s = findMedoid(this->G, 1000);
+  GraphNode<vamana_t> s = findMedoid(this->G, 1000);
   GreedyResult greedyResult = GreedySearch(this->G, s, query_vectors.at(query_number), k, L);
 
   // Calculate the recall evaluation of the search process and print the results to the console
@@ -453,3 +455,4 @@ template <typename vamana_t> void VamanaIndex<vamana_t>::test(const unsigned int
 }
 
 template class VamanaIndex<DataVector<float>>;
+template class VamanaIndex<BaseDataVector<float>>;

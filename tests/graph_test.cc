@@ -81,9 +81,26 @@ void test_graph_nodes_connectivity(void) {
     TEST_CHECK(*node2_ComputedNeighbors == node2_CorrectNeighbors);
 }
 
+void test_graph_get_nodes_vector(void) {
+
+    Graph<int> graph1(10);
+
+    // Insert some data to the graph nodes
+    for (unsigned int i = 0; i < graph1.getNodesCount(); i++) {
+        graph1.setNodeData(i, i + 1);
+    }
+
+    std::vector<GraphNode<int>> nodes = graph1.getNodesVector();
+    for (unsigned int i = 0; i < nodes.size(); i++) {
+        TEST_CHECK(nodes[i].getData() == int(i + 1));
+    }
+
+}
+
 TEST_LIST = {
     { "graph_initialization_test", test_graph_initialization },
     { "graph_setting_and_fetching_data_test", test_graph_node_data_setting_and_fetching },
     { "graph_nodes_connectivity_test", test_graph_nodes_connectivity },
+    { "graph_get_nodes_vector_test", test_graph_get_nodes_vector },
     { NULL, NULL }
 };
