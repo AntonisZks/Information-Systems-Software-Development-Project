@@ -79,7 +79,7 @@ FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const Categori
  */
 template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized) {
 
   using Filter = CategoricalAttributeFilter;
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;

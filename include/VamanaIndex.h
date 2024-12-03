@@ -87,7 +87,7 @@ public:
    * @param R the parameter R
    * 
   */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize = true);
 
   /**
    * @brief Saves a specific graph into a file. Specifically this method is used to save the contents of a Vamana 
@@ -127,7 +127,7 @@ public:
    * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
    * @return The medoid node of the sampled nodes.
    */
-  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, int sample_size = 100);
+  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, bool visualize = true, int sample_size = 100);
 
   //####################################################################
   //this is the new filtered medoid, i will brief in later time

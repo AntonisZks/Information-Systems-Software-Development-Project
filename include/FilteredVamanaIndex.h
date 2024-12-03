@@ -7,7 +7,7 @@
 
 template <typename vamana_t> class FilteredVamanaIndex : public VamanaIndex<vamana_t> {
 
-private:
+protected:
 
   std::set<CategoricalAttributeFilter> F;
 
@@ -55,7 +55,7 @@ public:
    * @param L An unsigned int parameter.
    * @param R An unsigned int parameter.
    */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized = true);
 
   /**
    * @brief Load a graph from a file. Specifically this method is used to receive the contents of a Vamana Index Graph

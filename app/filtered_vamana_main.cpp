@@ -9,6 +9,7 @@
 #include "../include/Filter.h"
 #include "../include/recall.h"
 #include "../include/groundtruth.h"
+#include "../include/StichedVamanaIndex.h"
 
 
 /**
@@ -107,11 +108,12 @@ void Create(std::unordered_map<std::string, std::string> args) {
   // Create some aliases for the vector types
   using BaseVectorVector = std::vector<BaseDataVector<float>>;
   
-  std::string baseFile, L, R, alpha, outputFile;
+  std::string indexType, baseFile, L, R, alpha, outputFile;
+  std::string L_small, R_small, R_stiched;
   bool save = false;
 
   // Check if the command line arguments of the execution mode are valid
-  std::vector<std::string> validArguments = {"-base-file", "-L", "-R", "-alpha", "-save"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save"};
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
       throw std::invalid_argument("Invalid argument: " + arg.first);
@@ -119,22 +121,58 @@ void Create(std::unordered_map<std::string, std::string> args) {
   }
 
   // Check if the required arguments are provided
+  if (args.find("-index-type") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -index-type");
+  } else {
+    indexType = args["-index-type"];
+    if (indexType == "stiched") {
+    }
+  }
+
+  if (indexType == "filtered") {
+
+    if (args.find("-L") == args.end()) {
+      throw std::invalid_argument("Missing required argument: -L");
+    } else {
+      L = args["-L"];
+    }
+
+    if (args.find("-R") == args.end()) {
+      throw std::invalid_argument("Missing required argument: -R");
+    } else {
+      R = args["-R"];
+    }
+
+  }
+  else if (indexType == "stiched") {
+
+    if (args.find("-L-small") == args.end()) {
+      throw std::invalid_argument("Missing required argument: -L-small");
+    } else {
+      L_small = args["-L-small"];
+    }
+
+    if (args.find("-R-small") == args.end()) {
+      throw std::invalid_argument("Missing required argument: -R-small");
+    } else {
+      R_small = args["-R-small"];
+    }
+
+    if (args.find("-R-stiched") == args.end()) {
+      throw std::invalid_argument("Missing required argument: -R-stiched");
+    } else {
+      R_stiched = args["-R-stiched"];
+    }
+
+  }
+  else {
+    throw std::invalid_argument("Invalid index type: " + indexType + ". Supported index types are: filtered, stiched");
+  }
+
   if (args.find("-base-file") == args.end()) {
     throw std::invalid_argument("Missing required argument: -base-file");
   } else {
     baseFile = args["-base-file"];
-  }
-
-  if (args.find("-L") == args.end()) {
-    throw std::invalid_argument("Missing required argument: -L");
-  } else {
-    L = args["-L"];
-  }
-
-  if (args.find("-R") == args.end()) {
-    throw std::invalid_argument("Missing required argument: -R");
-  } else {
-    R = args["-R"];
   }
 
   if (args.find("-alpha") == args.end()) {
@@ -162,13 +200,27 @@ void Create(std::unordered_map<std::string, std::string> args) {
     filters.insert(filter);
   }
 
-  // Initialize and create the filtered Vamana index
-  FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-  index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R));
+  if (indexType == "filtered") {
+    // Initialize and create the filtered Vamana index
+    FilteredVamanaIndex<BaseDataVector<float>> index(filters);
+    index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R));
 
-  // Save the graph to a file if the save flag is set
-  if (save) {
-    index.saveGraph(outputFile);
+    // Save the graph to a file if the save flag is set
+    if (save) {
+      index.saveGraph(outputFile);
+    }
+  }
+  else if (indexType == "stiched") {
+    
+    // Initialize and create the stiched Vamana index
+    StichedVamanaIndex<BaseDataVector<float>> index(filters);
+    index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched));
+
+    // // Save the graph to a file if the save flag is set
+    // if (save) {
+    //   index.saveGraph(outputFile);
+    // }
+
   }
 
 }
@@ -310,39 +362,6 @@ int main(int argc, char* argv[]) {
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;
   }
-  
-
-  // // Initialize the query vector and its filters vector
-  // for (unsigned int query_number = 0; query_number < 100; query_number++) {
-
-  //   QueryDataVector<float> xq = query_vectors[query_number];
-  //   if (xq.getQueryType() > 1) {
-  //     continue;
-  //   }
-    
-  //   std::vector<CategoricalAttributeFilter> Fx;
-  //   if (xq.getQueryType() == 1) {
-  //     Fx.push_back(CategoricalAttributeFilter(xq.getV()));
-  //   }
-
-  //   std::cout << "Query type: " << xq.getQueryType() << " ";
-  //   unsigned int k = 100;
-    
-  //   // Initialize the arguments for the recall function
-  //   std::set<BaseDataVector<float>> exactNeighbors;
-  //   for (auto index : groundtruth[query_number]) {
-  //     exactNeighbors.insert(base_vectors[index]);
-  //     if (exactNeighbors.size() >= k) {
-  //       break;
-  //     }
-  //   }
-
-  //   GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, k, 150, Fx);
-  //   std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
-
-  //   double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
-  //   std::cout << "Recall: " << recall << std::endl;
-  // }
 
   return 0;
 
