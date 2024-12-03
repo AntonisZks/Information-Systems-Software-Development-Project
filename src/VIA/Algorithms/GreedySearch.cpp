@@ -68,9 +68,9 @@ static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>&
  * 
  * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
  */
-template <typename graph_t>
+template <typename graph_t, typename query_t>
 std::pair<std::set<graph_t>, std::set<graph_t>>
-GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t& xq, unsigned int k, unsigned int L) {
+GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const query_t& xq, unsigned int k, unsigned int L) {
   
   std::set<graph_t> candidates = {s.getData()};
   std::set<graph_t> visited = {};
@@ -106,7 +106,7 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
 
     // Limit the size of candidates to L by keeping the closest L elements to the query
     if (candidates.size() > static_cast<size_t>(L)) {
-      std::set<graph_t, EuclideanDistanceOrder<graph_t, graph_t>> newCandidates{EuclideanDistanceOrder<graph_t, graph_t>(xq)};
+      std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{EuclideanDistanceOrder<graph_t, query_t>(xq)};
       for (auto candidate : candidates) {
         newCandidates.insert(candidate);
       }
@@ -125,7 +125,7 @@ GreedySearch(const Graph<graph_t>& G, const GraphNode<graph_t>& s, const graph_t
   }
 
   // Final selection of k closest candidates after main loop
-  std::set<graph_t, EuclideanDistanceOrder<graph_t, graph_t>> newCandidates{EuclideanDistanceOrder<graph_t, graph_t>(xq)};
+  std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{EuclideanDistanceOrder<graph_t, query_t>(xq)};
   for (auto candidate : candidates) {
     newCandidates.insert(candidate);
   }
@@ -264,6 +264,14 @@ template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<floa
   const Graph<BaseDataVector<float>>& G, 
   const GraphNode<BaseDataVector<float>>& s, 
   const BaseDataVector<float>& xq, 
+  unsigned int k, 
+  unsigned int L
+);
+
+template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>> GreedySearch(
+  const Graph<BaseDataVector<float>>& G, 
+  const GraphNode<BaseDataVector<float>>& s, 
+  const QueryDataVector<float>& xq, 
   unsigned int k, 
   unsigned int L
 );

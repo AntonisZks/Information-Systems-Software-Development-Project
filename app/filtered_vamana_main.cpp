@@ -1,186 +1,158 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 #include "../include/BQDataVectors.h"
 #include "../include/read_data.h"
 #include "../include/distance.h"
 #include "../include/FilteredVamanaIndex.h"
 #include "../include/Filter.h"
 #include "../include/recall.h"
-#include <fstream>
+#include "../include/groundtruth.h"
+
 
 /**
- * @brief Compute the groundtruth for a set of base and query vectors.
+ * @brief Parse the command line arguments and store them in a map for easy access.
  * 
- * This function computes the groundtruth for a set of base and query vectors by calculating the Euclidean distance
- * between each query vector and all base vectors. The function supports only two query types: 0 and 1. For query type 0,
- * the function computes the distances between the query vector and all base vectors. For query type 1, the function computes
- * the distances between the query vector and the base vectors with the same C value.
+ * @param argc Number of arguments
+ * @param argv Array of arguments
  * 
- * @param base_vectors A vector of BaseDataVector objects representing the base vectors
- * @param query_vectors A vector of QueryDataVector objects representing the query vectors
- * @param maxDistances The maximum number of distances to compute for each query vector
- * 
- * @return A 2D vector containing the computed distances for each query vector
+ * @return A map containing the parsed arguments
  */
-std::vector<std::vector<int>> computeGroundtruth(
-  const std::vector<BaseDataVector<float>> base_vectors, const std::vector<QueryDataVector<float>> query_vectors, const unsigned int maxBaseVectors) {
-
-  // Allocate memory for the distance vector and the indexes of the base vectors
-  std::vector<std::vector<float>> distances(query_vectors.size());
-  std::vector<std::vector<int>> base_vectors_indexes(query_vectors.size());
-
-  // Compute the distances between the query vectors and the base vectors (with the same filter)
-  // If no filter provided then compute to the whole graph
-  withProgress(0, query_vectors.size(), "Computing Groundtruth", [&](int i) {
-
-    auto query = query_vectors[i];
-
-    // Compute the distances between the query vector and all base vectors
-    if (query.getQueryType() == NO_FILTER) {
-      for (auto base : base_vectors) {
-        distances[query.getIndex()].push_back(euclideanDistance(base, query));
-        base_vectors_indexes[query.getIndex()].push_back(base.getIndex());
-      }
-    }
-
-    // If the filter type is C_EQUALS_v then compute the distances between the query vector 
-    // and the base vectors with the same C value
-    else if (query.getQueryType() == C_EQUALS_v) {
-      for (auto base : base_vectors) {
-        if (base.getC() == query.getV()) {
-          distances[query.getIndex()].push_back(euclideanDistance(base, query));
-          base_vectors_indexes[query.getIndex()].push_back(base.getIndex());
-        }
-      }
-    }
-
-    // IMPORTANT: Queries with filter type 2 and 3 are not supported in this version of the application
-
-  });
-
-  // Sort the distances for each query vector and keep the base vector indexes for each distance
-  withProgress(0, query_vectors.size(), "Sorting Distances", [&](int i) {
-    
-    // Pack the distances and the base vector indexes into a vector of pairs
-    std::vector<std::pair<float, int>> paired_vec;
-    for (unsigned int j = 0; j < distances[i].size(); j++) {
-      paired_vec.emplace_back(distances[i][j], base_vectors_indexes[i][j]);
-    }
-
-    std::sort(paired_vec.begin(), paired_vec.end());
-
-    // Unpack the sorted distances and base vector indexes
-    for (unsigned int j = 0; j < paired_vec.size(); j++) {
-      distances[i][j] = paired_vec[j].first;
-      base_vectors_indexes[i][j] = paired_vec[j].second;
-    }
-
-  });
-
-  // Return the first `maxBaseVectors` distances for each query vector
-  for (auto& base_vector_indexes : base_vectors_indexes) {
-    base_vector_indexes.resize(std::min((int)maxBaseVectors, (int)base_vector_indexes.size()));
-  }
-
-  return base_vectors_indexes;
-
-}
-
-/**
- * @brief Save the computed groundtruth distances to a binary file.
- * 
- * This function saves the computed groundtruth distances to a binary file. The file format consists of the following:
- * - The number of query vectors (4 bytes)
- * - For each query vector:
- *   - The number of distances (4 bytes)
- *   - The computed distances (4 bytes each)
- * 
- * @param distances A 2D vector containing the computed distances for each query vector
- * @param filename The name of the output file to save the distances
- */
-void saveGroundtruthToFile(const std::vector<std::vector<int>>& base_vectors_indexes, const std::string& filename) {
-
-  std::ofstream file(filename, std::ios::binary);
-
-  if (!file.is_open()) {
-    std::cerr << "Error opening file: " << filename << std::endl;
-    return;
-  }
-
-  // Write the number of query vectors to the file
-  uint32_t num_queries = base_vectors_indexes.size();
-  file.write(reinterpret_cast<const char*>(&num_queries), sizeof(num_queries));
-
-  // Write the distances for each query vector
-  withProgress(0, base_vectors_indexes.size(), "Saving Groundtruth", [&](int i) {
+std::unordered_map<std::string, std::string> parseArguments(int argc, char* argv[]) {
   
-    const std::vector<int>& base_vector_indexes = base_vectors_indexes[i];
+  std::unordered_map<std::string, std::string> args;
 
-    uint32_t num_vectors = base_vector_indexes.size();
-    file.write(reinterpret_cast<const char*>(&num_vectors), sizeof(num_vectors));
-    file.write(reinterpret_cast<const char*>(base_vector_indexes.data()), num_vectors * sizeof(float));
-  
-  });
+  // Iterate over the arguments and store them in a map for easy access
+  for (unsigned int i = 2; i < (unsigned int)argc; i += 2) {
+    std::string key = argv[i];
 
-  file.close();
+    // Check if the key is valid (starts with '-')
+    if (key[0] != '-') {
+      throw std::invalid_argument("Invalid argument: " + key);
+    }
 
+    // Check if the key has a value associated with it
+    if (i + 1 >= (unsigned int)argc) {
+      throw std::invalid_argument("Missing value for argument: " + key);
+    }
+    std::string value = argv[i + 1];
+    args[key] = value;
+  }
+
+  return args;
 }
 
 /**
- * @brief Read the groundtruth distances from a binary file.
+ * @brief Compute the groundtruth for a set of base and query vectors. This function handles the case of 
+ * computing the groundtruth execution mode of the application. It reads the base and query vectors from 
+ * the binary files, computes the groundtruth distances, and saves the computed distances to a file.
  * 
- * This function reads the groundtruth distances from a binary file. The file format consists of the following:
- * - The number of query vectors (4 bytes)
- * - For each query vector:
- *   - The number of distances (4 bytes)
- *   - The computed distances (4 bytes each)
+ * @param args A map containing the parsed arguments
  * 
- * @param filename The name of the input file to read the distances from
- * 
- * @return A 2D vector containing the read distances for each query vector
  */
-std::vector<std::vector<int>> readGroundtruthFromFile(const std::string& filename) {
-  std::ifstream file(filename, std::ios::binary);
+void ComputeGroundtruth(std::unordered_map<std::string, std::string> args) {
 
-  if (!file.is_open()) {
-    std::cerr << "Error opening file: " << filename << std::endl;
-    return {};
+  // Create some aliases for the vector types
+  using BaseVectorVector = std::vector<BaseDataVector<float>>;
+  using QueryVectorVector = std::vector<QueryDataVector<float>>;
+
+  std::string baseFile, queryFile, groundtruthFile;
+  unsigned int maxDistances = 1000;
+
+  // Check if the command line arguments of the execution mode are valid
+  std::vector<std::string> validArguments = {"-base-file", "-query-file", "-gt-file", "-max-distances"};
+  for (auto arg : args) {
+    if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
+      throw std::invalid_argument("Invalid argument: " + arg.first);
+    }
   }
 
-  // Read the number of query vectors from the file
-  uint32_t num_queries;
-  file.read(reinterpret_cast<char*>(&num_queries), sizeof(num_queries));
+  // Check if the required arguments are provided
+  if (args.find("-base-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -base-file");
+  } else {
+    baseFile = args["-base-file"];
+  }
 
-  std::vector<std::vector<int>> base_vectors_indexes(num_queries);
+  if (args.find("-query-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -query-file");
+  } else {
+    queryFile = args["-query-file"];
+  }
 
-  // Read the distances for each query vector
-  withProgress(0, base_vectors_indexes.size(), "Loading Groundtruth", [&](int i) {
-    auto& base_vector_indexes = base_vectors_indexes[i];
+  if (args.find("-gt-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -gt-file");
+  } else {
+    groundtruthFile = args["-gt-file"];
+  }
 
-    uint32_t num_vectors;
-    file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
-    base_vector_indexes.resize(num_vectors);
-    file.read(reinterpret_cast<char*>(base_vector_indexes.data()), num_vectors * sizeof(float));
-  });
-
-  file.close();
-  return base_vectors_indexes;
-}
-
-int main(int argc, char* argv[]) {
-
-  using GreedyResult = std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>>;
-
-  std::vector<BaseDataVector<float>> base_vectors = ReadFilteredBaseVectorFile("data/Dummy/dummy-data.bin");
-  std::vector<QueryDataVector<float>> query_vectors = ReadFilteredQueryVectorFile("data/Dummy/dummy-queries.bin");
+  if (args.find("-max-distances") != args.end()) {
+    maxDistances = std::stoi(args["-max-distances"]);
+  }
+  
+  // Read the base and query vectors from the binary files
+  BaseVectorVector base_vectors = ReadFilteredBaseVectorFile(baseFile);
+  QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
 
   // Compute the distance vector, and save the computed distances to a file
-  // std::vector<std::vector<int>> base_indexes = computeGroundtruth(base_vectors, query_vectors, 1000);
-  // saveGroundtruthToFile(base_indexes, "data/Dummy/dummy-groundtruth.bin");
+  std::vector<std::vector<int>> base_indexes = computeGroundtruth(base_vectors, query_vectors, maxDistances);
+  saveGroundtruthToFile(base_indexes, groundtruthFile);
 
-  // Example usage of readGroundtruthFromFile
-  std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile("data/Dummy/dummy-groundtruth.bin");
+}
+
+
+void Create(std::unordered_map<std::string, std::string> args) {
+
+  // Create some aliases for the vector types
+  using BaseVectorVector = std::vector<BaseDataVector<float>>;
+  
+  std::string baseFile, L, R, alpha, outputFile;
+  bool save = false;
+
+  // Check if the command line arguments of the execution mode are valid
+  std::vector<std::string> validArguments = {"-base-file", "-L", "-R", "-alpha", "-save"};
+  for (auto arg : args) {
+    if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
+      throw std::invalid_argument("Invalid argument: " + arg.first);
+    }
+  }
+
+  // Check if the required arguments are provided
+  if (args.find("-base-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -base-file");
+  } else {
+    baseFile = args["-base-file"];
+  }
+
+  if (args.find("-L") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -L");
+  } else {
+    L = args["-L"];
+  }
+
+  if (args.find("-R") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -R");
+  } else {
+    R = args["-R"];
+  }
+
+  if (args.find("-alpha") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -alpha");
+  } else {
+    alpha = args["-alpha"];
+  }
+
+  if (args.find("-save") != args.end()) {
+    if (args["-save"] == "") {
+      throw std::invalid_argument("Missing value for argument: -save");
+    }
+    outputFile = args["-save"];
+    save = true;
+  }
+
+  // Read the base vectors from the binary file
+  BaseVectorVector base_vectors = ReadFilteredBaseVectorFile(baseFile);
 
   // Initialize all the filters
   // IMPORTANT: This version of the application only supports CategoricalAttributeFilter
@@ -192,32 +164,185 @@ int main(int argc, char* argv[]) {
 
   // Initialize and create the filtered Vamana index
   FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-  index.createGraph(base_vectors, 1.5, 10, 20);
+  index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R));
+
+  // Save the graph to a file if the save flag is set
+  if (save) {
+    index.saveGraph(outputFile);
+  }
+
+}
+
+
+void Test(std::unordered_map<std::string, std::string> args) {
+
+  // Create some aliases for the vector types
+  using QueryVectorVector = std::vector<QueryDataVector<float>>;
+  using GreedyResult = std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>>;
+
+  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber;
+
+  // Check if the command line arguments of the execution mode are valid
+  std::vector<std::string> validArguments = {"-load", "-k", "-L", "-gt-file", "-query-file", "-query"};
+  for (auto arg : args) {
+    if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
+      throw std::invalid_argument("Invalid argument: " + arg.first);
+    }
+  }
+
+  // Check if the required arguments are provided
+  if (args.find("-load") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -load");
+  } else {
+    indexFile = args["-load"];
+  }
+
+  if (args.find("-k") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -k");
+  } else {
+    k = args["-k"];
+  }
+
+  if (args.find("-L") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -L");
+  } else {
+    L = args["-L"];
+  }
+
+  if (args.find("-gt-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -gt-file");
+  } else {
+    groundtruthFile = args["-gt-file"];
+  }
+
+  if (args.find("-query-file") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -query-file");
+  } else {
+    queryFile = args["-query-file"];
+  }
+
+  if (args.find("-query") == args.end()) {
+    throw std::invalid_argument("Missing required argument: -query");
+  } else {
+    queryNumber = args["-query"];
+  }
+
+  // Read the query vectors from the binary file, and check if the query type is supported by the application
+  QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
+  QueryDataVector<float> xq = query_vectors[std::stoi(queryNumber)];
+  if (xq.getQueryType() > 1) {
+    return;
+  }
+
+  FilteredVamanaIndex<BaseDataVector<float>> index;
+  index.loadGraph(indexFile);
+  std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile(groundtruthFile);
+
 
   // Store the start nodes for each filter inside a vector
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
-  for (auto filter : filters) {
+  for (auto filter : index.getFilters()) {
     start_nodes.push_back(index.getNodesWithCategoricalValueFilter(filter)[0]); // TODO: Use filtered Medoid instead of the first node
   }
 
-  // Initialize the query vector and its filters vector
-  QueryDataVector<float> xq = query_vectors[0];
   std::vector<CategoricalAttributeFilter> Fx;
   if (xq.getQueryType() == 1) {
     Fx.push_back(CategoricalAttributeFilter(xq.getV()));
   }
-  
-  GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, 1000, 1000, Fx);
 
-  // Initialize the arguments for the recall function
-  std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
+  std::vector<GraphNode<BaseDataVector<float>>> P = index.getNodes();
   std::set<BaseDataVector<float>> exactNeighbors;
-  for (auto index : groundtruth[0]) {
-    exactNeighbors.insert(base_vectors[index]);
+
+  for (auto index : groundtruth[std::stoi(queryNumber)]) {
+    exactNeighbors.insert(P[index].getData());
+    if ((int)exactNeighbors.size() >= std::stoi(k)) {
+      break;
+    }
   }
 
+  GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, std::stoi(k), std::stoi(L), Fx);
+  std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
+  
   double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
-  std::cout << "Recall: " << recall << std::endl;
+  std::cout << "Recall: " << recall*100 << "%" << std::endl;
+
+}
+
+
+int main(int argc, char* argv[]) {
+
+  // Check if an execution mode was provided in the command line
+  if (argc < 2) {
+    std::cerr << "Usage: " << argv[0] << " <execution-mode> [arguments]" << std::endl;
+    return 1;
+  }
+
+  // Receive the execution mode and arguments, that is the first argument of the command line
+  std::string executeMode = argv[1];
+  std::unordered_map<std::string, std::string> args;
+
+  // Trye to parse the arguments and catch any invalid argument exceptions
+  try {
+
+    args = parseArguments(argc, argv);
+
+    // Check the execution mode and call the appropriate function
+    if (executeMode == "--compute-gt") {
+      ComputeGroundtruth(args);
+    }
+    else if (executeMode == "--create") {
+      Create(args);
+    }
+    else if (executeMode == "--test") {
+      Test(args);  
+    }
+    else {
+      std::cerr << "Invalid execution mode: " << executeMode << ". Available execution modes are:" << std::endl;
+      std::cerr << "1)  --compute-gt" << std::endl;
+      std::cerr << "2)  --create" << std::endl;
+      std::cerr << "3)  --test" << std::endl;
+      
+      return 1;
+    }
+
+  }
+  catch (std::invalid_argument& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  }
+  
+
+  // // Initialize the query vector and its filters vector
+  // for (unsigned int query_number = 0; query_number < 100; query_number++) {
+
+  //   QueryDataVector<float> xq = query_vectors[query_number];
+  //   if (xq.getQueryType() > 1) {
+  //     continue;
+  //   }
+    
+  //   std::vector<CategoricalAttributeFilter> Fx;
+  //   if (xq.getQueryType() == 1) {
+  //     Fx.push_back(CategoricalAttributeFilter(xq.getV()));
+  //   }
+
+  //   std::cout << "Query type: " << xq.getQueryType() << " ";
+  //   unsigned int k = 100;
+    
+  //   // Initialize the arguments for the recall function
+  //   std::set<BaseDataVector<float>> exactNeighbors;
+  //   for (auto index : groundtruth[query_number]) {
+  //     exactNeighbors.insert(base_vectors[index]);
+  //     if (exactNeighbors.size() >= k) {
+  //       break;
+  //     }
+  //   }
+
+  //   GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, k, 150, Fx);
+  //   std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
+
+  //   double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
+  //   std::cout << "Recall: " << recall << std::endl;
+  // }
 
   return 0;
 

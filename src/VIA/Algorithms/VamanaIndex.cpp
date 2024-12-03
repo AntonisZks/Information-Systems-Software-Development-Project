@@ -184,11 +184,11 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::saveGraph(const std::st
     // Store the current node index and get its neighbors
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
     outFile << *currentNode;
-    
     outFile << std::endl; // Newline to seperate each node's neighbors
   
   });
 
+  // Save the edges of the graph
   withProgress(0, this->G.getNodesCount(), "Saving Edges", [&](int i) {
 
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
@@ -234,7 +234,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
   this->G.setNodesCount(nodesCount); // Set the nodes count of the graph
 
   // Load the nodes of the graph and their data from the file and store them in the graph
-  withProgress(0, nodesCount, "Nodes Loading", [&](int i) {
+  withProgress(0, nodesCount, "Loading nodes", [&](int i) {
     
     vamana_t currentData;
     inFile >> currentData;
@@ -246,7 +246,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
   });
 
   // Load the edges of the graph from the file and connect the nodes accordingly
-  withProgress(0, nodesCount, "Edges Loading", [&](int i) {
+  withProgress(0, nodesCount, "Loading edges", [&](int i) {
 
     unsigned int neighborsCount;
     inFile >> neighborsCount;
