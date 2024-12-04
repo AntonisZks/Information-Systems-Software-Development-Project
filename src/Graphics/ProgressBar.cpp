@@ -1,5 +1,7 @@
 #include "../include/graphics.h"
 
+bool firstTime = true;
+
 
 /**
  * @brief Function to display a progress bar with a percentage.
@@ -15,6 +17,21 @@
  */
 void displayProgressBar(
   const int current, const int total, const std::string& message, const std::chrono::steady_clock::time_point& startTime, const unsigned int barWidth) {
+
+  if (firstTime) {
+    std::cout << brightMagenta << "Action" << std::setw(22) << reset << " | ";
+    std::cout << brightMagenta << "Progress" << std::setw(36) << reset << " | ";
+    std::cout << brightMagenta << "Time Remaining" << reset << " | ";
+    std::cout << brightMagenta << "Time Elapsed" << reset << std::endl;
+
+    for (unsigned int i = 0; i < 24; i++) { std::cout << "-"; } std::cout << " | ";
+    for (unsigned int i = 0; i < 40; i++) { std::cout << "-"; } std::cout << " | ";
+    for (unsigned int i = 0; i < 14; i++) { std::cout << "-"; } std::cout << " | ";
+    for (unsigned int i = 0; i < 13; i++) { std::cout << "-"; }
+    std::cout << std::endl;
+
+    firstTime = false;
+  }
 
   float progress = static_cast<float>(current) / total;
   unsigned int position = barWidth * progress;
@@ -33,11 +50,10 @@ void displayProgressBar(
   int seconds = remainingSeconds % 60;
 
   // Display action message
-  std::cout << cyan << "Action: ";
-  std::cout << brightCyan << std::setw(24) << std::setfill(' ') << std::left << message << reset;
+  std::cout << brightYellow << std::setw(24) << std::setfill(' ') << std::left << message << reset;
 
   // Display progress bar
-  std::cout << " | " << green << "Progress: [";
+  std::cout << " | " << green << "[";
   for (unsigned int i = 0; i < barWidth; i++) {
     if (i < position) std::cout << "=";
     else if (i == position) std::cout << ">";
@@ -48,10 +64,23 @@ void displayProgressBar(
 
   // Display remaining time
   if (current > 0 && current < total) {
-    std::cout << " | " << yellow << "Time remaining: ";
-    std::cout << brightYellow << std::setw(2) << std::setfill('0') << minutes << "m ";
-    std::cout << std::setw(2) << std::setfill('0') << seconds << "s" << reset;
+    std::cout << " | " << yellow;
+    std::cout << yellow << std::setw(2) << std::setfill('0') << minutes << "m ";
+    std::cout << std::setw(2) << std::setfill('0') << seconds << "s" << std::setw(11) << std::setfill(' ') << reset;
   }
+  else if (current == total) {
+    std::cout << " | " << yellow;
+    std::cout << brightGreen << "Done" << std::setw(14) << std::setfill(' ') << reset;
+  }
+
+  // Display elapsed time
+  int elapsedSeconds = static_cast<int>(elapsed.count());
+  int elapsedMinutes = elapsedSeconds / 60;
+  elapsedSeconds = elapsedSeconds % 60;
+
+  std::cout << " | " << yellow;
+  std::cout << cyan << std::setw(2) << std::setfill('0') << elapsedMinutes << "m ";
+  std::cout << std::setw(2) << std::setfill('0') << elapsedSeconds << "s" << reset;
 
   std::cout << "\r"; // Return the cursor to the start of the line
   std::cout.flush();
@@ -74,8 +103,8 @@ void withProgress(
   auto startTime = std::chrono::steady_clock::now();
 
   for (unsigned int i = start; i < end; i++) {
-    func(i);
     displayProgressBar(i - start + 1, total, message, startTime, barWidth);
+    func(i);
   }
 
   std::cout << std::endl;

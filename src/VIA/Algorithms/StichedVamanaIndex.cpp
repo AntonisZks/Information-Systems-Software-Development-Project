@@ -7,6 +7,14 @@
 #include "../../../include/graphics.h"
 
 
+/**
+ * @brief Create the graph with the given parameters.
+ * 
+ * @param P A vector of vamana_t elements.
+ * @param alpha A float parameter.
+ * @param L An unsigned int parameter.
+ * @param R An unsigned int parameter.
+ */
 template <typename vamana_t>
 void StichedVamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, const unsigned int R_small, const unsigned int R_stiched, bool visualized) {
