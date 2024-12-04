@@ -216,10 +216,10 @@ void Create(std::unordered_map<std::string, std::string> args) {
     StichedVamanaIndex<BaseDataVector<float>> index(filters);
     index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched));
 
-    // // Save the graph to a file if the save flag is set
-    // if (save) {
-    //   index.saveGraph(outputFile);
-    // }
+    // Save the graph to a file if the save flag is set
+    if (save) {
+      index.saveGraph(outputFile);
+    }
 
   }
 

@@ -3,6 +3,8 @@
 #include "../../../include/Filter.h"
 #include "../../../include/VamanaIndex.h"
 #include "../../../include/graph.h"
+#include "../../../include/RobustPrune.h"
+#include "../../../include/graphics.h"
 
 
 template <typename vamana_t>
@@ -14,16 +16,10 @@ void StichedVamanaIndex<vamana_t>::createGraph(
   // Initialize graph memory
   unsigned int n = P.size();
   this->P = P;
-  this->G.setNodesCount(n);
 
   // Initialize G = (V, E) to an empty graph
+  this->G.setNodesCount(n);
   this->fillGraphNodes();
-
-  // Let Fx proper subset of F be the label-set for every x in P
-  std::map<vamana_t, Filter> Fx;
-  for (auto node : P) {
-    Fx[node] = CategoricalAttributeFilter(node.getC());
-  }
 
   // Let Pf proper subset of P be the set of points with label f in F
   std::map<Filter, std::vector<vamana_t>> Pf;
@@ -39,8 +35,13 @@ void StichedVamanaIndex<vamana_t>::createGraph(
   }
 
   // Foreach f in F do
-  for (auto filter : this->F) {
-    
+  withProgress(0, this->F.size(), "Creating Stiched Vamana", [&](int i) {
+
+    // Get the current filter
+    std::set<Filter>::iterator it = this->F.begin();
+    std::advance(it, i);
+    Filter filter = *it;
+
     std::vector<vamana_t> currentVector = Pf[filter];
     
     // Keep the indexes of the current filter points in P, to connect them later. The idea here is to create a new
@@ -71,22 +72,18 @@ void StichedVamanaIndex<vamana_t>::createGraph(
       
     }
 
-  }
+  });
 
   // Filtered Robust Prune for every v in V (the nodes of the graph)
   for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
 
     GraphNode<vamana_t>* currentNode = this->G.getNode(i);
-    std::vector<vamana_t>* neighbors = currentNode->getNeighborsVector();
+    std::set<vamana_t> neighbors = currentNode->getNeighborsSet();
 
-    // TODO: Implement Filtered Vamana call
+    // Run Filtered Robust Prune for the current node and its neighbors
+    FilteredRobustPrune(this->G, *currentNode, neighbors, alpha, R_stiched);
 
   }
-
-  // for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
-  //   std::cout << "Node " << i << " with filter " << this->G.getNode(i)->getData().getC() << " has number of neighbors: ";
-  //   std::cout << this->G.getNode(i)->getNeighborsVector()->size() << std::endl;
-  // }
 
 }
 
