@@ -41,10 +41,36 @@ void StichedVamanaIndex<vamana_t>::createGraph(
   // Foreach f in F do
   for (auto filter : this->F) {
     std::cout << "Creating graph for filter: " << filter.getC() << std::endl;
-    VamanaIndex<vamana_t>::createGraph(Pf[filter], alpha, R_small, L_small, false);
+    std::vector<vamana_t> currentVector = Pf[filter];
+    
+    // Keep the indexes of the current filter points in P
+    std::map<unsigned int, unsigned int> indexes;
+    for (unsigned int i = 0; i < currentVector.size(); i++) {
+      vamana_t currentData = currentVector[i];
+      indexes[i] = currentData.getIndex();
+    }
+
+    VamanaIndex<vamana_t> subIndex;
+    subIndex.createGraph(Pf[filter], alpha, R_small, L_small, false);
+
+    for (unsigned int i = 0; i < subIndex.getGraph().getNodesCount(); i++) {
+      GraphNode<vamana_t>* node = subIndex.getGraph().getNode(i);
+      unsigned int nodeIndex = node->getData().getIndex();
+
+      std::vector<vamana_t>* neighbors = node->getNeighborsVector();
+      for (auto neighbor : *neighbors) {
+        unsigned int currentNeighborIndex = neighbor.getIndex();
+        this->G.connectNodesByIndex(indexes[nodeIndex], indexes[currentNeighborIndex]);
+      }
+      
+    }
+
   }
 
-  std::cout << this->G << std::endl;
+  for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
+    std::cout << "Node " << i << " with filter " << this->G.getNode(i)->getData().getC() << " has number of neighbors: ";
+    std::cout << this->G.getNode(i)->getNeighborsVector()->size() << std::endl;
+  }
 
 }
 
