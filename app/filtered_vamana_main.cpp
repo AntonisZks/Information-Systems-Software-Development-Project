@@ -10,6 +10,8 @@
 #include "../include/recall.h"
 #include "../include/groundtruth.h"
 #include "../include/StichedVamanaIndex.h"
+#include "../include/graphics.h"
+
 
 
 /**
@@ -316,7 +318,9 @@ void Test(std::unordered_map<std::string, std::string> args) {
   std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
   
   double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
-  std::cout << "Recall: " << recall*100 << "%" << std::endl;
+
+  std::cout << brightMagenta << std::endl << "Results:" << reset << std::endl;
+  std::cout << yellow << "Recall: " << brightYellow << recall*100 << "%" << std::endl;
 
 }
 
