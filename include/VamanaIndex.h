@@ -167,22 +167,6 @@ public:
   //   return M;
   // }
 
-  /**
-   * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
-   * a Vamana Index Graph, by searching inside the graph for the nearest neighbors of a given query point, and
-   * determining how many of them were found. This method is using the RECALL evaluation function that calculates
-   * the success rate of the search process. For the search process GreedySearch is being used.
-   * 
-   * @param k the number of nearest neighbors to be found
-   * @param L the parameter L
-   * @param query_vectors the vector containing all the query points
-   * @param query_number the number of the query point we are interested in
-   * @param realNeighbors the exact solutions
-   *  
-  */
-  void test(const unsigned int k, const unsigned int L, const std::vector<vamana_t>& query_vectors, 
-    const unsigned int& query_number, const std::set<vamana_t>& realNeighbors);
-
 };
 
 /**

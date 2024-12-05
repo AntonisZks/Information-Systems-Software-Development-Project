@@ -9,6 +9,8 @@
 #include "../include/VamanaIndex.h"
 #include "../include/read_data.h"
 #include "../include/BQDataVectors.h"
+#include "../include/recall.h"
+#include "../include/graphics.h"
 
 using ParametersMap = std::map<std::string, std::string>;
 using BaseVectors = std::vector<DataVector<float>>;
@@ -119,6 +121,8 @@ bool create(unsigned int argc, char* argv[]) {
  */
 bool test(unsigned int argc, char* argv[]) {
 
+  using GreedyResult = std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>>;
+
   ParametersMap parameters;
   
   std::string load_file, k, L, groundtruth_file, query_file, query_number;
@@ -165,7 +169,18 @@ bool test(unsigned int argc, char* argv[]) {
   std::set<DataVector<float>> exactNeighbors = getExactNearestNeighbors(
     vamanaIndex.getPoints(), groundtruth_values, std::stoi(query_number)
   );
-  vamanaIndex.test(std::stoi(k), std::stoi(L), query_vectors, std::stoi(query_number), exactNeighbors);
+
+  // Find the medoid node of the graph and run Greedy Search to find the k nearest neighbors
+  GraphNode<DataVector<float>> s = vamanaIndex.findMedoid(vamanaIndex.getGraph(), 1000);
+  GreedyResult greedyResult = GreedySearch(vamanaIndex.getGraph(), s, query_vectors.at(std::stoi(query_number)), std::stoi(k), std::stoi(L));
+
+  // Calculate the recall evaluation of the search process and print the results to the console
+  float recall = calculateRecallEvaluation(greedyResult.first, exactNeighbors);
+
+  std::cout << std::endl << brightMagenta << "Results:" << reset << std::endl;
+  std::cout << brightMagenta << "Current Query: " << brightGreen << query_number << reset << " | ";
+  std::cout << brightMagenta << "Query Type: " << brightGreen << "Unfiltered" << reset << " | ";
+  std::cout << brightMagenta << "Recall Evaluation: " << brightGreen << recall*100 << "%" << reset << std::endl;
 
   return true;
 }

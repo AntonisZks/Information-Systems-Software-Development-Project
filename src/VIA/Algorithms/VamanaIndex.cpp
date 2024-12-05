@@ -480,36 +480,5 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
 
 }
 
- /**
- * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
- * a Vamana Index Graph, by searching inside the graph for the nearest neighbors of a given query point, and
- * determining how many of them were found. This method is using the RECALL evaluation function that calculates
- * the success rate of the search process. For the search process GreedySearch is being used.
- * 
- * @param k the number of nearest neighbors to be found
- * @param L the parameter L
- * @param query_vectors the vector containing all the query points
- * @param query_number the number of the query point we are interested in
- * @param realNeighbors the exact solutions
- *  
-*/
-template <typename vamana_t> void VamanaIndex<vamana_t>::test(const unsigned int k, const unsigned int L, const std::vector<vamana_t>& query_vectors, 
-  const unsigned int& query_number, const std::set<vamana_t>& realNeighbors) 
-{
-
-  using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
-
-  // Find the medoid node of the graph and run Greedy Search to find the k nearest neighbors
-  GraphNode<vamana_t> s = findMedoid(this->G, 1000);
-  GreedyResult greedyResult = GreedySearch(this->G, s, query_vectors.at(query_number), k, L);
-
-  // Calculate the recall evaluation of the search process and print the results to the console
-  float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
-
-  std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
-  std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
-
-}
-
 template class VamanaIndex<DataVector<float>>;
 template class VamanaIndex<BaseDataVector<float>>;
