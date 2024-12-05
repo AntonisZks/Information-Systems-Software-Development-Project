@@ -87,7 +87,7 @@ public:
    * @param R the parameter R
    * 
   */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize = true);
 
   /**
    * @brief Saves a specific graph into a file. Specifically this method is used to save the contents of a Vamana 
@@ -127,61 +127,7 @@ public:
    * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
    * @return The medoid node of the sampled nodes.
    */
-  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, int sample_size = 100);
-
-  //####################################################################
-  //this is the new filtered medoid, i will brief in later time
-  //####################################################################
-  
-  // map<string, int> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold){
-
-  //   //                        VARIABLES
-
-  //   //get filtered Graph's nodes (as BaseDatavectors)
-  //   set<BaseDataVector<float>> P = Graph.getNodesSet;
-
-  //   //Map tha will fill with the medoids
-  //   map<string,int> M;
-
-  //   //This is the set of all the different filters (categorical attributes).
-  //   //it will work as a counter for the loop (for example it will be 1,2,3,4)
-  //   set<int> Filters; //we need to get this information from the BDataVectors
-
-  //   //This is the set of all the nodes with the same filter (cat. attribute).
-  //   //it will change in each iteration
-  //   set<BaseDataVector<float>> Pf;
-
-  //   //the given threshold
-  //   int τ = threshold;
-
-  //   //this is a random collection of nodes of the same filter
-  //   //the number of nodes will be defined by the threshold τ
-  //   set<BaseDataVector<float>> Rf;
-
-  //   //                      ALGORITHM LOOP
-  //   for(int f : Filters){
-
-  //   }
-
-  //   //retutn the map of the medoids
-  //   return M;
-  // }
-
-  /**
-   * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
-   * a Vamana Index Graph, by searching inside the graph for the nearest neighbors of a given query point, and
-   * determining how many of them were found. This method is using the RECALL evaluation function that calculates
-   * the success rate of the search process. For the search process GreedySearch is being used.
-   * 
-   * @param k the number of nearest neighbors to be found
-   * @param L the parameter L
-   * @param query_vectors the vector containing all the query points
-   * @param query_number the number of the query point we are interested in
-   * @param realNeighbors the exact solutions
-   *  
-  */
-  void test(const unsigned int k, const unsigned int L, const std::vector<vamana_t>& query_vectors, 
-    const unsigned int& query_number, const std::set<vamana_t>& realNeighbors);
+  GraphNode<vamana_t> findMedoid(const Graph<vamana_t>& graph, bool visualize = true, int sample_size = 100);
 
 };
 

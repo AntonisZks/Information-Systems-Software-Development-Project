@@ -5,9 +5,11 @@
 #include "VamanaIndex.h"
 #include "Filter.h"
 
+using Filter = CategoricalAttributeFilter;
+
 template <typename vamana_t> class FilteredVamanaIndex : public VamanaIndex<vamana_t> {
 
-private:
+protected:
 
   std::set<CategoricalAttributeFilter> F;
 
@@ -55,7 +57,7 @@ public:
    * @param L An unsigned int parameter.
    * @param R An unsigned int parameter.
    */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized = true);
 
   /**
    * @brief Load a graph from a file. Specifically this method is used to receive the contents of a Vamana Index Graph
@@ -67,6 +69,17 @@ public:
    * @return true if the graph was loaded successfully, false otherwise
   */
   bool loadGraph(const std::string& filename);
+
+  /**
+   * @brief Finds the set of medoid nodes in the graph using a sample of nodes.
+   *
+   * The medoid is the node with the minimum average distance to all other nodes in the sample.
+   * This function uses Euclidean distance to calculate the distances between nodes.
+   *
+   * @param tau The graph from which to find the medoid.
+   * @return A map containing the medoid node for each filter.
+   */
+  std::map<Filter, GraphNode<vamana_t>> findFilteredMedoid(const unsigned int tau);
 
 };
 

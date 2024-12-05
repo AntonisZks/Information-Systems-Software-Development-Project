@@ -64,7 +64,9 @@ static std::set<int> generateRandomIndices(const unsigned int max, const unsigne
 */
 template <typename vamana_t> void VamanaIndex<vamana_t>::fillGraphNodes(void) {
   for (unsigned int i = 0; i < this->P.size(); i++) {
-    this->G.setNodeData(i, this->P.at(i));
+    vamana_t point = this->P.at(i);
+    point.setIndex(i);
+    this->G.setNodeData(i, point);
   }
 }
 
@@ -81,7 +83,7 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
   for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
       
     // Generate a random range of indeces and apply those indeces as neighbors for the current node
-    std::set<int> indeces = generateRandomIndices(this->G.getNodesCount(), i, maxEdges);
+    std::set<int> indeces = generateRandomIndices(this->G.getNodesCount(), i, std::min(maxEdges, this->G.getNodesCount() - 1));
     for (unsigned int j = 0; j < indeces.size(); j++) {
       std::set<int>::iterator it = indeces.begin();
       std::advance(it, j);
@@ -109,10 +111,15 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
 */
 template <typename vamana_t> 
 void VamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
+
+  // Check if the dataset is empty or it has only one point
+  if (P.size() <= 1) {
+    return;
+  }
 
   // Initialize graph memory
   unsigned int n = P.size();
@@ -122,40 +129,75 @@ void VamanaIndex<vamana_t>::createGraph(
   // Initialize the graph to a random R-regular directed graph with n vertices and R edges per vertex
   this->fillGraphNodes();
   this->createRandomEdges(R);
-  GraphNode<vamana_t> s = findMedoid(this->G, 1000);
+  GraphNode<vamana_t> s = findMedoid(this->G, visualize, 1000);
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
-  withProgress(0, n, "Creating Vamana", [&](int i) {
-    
-    GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
-    vamana_t sigma_i = sigma_i_node->getData();
+  if (visualize) {
+    withProgress(0, n, "Creating Vamana", [&](int i) {
+      
+      GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
+      vamana_t sigma_i = sigma_i_node->getData();
 
-    // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
-    greedyResult = GreedySearch(this->G, s, this->P.at(sigma.at(i)), 1, L);
-    RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
+      // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
+      greedyResult = GreedySearch(this->G, s, this->P.at(sigma.at(i)), 1, L);
+      RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
 
-    // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
-    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
-    for (auto j : *sigma_i_neighbors) {
-      std::set<vamana_t> outgoing;
-      GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
+      // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
+      std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
+      for (auto j : *sigma_i_neighbors) {
+        std::set<vamana_t> outgoing;
+        GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
 
-      // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
-      for (auto neighbor : *j_node->getNeighborsVector()) {
-        outgoing.insert(neighbor);
+        // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
+        for (auto neighbor : *j_node->getNeighborsVector()) {
+          outgoing.insert(neighbor);
+        }
+        outgoing.insert(sigma_i);
+
+        // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
+        if (outgoing.size() > (long unsigned int)R) {
+          RobustPrune(this->G, *j_node, outgoing, alpha, R);
+        } 
+        else {
+          j_node->addNeighbor(sigma_i);
+        }
       }
-      outgoing.insert(sigma_i);
 
-      // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
-      if (outgoing.size() > (long unsigned int)R) {
-        RobustPrune(this->G, *j_node, outgoing, alpha, R);
-      } 
-      else {
-        j_node->addNeighbor(sigma_i);
+    });
+  }
+  else {
+    for (unsigned int i = 0; i < n; i++) {
+
+      GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
+      vamana_t sigma_i = sigma_i_node->getData();
+
+      // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
+      greedyResult = GreedySearch(this->G, s, this->P.at(sigma.at(i)), 1, L);
+      RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
+
+      // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
+      std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
+      for (auto j : *sigma_i_neighbors) {
+        std::set<vamana_t> outgoing;
+        GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
+
+        // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
+        for (auto neighbor : *j_node->getNeighborsVector()) {
+          outgoing.insert(neighbor);
+        }
+        outgoing.insert(sigma_i);
+
+        // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
+        if (outgoing.size() > (long unsigned int)R) {
+          RobustPrune(this->G, *j_node, outgoing, alpha, R);
+        } 
+        else {
+          j_node->addNeighbor(sigma_i);
+        }
       }
+
     }
-
-  });
+  }
 
 }
 
@@ -266,94 +308,6 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
 
 }
 
-// template <typename vamana_t>
-// map<int, BaseDataVector<float>> VamanaIndex<vamana_t>::FilteredMedoid(const Graph<vamana_t>& Graph, int threshold) {
-
-//   //________________________________________________________
-//   //
-//   //                          DATA
-//   //________________________________________________________
-
-//   //Set of all nodes (with there data).
-//   set<BaseDataVector<float>> P = Graph.getNodesSet;
-
-//   //the given threshold
-//   //int τ = threshold;
-
-//   //IMPLEMENTATION
-//   // # set<int> GetGraphFilters(Graph<vamana_t>& Graph)
-//   //We need a function that returns a set of all the categorical attributes
-//   //that are in the graph.
-//   //--------------------------------------------------------------------------------------
-//   //Set of all categorical attributes.
-//   set<int> Filters; //= GetGraphFilters(Graph)
-
-//   //The map that the function returns
-//   //The key is the categorical attribute (int) the filter,
-//   //and it correspods to a the value, which is a node (BaseDataVector<float>)
-//   // f=1 -> starting node: BaseDataVector<float> p1
-//   // f=2 -> starting node: BaseDataVector<float> p2
-//   // ...
-//   map<int, BaseDataVector<float>> M;
-
-//   //The map that takes the key (a node), and connects it
-//   //to an integer (number of times this node was considered
-//   //to be the filtered medoid point)
-//   map<BaseDataVector<float>,int> T;
-//   //Initialize T to an zero map
-//   for (BaseDataVector<float> nodes : P){
-//     T[nodes] = 0;
-//   }
-
-//   //True medoid point of Pf, p*
-//   BaseDataVector<float> pointAsterisk;
-
-//   //__________________________________________________________
-//   //
-//   //                    ALGORITHM LOOP
-//   //__________________________________________________________
-
-//   for(int f : Filters){
-    
-//     //IMPLEMENTATION
-//     //# set<BaseDataVector<float>> GetNodesWithFilters(Graph<vamana_t>& Graph, int filter){}
-//     //We need a function that returns a subset of nodes of the set P
-//     //that correspond to the arguement f (nodes that have the same categorical attribute).
-//     //--------------------------------------------------------------------------------------
-//     //Subset of P. Nodes with the same categorical attribute.
-//     set<BaseDataVector<float>> Pf; //= GetNodesWithFilters(P, f)
-
-//     //IMPLEMENTATION
-//     //# set<BaseDataVector<float>> GetRandomNodesWithFilters(set<BaseDataVector<float>> Set, int threshold){}
-//     //We need a function that returns a subset of τ random nodes of the set P
-//     //that correspond to the arguement f (nodes that have the same categorical attribute).
-//     //---------------------------------------------------------------------------------------
-//     //Subset of Pf. Set of τ randomly selected nodes of Pf.
-//     set<BaseDataVector<float>> Rf; //= GetRandomNodesWithFilters(Pf, τ)
-
-//     //This is the arg_min method.
-//     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//     pointAsterisk = *Rf.begin();
-//     int min_value = T[pointAsterisk];
-
-//     //this is gonna run τ times
-//     for(BaseDataVector<float> p : Rf){
-//       if(T[p] < min_value){
-//         pointAsterisk = p;
-//         min_value = T[p];
-//       }
-//     }
-//     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//     //Update...
-//     M[f] = pointAsterisk;
-//     T[pointAsterisk]++; 
-//   }
-
-//   return M;
-
-// }
-
 /**
  * @brief Finds the medoid node in the graph using a sample of nodes.
  *
@@ -365,7 +319,7 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
  * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
  * @return The medoid node of the sampled nodes.
  */
-template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedoid(const Graph<vamana_t>& graph, int sample_size) {
+template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedoid(const Graph<vamana_t>& graph, bool visualize, int sample_size) {
 
   const int node_count = graph.getNodesCount();  // Get the total number of nodes in the graph
   sample_size = std::min(sample_size, node_count);  // Ensure the sample size doesn’t exceed the total node count
@@ -385,19 +339,34 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
   std::vector<std::vector<float>> distance_matrix(sample_size, std::vector<float>(sample_size, 0.0));
 
   // Compute pairwise distances between each pair of sampled nodes
-  withProgress(0, sample_size, "Finding Medoid", [&](int i) {
+  if (visualize) {
+    withProgress(0, sample_size, "Finding Medoid", [&](int i) {
 
-    for (int j = i + 1; j < sample_size; ++j) {
-      // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
-      float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
-      
-      // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
-      // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
-      distance_matrix[i][j] = dist;
-      distance_matrix[j][i] = dist;
+      for (int j = i + 1; j < sample_size; ++j) {
+        // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
+        float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
+        
+        // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
+        // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
+        distance_matrix[i][j] = dist;
+        distance_matrix[j][i] = dist;
+      }
+
+    });
+  }
+  else {
+    for (unsigned int i = 0; i < (unsigned int)sample_size; i++) {
+      for (int j = i + 1; j < sample_size; ++j) {
+        // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
+        float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
+        
+        // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
+        // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
+        distance_matrix[i][j] = dist;
+        distance_matrix[j][i] = dist;
+      }
     }
-
-  });
+  }
 
   // Find the medoid node among the sampled nodes by calculating the average distance for each one
   float min_average_distance = std::numeric_limits<float>::max();  // Initialize with a large value to find minimum
@@ -420,37 +389,6 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
   }
 
   return *medoid_node;
-
-}
-
- /**
- * @brief tests a specific Vamana index and prints its accuracy. Specifically this method is used to evaluate
- * a Vamana Index Graph, by searching inside the graph for the nearest neighbors of a given query point, and
- * determining how many of them were found. This method is using the RECALL evaluation function that calculates
- * the success rate of the search process. For the search process GreedySearch is being used.
- * 
- * @param k the number of nearest neighbors to be found
- * @param L the parameter L
- * @param query_vectors the vector containing all the query points
- * @param query_number the number of the query point we are interested in
- * @param realNeighbors the exact solutions
- *  
-*/
-template <typename vamana_t> void VamanaIndex<vamana_t>::test(const unsigned int k, const unsigned int L, const std::vector<vamana_t>& query_vectors, 
-  const unsigned int& query_number, const std::set<vamana_t>& realNeighbors) 
-{
-
-  using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
-
-  // Find the medoid node of the graph and run Greedy Search to find the k nearest neighbors
-  GraphNode<vamana_t> s = findMedoid(this->G, 1000);
-  GreedyResult greedyResult = GreedySearch(this->G, s, query_vectors.at(query_number), k, L);
-
-  // Calculate the recall evaluation of the search process and print the results to the console
-  float recall = calculateRecallEvaluation(greedyResult.first, realNeighbors);
-
-  std::cout << std::endl << "[================= RESULTS =================]" << std::endl; 
-  std::cout << "Recall Evaluation: " << recall*100 << "%" << std::endl;
 
 }
 
