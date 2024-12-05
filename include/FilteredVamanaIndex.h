@@ -5,6 +5,8 @@
 #include "VamanaIndex.h"
 #include "Filter.h"
 
+using Filter = CategoricalAttributeFilter;
+
 template <typename vamana_t> class FilteredVamanaIndex : public VamanaIndex<vamana_t> {
 
 protected:
@@ -67,6 +69,17 @@ public:
    * @return true if the graph was loaded successfully, false otherwise
   */
   bool loadGraph(const std::string& filename);
+
+  /**
+   * @brief Finds the set of medoid nodes in the graph using a sample of nodes.
+   *
+   * The medoid is the node with the minimum average distance to all other nodes in the sample.
+   * This function uses Euclidean distance to calculate the distances between nodes.
+   *
+   * @param tau The graph from which to find the medoid.
+   * @return A map containing the medoid node for each filter.
+   */
+  std::map<Filter, GraphNode<vamana_t>> findFilteredMedoid(const unsigned int tau);
 
 };
 

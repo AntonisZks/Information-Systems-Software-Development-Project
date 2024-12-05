@@ -294,9 +294,11 @@ void Test(std::unordered_map<std::string, std::string> args) {
 
 
   // Store the start nodes for each filter inside a vector
+  std::map<Filter, GraphNode<BaseDataVector<float>>> medoids = index.findFilteredMedoid(std::stoi(L)); 
+
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
   for (auto filter : index.getFilters()) {
-    start_nodes.push_back(index.getNodesWithCategoricalValueFilter(filter)[0]); // TODO: Use filtered Medoid instead of the first node
+    start_nodes.push_back(medoids[filter]);
   }
 
   std::vector<CategoricalAttributeFilter> Fx;
