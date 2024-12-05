@@ -18,30 +18,20 @@ UNIT_TEST_SRCS := $(wildcard $(TST_DIR)/*.cc)
 UNIT_TESTS := $(patsubst $(TST_DIR)/%.cc, $(EXE_DIR)/%, $(UNIT_TEST_SRCS))
 
 # Define the application executables
-TARGET_SIMPLE_VAMANA = $(EXE_DIR)/simple_vamana
-TARGET_FILTERED_VAMANA = $(EXE_DIR)/filtered_vamana
+TARGET = $(EXE_DIR)/main
 
 # Default targets
 all: app tests
 
-app: $(TARGET_SIMPLE_VAMANA) $(TARGET_FILTERED_VAMANA)
+app: $(TARGET)
 tests: $(UNIT_TESTS)
 
-# Compile the first executable and its dependencies (objects)
-$(TARGET_SIMPLE_VAMANA): $(OBJS) $(OBJ_DIR)/simple_vamana_main.o
+# Compile the third executable and its dependencies (objects)
+$(TARGET): $(OBJS) $(OBJ_DIR)/main.o
 	@mkdir -p $(EXE_DIR)
-	$(CC) $(FLAGS) $(OBJS) $(OBJ_DIR)/simple_vamana_main.o -o $@
+	$(CC) $(FLAGS) $(OBJS) $(OBJ_DIR)/main.o -o $@
 
-$(OBJ_DIR)/simple_vamana_main.o: app/simple_vamana_main.cpp
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(FLAGS) -c $< -o $@
-
-# Compile the second executable and its dependencies (objects)
-$(TARGET_FILTERED_VAMANA): $(OBJS) $(OBJ_DIR)/filtered_vamana_main.o
-	@mkdir -p $(EXE_DIR)
-	$(CC) $(FLAGS) $(OBJS) $(OBJ_DIR)/filtered_vamana_main.o -o $@
-
-$(OBJ_DIR)/filtered_vamana_main.o: app/filtered_vamana_main.cpp
+$(OBJ_DIR)/main.o: app/main.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(FLAGS) -c $< -o $@
 
@@ -70,30 +60,32 @@ FLAGS += $(DEPFLAGS)
 -include $(OBJS:.o=.d)
 -include $(OBJ_DIR)/simple_vamana_main.d
 -include $(OBJ_DIR)/filtered_vamana_main.d
+-include $(OBJ_DIR)/main.d
 
 
 
 # Execution Rules
 
-create_simple_vamana:
-	./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 20 -R 14 -alpha 1.0 -save 'index.bin'
+create_simple_via:
+	./bin/main --create -index-type 'simple' -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 120 -R 12 -alpha 1.0 -save 'simple_index.bin'
 
-create_simple_vamana_valgrind:
-	valgrind --leak-check=full ./bin/simple_vamana --create -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 10 -R 14 -alpha 1.0 -save 'index.bin'
+create_filtered_via:
+	./bin/main --create -index-type 'filtered' -base-file 'data/Dummy/dummy-data.bin' -L 120 -R 12 -alpha 1.0 -save 'filtered_index.bin'
 
+create_stiched_via:
+	./bin/main --create -index-type 'stiched' -base-file 'data/Dummy/dummy-data.bin' -L-small 150 -R-small 12 -R-stiched 20 -alpha 1.0 -save 'stiched_index.bin'
 
-test_simple_vamana:
-	./bin/simple_vamana --test -load 'index.bin' -k 100 -L 20 -gt-file 'data/siftsmall/siftsmall_groundtruth.ivecs' -query-file 'data/siftsmall/siftsmall_query.fvecs' -query 0
+compute_groundtruth:
+	./bin/main --compute-gt -base-file 'data/Dummy/dummy-data.bin' -query-file 'data/Dummy/dummy-queries.bin' -gt-file 'data/Dummy/dummy-groundtruth.bin'
 
-test_simple_vamana_valgrind:
-	valgrind --leak-check=full ./bin/simple_vamana --test -load 'index.bin' -k 100 -L 10 -gt-file 'data/siftsmall/siftsmall_groundtruth.ivecs' -query-file 'data/siftsmall/siftsmall_query.fvecs' -query 0
+test_simple_via:
+	./bin/main --test -index-type 'simple' -load 'simple_index.bin' -k 100 -L 120 -gt-file 'data/siftsmall/siftsmall_groundtruth.ivecs' -query-file 'data/siftsmall/siftsmall_query.fvecs' -query 1
 
+test_filtered_via:
+	./bin/main --test -index-type 'filtered' -load 'filtered_index.bin' -L 120 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query 1
 
-create_filtered_vamana:
-	./bin/filtered_vamana
-
-create_filtered_vamana_valgrind:
-	./bin/filtered_vamana
+test_stiched_via:
+	./bin/main --test -index-type 'stiched' -load 'stiched_index.bin' -L 120 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query 1
 
 
 run_tests:
