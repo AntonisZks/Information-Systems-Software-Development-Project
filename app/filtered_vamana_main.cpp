@@ -11,6 +11,7 @@
 #include "../include/groundtruth.h"
 #include "../include/StichedVamanaIndex.h"
 #include "../include/graphics.h"
+#include <chrono>
 
 
 
@@ -316,13 +317,27 @@ void Test(std::unordered_map<std::string, std::string> args) {
     }
   }
 
+  auto start = std::chrono::high_resolution_clock::now();
   GreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, std::stoi(k), std::stoi(L), Fx);
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+
   std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
-  
   double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
 
   std::cout << brightMagenta << std::endl << "Results:" << reset << std::endl;
-  std::cout << yellow << "Recall: " << brightYellow << recall*100 << "%" << std::endl;
+  std::cout << reset << "Current Query: " << brightCyan << queryNumber << reset << " | ";
+  std::cout << reset << "Query Type: ";
+  if (xq.getQueryType() == 0) std::cout << brightBlack << "Uniltered" << reset << " | ";
+  else std::cout << brightWhite << "Filtered" << reset << " | ";
+  std::cout << reset << "Recall: ";
+  if (recall < 0.2) std::cout << brightRed;
+  else if (recall < 0.4) std::cout << brightOrange;
+  else if (recall < 0.6) std::cout << brightYellow;
+  else if (recall < 0.8) std::cout << brightCyan;
+  else std::cout << brightGreen;
+  std::cout << recall*100 << "%" << reset << " | ";
+  std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
 
 }
 

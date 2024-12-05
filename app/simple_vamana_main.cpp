@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 #include "../include/DataVector.h"
 #include "../include/VamanaIndex.h"
 #include "../include/read_data.h"
@@ -172,15 +173,26 @@ bool test(unsigned int argc, char* argv[]) {
 
   // Find the medoid node of the graph and run Greedy Search to find the k nearest neighbors
   GraphNode<DataVector<float>> s = vamanaIndex.findMedoid(vamanaIndex.getGraph(), 1000);
+  
+  auto start = std::chrono::high_resolution_clock::now();
   GreedyResult greedyResult = GreedySearch(vamanaIndex.getGraph(), s, query_vectors.at(std::stoi(query_number)), std::stoi(k), std::stoi(L));
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
 
   // Calculate the recall evaluation of the search process and print the results to the console
   float recall = calculateRecallEvaluation(greedyResult.first, exactNeighbors);
 
   std::cout << std::endl << brightMagenta << "Results:" << reset << std::endl;
-  std::cout << brightMagenta << "Current Query: " << brightGreen << query_number << reset << " | ";
-  std::cout << brightMagenta << "Query Type: " << brightGreen << "Unfiltered" << reset << " | ";
-  std::cout << brightMagenta << "Recall Evaluation: " << brightGreen << recall*100 << "%" << reset << std::endl;
+  std::cout << reset << "Current Query: " << brightCyan << query_number << reset << " | ";
+  std::cout << reset << "Query Type: " << brightBlack << "Unfiltered" << reset << " | ";
+  std::cout << reset << "Recall: ";
+  if (recall < 0.2) std::cout << brightRed;
+  else if (recall < 0.4) std::cout << brightOrange;
+  else if (recall < 0.6) std::cout << brightYellow;
+  else if (recall < 0.8) std::cout << brightCyan;
+  else std::cout << brightGreen;
+  std::cout << recall*100 << "%" << reset << " | ";
+  std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
 
   return true;
 }
