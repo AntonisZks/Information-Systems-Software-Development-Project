@@ -1,6 +1,9 @@
-# Ανάπτυξη Λογισμικού για Πληροφοριακά Συστήματα
-##  Project - Μέρος Πρώτο : Προσσεγιστική Επίλυση του προβλήματος K-Εγγύτερων Γειτόνων (K-Nearest Neigbours) μέσω του Αλγορίθμου **Vamana**
-### Τμήμα Πληροφορικής και Τηλεπικοινωνιών - ΕΚΠΑ - Χειμερινό Εξάμηνο 24-25
+<center>
+<h1>Ανάπτυξη Λογισμικού για Πληροφοριακά Συστήματα</h1>
+</center>
+
+##  Project: Προσσεγιστική Επίλυση του προβλήματος K-Εγγύτερων Γειτόνων (K-Nearest Neigbours) μέσω του Αλγορίθμου **Vamana Indexing Algorithm (VIA)**
+### Τμήμα Πληροφορικής και Τηλεπικοινωνιών - ΕΚΠΑ - Χειμερινό Εξάμηνο 2024-2025
 
 <div align="center">
   
@@ -12,23 +15,82 @@
 
 </div>
 
-# Overview
+## Overview
 
 ### Χαρακτηριστικά Κώδικα
-- <ins>Γλώσσα Υλοποίησης:</ins> C++
+- <ins>Γλώσσα Υλοποίησης:</ins> C++11
 - <ins>Μεταγλώττιση:</ins> **g++** (έγινε modularization των αρχείων σε directories και χρήση του [make](https://www.gnu.org/software/make/manual/make.html))
-- <ins>Επαλήθευση Ορθότητας Κώδικα:</ins> **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (η εκτέλεση των test γίνεται μέσω ένος [shell script](https://www.shellscript.sh/))
-- <ins>Mέσω της χρήσης [Github Actions](https://github.com/features/actions) εξασφαλίσαμε σε κάθε στάδιο ανάπτυξης του δεύτερου μέρους του Project την ορθή λειτουργία του κώδικα που γινόταν pushed στο main branch.
+- <ins>Επαλήθευση Ορθότητας Κώδικα:</ins> **Unit Tests** με την χρήση της βιβλιοθήκης [Acutest](https://github.com/mity/acutest) (η εκτέλεση των test γίνεται μέσω ένος makefile rule)
+- <ins>Mέσω της χρήσης [Github Actions](https://github.com/features/actions)</ins> εξασφαλίσαμε σε κάθε στάδιο ανάπτυξης του δεύτερου μέρους του Project την ορθή λειτουργία του κώδικα που γινόταν pushed στο main branch.
 
 ### Μεταγλώττιση και Εκτέλεση
-- Για την Μεταγλώττιση του Κώδικα:
-`make all`
-- Για την Εκτέλεση των **Unit Test**: 
-`./scripts/run_all_tests.sh`
-- Για την εκτέλεση του **Vamana Indexing Algorithm**, με Κ=100, α=10, L=120, R=120, query index = 0: 
-  `time ./bin/main 'data/siftsmall/siftsmall_base.fvecs' 'data/siftsmall/siftsmall_query.fvecs' 'data/siftsmall/siftsmall_groundtruth.ivecs' 100 1.0 120 14 0`
-- Καθαρισμός αρχείων: 
-`make clean`
+- **Μεταγλώττιση του Κώδικα:** 
+  
+  Για την κατασκευή των εκτελέσιμων αρχείων παρέχονται διάφορες εντολές που εξασφαλίζουν τη μεταγλώττιση της κύριας εφαρμογής, των unit tests, καθώς και συνδιασμό τους:
+  - Για την μεταγλώττιση της κύριας εφαρμογής:
+    ```bash
+    make app
+    ```
+  - Για την μεταγλώττιση των unit tests:
+    ```bash
+    make tests
+    ```
+  - Για την μεταγλώττιση και των δύο:
+    ```bash
+    make all
+    ```
+- **Εκτέλεση των Unit Test:**
+
+  Για την εκτέλεση των **unit tests** παρέχονται δύο **makefile rulew** με τα οποία εκτελούνται όλα τα unit tests, απλά, είτε με τη χρήση του [valgrind](https://en.wikipedia.org/wiki/Valgrind) για έλεγχο της κατάστασης της μνήμης. Οι αντίστοιχες εντολές είναι:
+  - Απλή Εκτέλεση:
+    ```bash
+    make run_tests
+    ```
+  - Εκτέλεση με Valgrind:
+    ```bash
+    make run_tests_valgrind
+    ```
+- **Εκτέλεση Εφαρμογής**:
+
+  Η εφαρμογή στηρίζεται πάνω σε **ένα εκτελέσιμο αρχείο** το οποίο αφού μεταγλωττίσετε τον κώδικα μπορείτε να το βρείτε στο `/bin/main`. Αυτό το εκτελέσιμο αρχείο είναι υπεύθυνο για την εκτέλεση όλων των αλγορίθμων, χρησιμοποιώντας κατάλληλα **command line arguments** τα οποία περιγράφονται παρακάτω. Μερικά ενδεικτικά παραδείγματα όλων των λειτουργιών που προφέρει η εφαρμογή έχουν συμπιεστεί σε κατάλληλα makefile rules τα οποία είναι:
+  - **Δημιουργία Simple Vamana:**
+    ```bash
+    make create_simple_via
+    ``` 
+  - **Δημιουργία Filtered Vamana:**
+    ```bash
+    make create_filtered_via
+    ``` 
+  - **Δημιουργία Stiched Vamana:**
+    ```bash
+    make create_stiched_via
+    ``` 
+  καθώς επίσης και δοκιμές πάνω σε **αποθηκευμένα indexes:**
+  - **Δοκιμή Simple Vamana:**
+    ```bash
+    make test_simple_via
+    ``` 
+  - **Δοκιμή Filtered Vamana:**
+    ```bash
+    make test_filtered_via
+    ``` 
+  - **Δοκιμή Stiched Vamana:**
+    ```bash
+    make test_stiched_via
+    ```
+
+  > [!IMPORTANT]
+  > Για το δεύτερο μέρος της εργασίας χρειάστηκε να υλοποιήσουμε εμείς έναν αλγόριθμο ο οποίος υπολογίζει το **Groundtruth** των δεδομένων. Γι αυτό το λόγο παρέχεται και ένα επιπλέον makefile rule το οποίο φαίνεται παρακάτω και η δουλειά του είναι ακριβώς να υπολογίζει το Groundtruth για τα **Filtered** και **Stiched** indexes.
+  > ```bash
+  > make compute groundtruth
+  > ```
+
+- **Καθαρισμός αρχείων**:
+
+Για τον καθαρισμό των αντικειμενικων **(object files)** και των εκτελέσιμων αρχείων **(executable files)** χρησιμοποιείται η εντολή:
+```bash
+make clean
+```
 
 ### Datasets
 
