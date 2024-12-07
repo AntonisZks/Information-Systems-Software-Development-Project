@@ -2,7 +2,8 @@
 <h1 align="center">Ανάπτυξη Λογισμικού για Πληροφοριακά Συστήματα</h1>
 
 <div align="center">
-	
+
+![License](https://img.shields.io/github/license/AntonisZks/Information-Systems-Software-Development-Project.svg)
 ![Repository Size](https://img.shields.io/github/repo-size/AntonisZks/Information-Systems-Software-Development-Project.svg)
 ![Actions](https://github.com/AntonisZks/Information-Systems-Software-Development-Project/actions/workflows/unit_tests.yml/badge.svg)
 ![Release](https://img.shields.io/github/v/release/AntonisZks/Information-Systems-Software-Development-Project.svg)
