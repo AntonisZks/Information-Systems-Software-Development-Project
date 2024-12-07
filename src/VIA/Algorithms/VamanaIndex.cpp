@@ -95,6 +95,33 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
 }
 
 /**
+ * @brief Computes the distances between every node in the dataset and stores them in the distance matrix.
+ */
+template <typename vamana_t>
+void VamanaIndex<vamana_t>::computeDistances(const bool visualize) {
+
+  // Compute the distance between every pair of points in the dataset
+  if (visualize) {
+    withProgress(0, this->P.size(), "Computing Distances", [&](int i) {
+      for (unsigned int j = i; j < this->P.size(); j++) {
+        double dist = euclideanDistance(this->P.at(i), this->P.at(j));
+        this->distanceMatrix[i][j] = dist;
+        this->distanceMatrix[j][i] = dist;
+      }
+    });
+  } else {
+    for (unsigned int i = 0; i < this->P.size(); i++) {
+      for (unsigned int j = i; j < this->P.size(); j++) {
+        double dist = euclideanDistance(this->P.at(i), this->P.at(j));
+        this->distanceMatrix[i][j] = dist;
+        this->distanceMatrix[j][i] = dist;
+      }
+    }
+  }
+
+}
+
+/**
  * @brief Creates a Vamana Index Graph according to the provided dataset points and the given parameters.
  * Specifically this method follows the Vamana algorithm found on the paper:
  * 
@@ -111,7 +138,7 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
 */
 template <typename vamana_t> 
 void VamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize, double** distanceMatrix) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
@@ -124,6 +151,19 @@ void VamanaIndex<vamana_t>::createGraph(
   // Initialize graph memory
   unsigned int n = P.size();
   this->P = P;
+
+  // If the distance matrix is provided, use it, otherwise compute the distances
+  if (distanceMatrix != nullptr) {
+    this->distanceMatrix = distanceMatrix;
+  } else {
+    this->distanceMatrix = new double*[n];
+    for (unsigned int i = 0; i < n; i++) {
+      this->distanceMatrix[i] = new double[n];
+    }
+    this->computeDistances(visualize);
+  }
+  
+  this->computeDistances(false);
   this->G.setNodesCount(n);
 
   // Initialize the graph to a random R-regular directed graph with n vertices and R edges per vertex
@@ -139,8 +179,8 @@ void VamanaIndex<vamana_t>::createGraph(
       vamana_t sigma_i = sigma_i_node->getData();
 
       // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
-      greedyResult = GreedySearch(this->G, s, this->P.at(sigma.at(i)), 1, L);
-      RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
+      greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
+      RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
 
       // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
       std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
@@ -156,7 +196,7 @@ void VamanaIndex<vamana_t>::createGraph(
 
         // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
         if (outgoing.size() > (long unsigned int)R) {
-          RobustPrune(this->G, *j_node, outgoing, alpha, R);
+          RobustPrune(*this, *j_node, outgoing, alpha, R);
         } 
         else {
           j_node->addNeighbor(sigma_i);
@@ -172,8 +212,8 @@ void VamanaIndex<vamana_t>::createGraph(
       vamana_t sigma_i = sigma_i_node->getData();
 
       // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
-      greedyResult = GreedySearch(this->G, s, this->P.at(sigma.at(i)), 1, L);
-      RobustPrune(this->G, *sigma_i_node, greedyResult.second, alpha, R);
+      greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
+      RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
 
       // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
       std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
@@ -189,7 +229,7 @@ void VamanaIndex<vamana_t>::createGraph(
 
         // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
         if (outgoing.size() > (long unsigned int)R) {
-          RobustPrune(this->G, *j_node, outgoing, alpha, R);
+          RobustPrune(*this, *j_node, outgoing, alpha, R);
         } 
         else {
           j_node->addNeighbor(sigma_i);
@@ -197,6 +237,14 @@ void VamanaIndex<vamana_t>::createGraph(
       }
 
     }
+  }
+
+  // Free up the memory allocated for the distance matrix, if it was computed
+  if (distanceMatrix == nullptr) {
+    for (unsigned int i = 0; i < n; i++) {
+      delete[] this->distanceMatrix[i];
+    }
+    delete[] this->distanceMatrix;
   }
 
 }

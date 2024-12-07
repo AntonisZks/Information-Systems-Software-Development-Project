@@ -30,6 +30,7 @@ protected:
   
   Graph<vamana_t> G;
   std::vector<vamana_t> P;
+  double** distanceMatrix;
 
   /**
    * @brief Fills the graph nodes with the given dataset points. 
@@ -43,6 +44,13 @@ protected:
    * @param maxEdges the maximum number of edges a node can have.
   */
   void createRandomEdges(const unsigned int maxEdges);
+
+  /**
+   * @brief Computes the distances between every node in the dataset and stores them in the distance matrix.
+   * 
+   * @param visualize a boolean flag to visualize the progress of the computation
+   */
+  void computeDistances(const bool visualize = true);
 
 public:
 
@@ -73,6 +81,13 @@ public:
   inline std::vector<GraphNode<vamana_t>> getNodes(void) const { return this->G.getNodesVector(); }
 
   /**
+   * @brief Returns the distance matrix of the Vamana Index entity as a double pointer.
+   * 
+   * @return the distance matrix
+   */
+  inline double** getDistanceMatrix(void) const { return this->distanceMatrix; }
+
+  /**
    * @brief Creates a Vamana Index Graph according to the provided dataset points and the given parameters.
    * Specifically this method follows the Vamana algorithm found on the paper:
    * 
@@ -87,7 +102,7 @@ public:
    * @param R the parameter R
    * 
   */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize = true);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize = true, double** distanceMatrix = nullptr);
 
   /**
    * @brief Saves a specific graph into a file. Specifically this method is used to save the contents of a Vamana 
@@ -110,11 +125,6 @@ public:
    * @return true if the graph was loaded successfully, false otherwise
   */
   bool loadGraph(const std::string& filename);
-
-  //####################################################################
-  //this is the new filtered medoid, i will brief in later time
-  //####################################################################
-  map<int, BaseDataVector<float>> FilteredMedoid(const Graph<vamana_t>& Graph, int threshold);
 
   /**
    * @brief Finds the medoid node in the graph using a sample of nodes.

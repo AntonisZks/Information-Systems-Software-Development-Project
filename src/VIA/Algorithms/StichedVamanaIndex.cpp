@@ -24,6 +24,11 @@ void StichedVamanaIndex<vamana_t>::createGraph(
   // Initialize graph memory
   unsigned int n = P.size();
   this->P = P;
+  this->distanceMatrix = new double*[n];
+  for (unsigned int i = 0; i < n; i++) {
+    this->distanceMatrix[i] = new double[n];
+  }
+  this->computeDistances();
 
   // Initialize G = (V, E) to an empty graph
   this->G.setNodesCount(n);
@@ -63,7 +68,7 @@ void StichedVamanaIndex<vamana_t>::createGraph(
 
     // Initialize the sub-index for the current filter and create its graph
     VamanaIndex<vamana_t> subIndex;
-    subIndex.createGraph(Pf[filter], alpha, R_small, L_small, false);
+    subIndex.createGraph(Pf[filter], alpha, R_small, L_small, false, this->distanceMatrix);
 
     for (unsigned int i = 0; i < subIndex.getGraph().getNodesCount(); i++) {
       
@@ -89,9 +94,15 @@ void StichedVamanaIndex<vamana_t>::createGraph(
     std::set<vamana_t> neighbors = currentNode->getNeighborsSet();
 
     // Run Filtered Robust Prune for the current node and its neighbors
-    FilteredRobustPrune(this->G, *currentNode, neighbors, alpha, R_stiched);
+    FilteredRobustPrune(*this, *currentNode, neighbors, alpha, R_stiched);
 
   }
+
+  // Free up the memory allocated for the distance matrix
+  for (unsigned int i = 0; i < n; i++) {
+    delete[] this->distanceMatrix[i];
+  }
+  delete[] this->distanceMatrix;
 
 }
 

@@ -50,7 +50,7 @@ static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>&
  * 5. Stops when the number of neighbors of `p_node` reaches `R` or `V` is empty.
  */
 template <typename graph_t>
-void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
+void RobustPrune(VamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
     
   // Get the data of the node p_node
   graph_t p = p_node.getData();
@@ -70,11 +70,13 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
 
     // Find the closest neighbor to p_node in V
     graph_t p_star = getSetItemAtIndex(0, V);
-    float p_star_distance = euclideanDistance(p, p_star);
+    // float p_star_distance = euclideanDistance(p, p_star);
+    float p_star_distance = index.getDistanceMatrix()[p.getIndex()][p_star.getIndex()];
 
     // Update p_star if a closer neighbor is found
     for (auto p_tone : V) {
-      float currentDistance = euclideanDistance(p, p_tone);
+      // float currentDistance = euclideanDistance(p, p_tone);
+      float currentDistance = index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()];
       
       if (currentDistance < p_star_distance) {
         p_star_distance = currentDistance;
@@ -94,7 +96,10 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
     std::set<graph_t> V_copy = V;
     for (auto p_tone : V_copy) {
       // Remove neighbors that are too far from p_star based on alpha and euclideanDistance
-      if ((alpha * euclideanDistance(p_star, p_tone)) <= euclideanDistance(p, p_tone)) {
+      // if ((alpha * euclideanDistance(p_star, p_tone)) <= euclideanDistance(p, p_tone)) {
+      //   V.erase(p_tone);
+      // }
+      if ((alpha * index.getDistanceMatrix()[p_star.getIndex()][p_tone.getIndex()]) <= index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()]) {
         V.erase(p_tone);
       }
     }
@@ -102,7 +107,7 @@ void RobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t
 }
 
 template <typename graph_t>
-void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
+void FilteredRobustPrune(FilteredVamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
   
   // Get the data of the node p_node
   graph_t p = p_node.getData();
@@ -124,11 +129,13 @@ void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set
 
     // Find the closest neighbor to p_node in V
     graph_t p_star = getSetItemAtIndex(0, V);
-    float p_star_distance = euclideanDistance(p, p_star);
+    // float p_star_distance = euclideanDistance(p, p_star);
+    float p_star_distance = index.getDistanceMatrix()[p.getIndex()][p_star.getIndex()];
 
     // Update p_star if a closer neighbor is found
     for (auto p_tone : V) {
-      float currentDistance = euclideanDistance(p, p_tone);
+      // float currentDistance = euclideanDistance(p, p_tone);
+      float currentDistance = index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()];
       if (currentDistance < p_star_distance) {
         p_star_distance = currentDistance;
         p_star = p_tone;
@@ -160,7 +167,10 @@ void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set
       }
 
       // Remove nodes that do NOT satisfy the filtering condition
-      if ((alpha * euclideanDistance(p_star, p_tone)) <= euclideanDistance(p, p_tone)) {
+      // if ((alpha * euclideanDistance(p_star, p_tone)) <= euclideanDistance(p, p_tone)) {
+      //   V.erase(p_tone);
+      // }
+      if ((alpha * index.getDistanceMatrix()[p_star.getIndex()][p_tone.getIndex()]) <= index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()]) {
         V.erase(p_tone);
       }
 
@@ -169,7 +179,7 @@ void FilteredRobustPrune(Graph<graph_t>& G, GraphNode<graph_t>& p_node, std::set
 }
 
 template void RobustPrune<DataVector<float>>(
-  Graph<DataVector<float>>& G, 
+  VamanaIndex<DataVector<float>>& index, 
   GraphNode<DataVector<float>>& p_node, 
   std::set<DataVector<float>>& V, 
   float alpha, 
@@ -177,7 +187,7 @@ template void RobustPrune<DataVector<float>>(
 );
 
 template void RobustPrune<BaseDataVector<float>>(
-  Graph<BaseDataVector<float>>& G, 
+  VamanaIndex<BaseDataVector<float>>& index, 
   GraphNode<BaseDataVector<float>>& p_node, 
   std::set<BaseDataVector<float>>& V, 
   float alpha, 
@@ -185,7 +195,7 @@ template void RobustPrune<BaseDataVector<float>>(
 );
 
 template void FilteredRobustPrune<BaseDataVector<float>>(
-  Graph<BaseDataVector<float>>& G, 
+  FilteredVamanaIndex<BaseDataVector<float>>& index, 
   GraphNode<BaseDataVector<float>>& p_node, 
   std::set<BaseDataVector<float>>& V, 
   float alpha, 

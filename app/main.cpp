@@ -198,7 +198,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
         std::cerr << "Error opening file for writing." << std::endl;
         return;
       }
-      std::cout << std::endl << green << "Vamana Index was saved successfully to `" << brightYellow << outputFile << "`" << std::endl;
+      std::cout << std::endl << green << "Vamana Index was saved successfully to " << brightYellow << "`" << outputFile << "`" << reset << std::endl;
     }
   } else {
     BaseVectorVector base_vectors = ReadFilteredBaseVectorFile(baseFile);
@@ -215,6 +215,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
 
       if (save) {
         index.saveGraph(outputFile);
+        std::cout << std::endl << green << "Vamana Index was saved successfully to " << brightYellow << "`" << outputFile << "`" << reset << std::endl;
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
@@ -222,7 +223,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
 
       if (save) {
         index.saveGraph(outputFile);
-        std::cout << std::endl << green << "Vamana Index was saved successfully to `" << brightYellow << outputFile << "`" << std::endl;
+        std::cout << std::endl << green << "Vamana Index was saved successfully to " << brightYellow << "`" << outputFile << "`" << reset << std::endl;
       }
     }
   }
@@ -240,8 +241,8 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
   if (!getParameterValue(args, "-query-file", queryFile)) return;
   if (!getParameterValue(args, "-query", queryNumber)) return;
 
-  BaseVectors base_vectors = ReadVectorFile(queryFile);
-  if (base_vectors.empty()) {
+  BaseVectors query_vectors = ReadVectorFile(queryFile);
+  if (query_vectors.empty()) {
     std::cerr << "Error reading query file" << std::endl;
     return;
   }
@@ -259,7 +260,7 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
   GraphNode<DataVector<float>> s = vamanaIndex.findMedoid(vamanaIndex.getGraph(), 1000);
   
   auto start = std::chrono::high_resolution_clock::now();
-  SimpleGreedyResult greedyResult = GreedySearch(vamanaIndex.getGraph(), s, base_vectors.at(std::stoi(queryNumber)), std::stoi(k), std::stoi(L));
+  SimpleGreedyResult greedyResult = GreedySearch(vamanaIndex, s, query_vectors.at(std::stoi(queryNumber)), std::stoi(k), std::stoi(L), TEST);
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
 
@@ -322,7 +323,7 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   }
 
   auto start = std::chrono::high_resolution_clock::now();
-  FilteredGreedyResult greedyResult = FilteredGreedySearch(index.getGraph(), start_nodes, xq, std::stoi(k), std::stoi(L), Fx);
+  FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
 

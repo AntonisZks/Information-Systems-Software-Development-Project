@@ -17,8 +17,15 @@ using namespace std;
  */
 template <typename base_t, typename query_t> bool EuclideanDistanceOrder<base_t, query_t>::operator()(const base_t& a, const base_t& b) {
 
-    double distanceA = euclideanDistance(a, xq);
-    double distanceB = euclideanDistance(b, xq);
+    double distanceA, distanceB;
+
+    if (!useCashe) {
+        distanceA = euclideanDistance(a, xq);
+        distanceB = euclideanDistance(b, xq);
+    } else {
+        distanceA = distances[a.getIndex()][xq.getIndex()];
+        distanceB = distances[b.getIndex()][xq.getIndex()];
+    }
 
     // Primary comparison by distance
     if (distanceA != distanceB) {
