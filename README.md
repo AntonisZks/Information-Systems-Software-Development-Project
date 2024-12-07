@@ -1,7 +1,18 @@
 
-<center>
-<h1>Ανάπτυξη Λογισμικού για Πληροφοριακά Συστήματα</h1>
-</center>
+<h1 align="center">Ανάπτυξη Λογισμικού για Πληροφοριακά Συστήματα</h1>
+
+<div align="center">
+	
+![Repository Size](https://img.shields.io/github/repo-size/AntonisZks/Information-Systems-Software-Development-Project.svg)
+![Actions](https://github.com/AntonisZks/Information-Systems-Software-Development-Project/actions/workflows/unit_tests.yml/badge.svg)
+![Release](https://img.shields.io/github/v/release/AntonisZks/Information-Systems-Software-Development-Project.svg)
+![Issues](https://img.shields.io/github/issues/AntonisZks/Information-Systems-Software-Development-Project.svg)
+![Pull Requests](https://img.shields.io/github/issues-pr/AntonisZks/Information-Systems-Software-Development-Project.svg)
+![Contributors](https://img.shields.io/github/contributors/AntonisZks/Information-Systems-Software-Development-Project.svg)
+![Stars](https://img.shields.io/github/stars/AntonisZks/Information-Systems-Software-Development-Project?style=social)
+	
+</div>
+
 
 ##  Project: Προσσεγιστική Επίλυση του προβλήματος K-Εγγύτερων Γειτόνων (K-Nearest Neigbours) μέσω του Αλγορίθμου **Vamana Indexing Algorithm (VIA)**
 ### Τμήμα Πληροφορικής και Τηλεπικοινωνιών - ΕΚΠΑ - Χειμερινό Εξάμηνο 2024-2025
