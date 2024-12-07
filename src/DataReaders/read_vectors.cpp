@@ -156,13 +156,13 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
         return {};
     }
 
-    uint32_t num_vectors;
+    unsigned int num_vectors;
     file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
 
     vector<BaseDataVector<float>> dataVectors;
     dataVectors.reserve(num_vectors);
 
-    for (uint32_t i = 0; i < num_vectors; ++i) {
+    for (unsigned int i = 0; i < num_vectors; ++i) {
         float C, T;
         file.read(reinterpret_cast<char*>(&C), sizeof(C));
         file.read(reinterpret_cast<char*>(&T), sizeof(T));
