@@ -8,7 +8,6 @@
 ![Actions](https://github.com/AntonisZks/Information-Systems-Software-Development-Project/actions/workflows/unit_tests.yml/badge.svg)
 ![Release](https://img.shields.io/github/v/release/AntonisZks/Information-Systems-Software-Development-Project.svg)
 ![Issues](https://img.shields.io/github/issues/AntonisZks/Information-Systems-Software-Development-Project.svg)
-![Pull Requests](https://img.shields.io/github/issues-pr/AntonisZks/Information-Systems-Software-Development-Project.svg)
 ![Contributors](https://img.shields.io/github/contributors/AntonisZks/Information-Systems-Software-Development-Project.svg)
 ![Stars](https://img.shields.io/github/stars/AntonisZks/Information-Systems-Software-Development-Project?style=social)
 	
