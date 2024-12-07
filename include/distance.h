@@ -7,6 +7,7 @@
 #include <vector>
 #include "DataVector.h"
 
+
 /**
  * @brief Comparator structure for ordering elements by Euclidean distance.
  * 
@@ -17,13 +18,16 @@ template <typename base_t, typename query_t>
 struct EuclideanDistanceOrder {
 
   query_t xq; // Target vector for distance comparisons
+  double** distances;
+  bool useCashe;
 
   /**
    * @brief Constructs a new EuclideanDistanceOrder object with a target vector.
    * 
    * @param target The target vector for distance comparisons.
    */
-  EuclideanDistanceOrder(const query_t& target) : xq(target) {}
+  EuclideanDistanceOrder(const query_t& target, double** distanceMatrix, const bool useCashe_) 
+    : xq(target), distances(distanceMatrix), useCashe(useCashe_) {}
 
   /**
    * @brief Comparison operator for ordering elements by Euclidean distance.

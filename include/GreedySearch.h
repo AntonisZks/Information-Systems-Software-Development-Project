@@ -14,6 +14,22 @@
 #include "distance.h"
 #include <queue>
 #include <cmath>
+#include "VamanaIndex.h"
+#include "FilteredVamanaIndex.h"
+
+/**
+ * @brief Enum to define the execution mode of the algorithm.
+ * 
+ * The algorithm can be executed in two modes: CREATE and TEST. CREATE mode is used to create the index, 
+ * while TEST mode is used to test the index.
+ */
+enum EXEC_MODE {
+    CREATE = 0,
+    TEST = 1
+};
+
+template <typename vamana_t> class VamanaIndex;
+template <typename vamana_t> class FilteredVamanaIndex;
 
 /**
  * @brief Greedy search algorithm for finding the k nearest nodes in a graph relative to a query vector.
@@ -31,20 +47,22 @@
  * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
  */
 template <typename graph_t, typename query_t> std::pair<std::set<graph_t>, std::set<graph_t>> GreedySearch(
-    const Graph<graph_t>& G, 
+    const VamanaIndex<graph_t>& index, 
     const GraphNode<graph_t>& s, 
     const query_t& xq, 
     unsigned int k, 
-    unsigned int L
+    unsigned int L,
+    const EXEC_MODE execMode = CREATE
 );
 
 template <typename graph_t, typename query_t> std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
-    const Graph<graph_t>& G, 
+    const FilteredVamanaIndex<graph_t>& index, 
     const std::vector<GraphNode<graph_t>>& S, 
     const query_t& xq,  
     const unsigned int k, 
     const unsigned int L,  
-    const std::vector<CategoricalAttributeFilter>& queryFilters
+    const std::vector<CategoricalAttributeFilter>& queryFilters,
+    const EXEC_MODE execMode = CREATE
 );
                      
 

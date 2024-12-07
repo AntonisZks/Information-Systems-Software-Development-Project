@@ -3,6 +3,8 @@
 #include <vector>
 #include "../../include/DataVector.h"
 #include "../../include/read_data.h"
+#include "../../include/graphics.h"
+
 
 using namespace std;
 
@@ -162,7 +164,8 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
     vector<BaseDataVector<float>> dataVectors;
     dataVectors.reserve(num_vectors);
 
-    for (unsigned int i = 0; i < num_vectors; ++i) {
+    withProgress(0, num_vectors, "Reading base vectors", [&](int i) {
+
         float C, T;
         file.read(reinterpret_cast<char*>(&C), sizeof(C));
         file.read(reinterpret_cast<char*>(&T), sizeof(T));
@@ -176,7 +179,8 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
         }
 
         dataVectors.push_back(dataVector);
-    }
+        
+    });
 
     file.close();
     return dataVectors;

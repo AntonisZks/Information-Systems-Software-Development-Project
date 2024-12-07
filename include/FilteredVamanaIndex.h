@@ -2,10 +2,13 @@
 #define FILTERED_VAMANA_INDEX_H
 
 #include <iostream>
+#include <map>
 #include "VamanaIndex.h"
 #include "Filter.h"
 
 using Filter = CategoricalAttributeFilter;
+
+template <typename vamana_t> class VamanaIndex;
 
 template <typename vamana_t> class FilteredVamanaIndex : public VamanaIndex<vamana_t> {
 

@@ -85,7 +85,7 @@ test_filtered_via:
 	./bin/main --test -index-type 'filtered' -load 'filtered_index.bin' -L 120 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query 1
 
 test_stiched_via:
-	./bin/main --test -index-type 'stiched' -load 'stiched_index.bin' -L 120 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query 1
+	./bin/main --test -index-type 'stiched' -load 'stiched_index.bin' -L 150 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query 1
 
 
 run_tests:
