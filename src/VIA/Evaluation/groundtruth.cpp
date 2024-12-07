@@ -101,7 +101,7 @@ void saveGroundtruthToFile(const std::vector<std::vector<int>>& base_vectors_ind
   }
 
   // Write the number of query vectors to the file
-  uint32_t num_queries = base_vectors_indexes.size();
+  unsigned int num_queries = base_vectors_indexes.size();
   file.write(reinterpret_cast<const char*>(&num_queries), sizeof(num_queries));
 
   // Write the distances for each query vector
@@ -109,7 +109,7 @@ void saveGroundtruthToFile(const std::vector<std::vector<int>>& base_vectors_ind
   
     const std::vector<int>& base_vector_indexes = base_vectors_indexes[i];
 
-    uint32_t num_vectors = base_vector_indexes.size();
+    unsigned int num_vectors = base_vector_indexes.size();
     file.write(reinterpret_cast<const char*>(&num_vectors), sizeof(num_vectors));
     file.write(reinterpret_cast<const char*>(base_vector_indexes.data()), num_vectors * sizeof(float));
   
@@ -141,7 +141,7 @@ std::vector<std::vector<int>> readGroundtruthFromFile(const std::string& filenam
   }
 
   // Read the number of query vectors from the file
-  uint32_t num_queries;
+  unsigned int num_queries;
   file.read(reinterpret_cast<char*>(&num_queries), sizeof(num_queries));
 
   std::vector<std::vector<int>> base_vectors_indexes(num_queries);
@@ -150,7 +150,7 @@ std::vector<std::vector<int>> readGroundtruthFromFile(const std::string& filenam
   withProgress(0, base_vectors_indexes.size(), "Loading Groundtruth", [&](int i) {
     auto& base_vector_indexes = base_vectors_indexes[i];
 
-    uint32_t num_vectors;
+    unsigned int num_vectors;
     file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
     base_vector_indexes.resize(num_vectors);
     file.read(reinterpret_cast<char*>(base_vector_indexes.data()), num_vectors * sizeof(float));
