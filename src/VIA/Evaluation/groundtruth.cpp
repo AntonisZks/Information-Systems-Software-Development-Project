@@ -133,6 +133,7 @@ void saveGroundtruthToFile(const std::vector<std::vector<int>>& base_vectors_ind
  * @return A 2D vector containing the read distances for each query vector
  */
 std::vector<std::vector<int>> readGroundtruthFromFile(const std::string& filename) {
+  
   std::ifstream file(filename, std::ios::binary);
 
   if (!file.is_open()) {
@@ -157,5 +158,7 @@ std::vector<std::vector<int>> readGroundtruthFromFile(const std::string& filenam
   });
 
   file.close();
+
   return base_vectors_indexes;
+
 }

@@ -87,16 +87,21 @@ void StichedVamanaIndex<vamana_t>::createGraph(
 
   });
 
-  // Filtered Robust Prune for every v in V (the nodes of the graph)
-  for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
 
-    GraphNode<vamana_t>* currentNode = this->G.getNode(i);
-    std::set<vamana_t> neighbors = currentNode->getNeighborsSet();
 
-    // Run Filtered Robust Prune for the current node and its neighbors
-    FilteredRobustPrune(*this, *currentNode, neighbors, alpha, R_stiched);
+  // NOTE: Without the Filtered Robust we get better results...
 
-  }
+
+  // // Filtered Robust Prune for every v in V (the nodes of the graph)
+  // for (unsigned int i = 0; i < this->G.getNodesCount(); i++) {
+
+  //   GraphNode<vamana_t>* currentNode = this->G.getNode(i);
+  //   std::set<vamana_t> neighbors = currentNode->getNeighborsSet();
+
+  //   // Run Filtered Robust Prune for the current node and its neighbors
+  //   FilteredRobustPrune(*this, *currentNode, neighbors, alpha, R_stiched);
+
+  // }
 
   // Free up the memory allocated for the distance matrix
   for (unsigned int i = 0; i < n; i++) {

@@ -118,7 +118,10 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
 
     // Limit the size of candidates to L by keeping the closest L elements to the query
     if (candidates.size() > static_cast<size_t>(L)) {
-      std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), execMode==CREATE)};
+      std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
+        EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), execMode==CREATE)
+      };
+
       for (auto candidate : candidates) {
         newCandidates.insert(candidate);
       }
@@ -137,7 +140,10 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
   }
 
   // Final selection of k closest candidates after main loop
-  std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), execMode==CREATE)};
+  std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
+    EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), execMode==CREATE)
+  };
+  
   for (auto candidate : candidates) {
     newCandidates.insert(candidate);
   }
@@ -153,6 +159,26 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
 
 }
 
+/**
+ * @brief Greedy search algorithm for finding the k nearest nodes in a graph relative to a query vector.
+ * 
+ * This function implements a greedy search that iteratively explores the closest nodes to the query vector.
+ * It maintains a candidate set of nodes to visit and a visited set of nodes already processed. This version
+ * of the function is used with a FilteredVamanaIndex, which applies additional filtering criteria to the search.
+ * 
+ * @param graph_t Type of data stored in the graph nodes
+ * @param query_t Type of the query vector
+ * @param index The FilteredVamanaIndex to search
+ * @param S Starting nodes for the search
+ * @param xq Query vector for distance computation
+ * @param k Number of nearest nodes to return
+ * @param L Maximum number of nodes in the candidate set
+ * @param queryFilters A vector of CategoricalAttributeFilter objects to apply to the search
+ * @param mode Execution mode for the algorithm
+ * 
+ * @return Pair of sets: the first set contains the k nearest nodes, and the second set contains all visited nodes
+ * 
+ */
 template <typename graph_t, typename query_t>
 std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
   const FilteredVamanaIndex<graph_t>& index, const std::vector<GraphNode<graph_t>>& S, const query_t& xq,  
@@ -241,7 +267,10 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
     // Limit the size of candidates to L by keeping the closest L elements to the query
     if (candidates.size() > static_cast<size_t>(L)) {
 
-      std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), mode==CREATE)};
+      std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
+        EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), mode==CREATE)
+      };
+
       for (auto candidate : candidates) {
         newCandidates.insert(candidate);
       }
@@ -261,7 +290,10 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
   }
 
   // Final selection of k closest candidates after main loop
-  std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), mode==CREATE)};
+  std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
+    EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), mode==CREATE)
+  };
+
   for (auto candidate : candidates) {
     newCandidates.insert(candidate);
   }
