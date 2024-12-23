@@ -33,6 +33,7 @@ void StichedVamanaIndex<vamana_t>::createGraph(
   // Initialize G = (V, E) to an empty graph
   this->G.setNodesCount(n);
   this->fillGraphNodes();
+  this->createRandomEdges(R_stiched); // Experimental
 
   // Let Pf proper subset of P be the set of points with label f in F
   std::map<Filter, std::vector<vamana_t>> Pf;

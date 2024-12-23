@@ -96,6 +96,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
 
   // Initialize G to an empty graph and get the medoid node
   this->fillGraphNodes();
+  this->createRandomEdges(R); // Experimental
   GraphNode<vamana_t> s = this->findMedoid(this->G, 1000);
 
   // Let st(f) be the start node for filter label f for every f in F.

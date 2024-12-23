@@ -116,7 +116,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
   std::string L_small, R_small, R_stiched;
   bool save = false;
 
-  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges"};
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
       throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save");
@@ -141,6 +141,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
     } else {
       R = args["-R"];
     }
+
   } else if (indexType == "stiched") {
     if (args.find("-L-small") == args.end()) {
       throw std::invalid_argument("Error: Missing required argument: -L-small");
@@ -292,57 +293,66 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   if (!getParameterValue(args, "-query", queryNumber)) return;
 
   QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
-  QueryDataVector<float> xq = query_vectors[std::stoi(queryNumber)];
-  if (xq.getQueryType() > 1) {
-    return;
-  }
-
   FilteredVamanaIndex<BaseDataVector<float>> index;
   index.loadGraph(indexFile);
   std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile(groundtruthFile);
-
   std::map<Filter, GraphNode<BaseDataVector<float>>> medoids = index.findFilteredMedoid(std::stoi(L)); 
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
   for (auto filter : index.getFilters()) {
     start_nodes.push_back(medoids[filter]);
   }
 
-  std::vector<CategoricalAttributeFilter> Fx;
-  if (xq.getQueryType() == 1) {
-    Fx.push_back(CategoricalAttributeFilter(xq.getV()));
-  }
-
-  std::vector<GraphNode<BaseDataVector<float>>> P = index.getNodes();
-  std::set<BaseDataVector<float>> exactNeighbors;
-
-  for (auto index : groundtruth[std::stoi(queryNumber)]) {
-    exactNeighbors.insert(P[index].getData());
-    if ((int)exactNeighbors.size() >= std::stoi(k)) {
-      break;
+  auto processQuery = [&](int queryIdx) {
+    QueryDataVector<float> xq = query_vectors[queryIdx];
+    if (xq.getQueryType() > 1) {
+      return;
     }
+
+    std::vector<CategoricalAttributeFilter> Fx;
+    if (xq.getQueryType() == 1) {
+      Fx.push_back(CategoricalAttributeFilter(xq.getV()));
+    }
+
+    std::vector<GraphNode<BaseDataVector<float>>> P = index.getNodes();
+    std::set<BaseDataVector<float>> exactNeighbors;
+
+    for (auto idx : groundtruth[queryIdx]) {
+      exactNeighbors.insert(P[idx].getData());
+      if ((int)exactNeighbors.size() >= std::stoi(k)) {
+        break;
+      }
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+
+    std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
+    double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
+
+    // std::cout << brightMagenta << std::endl << "Results for query " << queryIdx << ":" << reset << std::endl;
+    std::cout << reset << "Current Query: " << brightCyan << queryIdx << reset << " | ";
+    std::cout << reset << "Query Type: ";
+    if (xq.getQueryType() == 0) std::cout << brightBlack << "Unfiltered" << reset << " | ";
+    else std::cout << brightWhite << "Filtered  " << reset << " | ";
+    std::cout << reset << "Recall: ";
+    if (recall < 0.2) std::cout << brightRed;
+    else if (recall < 0.4) std::cout << brightOrange;
+    else if (recall < 0.6) std::cout << brightYellow;
+    else if (recall < 0.8) std::cout << brightCyan;
+    else std::cout << brightGreen;
+    std::cout << recall*100 << "%" << reset << " | ";
+    std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
+  };
+
+  if (queryNumber == "-1") {
+    for (size_t i = 0; i < query_vectors.size(); ++i) {
+      processQuery(i);
+    }
+  } else {
+    processQuery(std::stoi(queryNumber));
   }
-
-  auto start = std::chrono::high_resolution_clock::now();
-  FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-
-  std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
-  double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
-
-  std::cout << brightMagenta << std::endl << "Results:" << reset << std::endl;
-  std::cout << reset << "Current Query: " << brightCyan << queryNumber << reset << " | ";
-  std::cout << reset << "Query Type: ";
-  if (xq.getQueryType() == 0) std::cout << brightBlack << "Uniltered" << reset << " | ";
-  else std::cout << brightWhite << "Filtered" << reset << " | ";
-  std::cout << reset << "Recall: ";
-  if (recall < 0.2) std::cout << brightRed;
-  else if (recall < 0.4) std::cout << brightOrange;
-  else if (recall < 0.6) std::cout << brightYellow;
-  else if (recall < 0.8) std::cout << brightCyan;
-  else std::cout << brightGreen;
-  std::cout << recall*100 << "%" << reset << " | ";
-  std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
 }
 
 void Test(std::unordered_map<std::string, std::string> args) {
