@@ -293,7 +293,7 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
 void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   using QueryVectorVector = std::vector<QueryDataVector<float>>;
 
-  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber;
+  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber, testOn;
 
   if (!getParameterValue(args, "-load", indexFile)) return;
   if (!getParameterValue(args, "-k", k)) return;
@@ -301,6 +301,13 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   if (!getParameterValue(args, "-gt-file", groundtruthFile)) return;
   if (!getParameterValue(args, "-query-file", queryFile)) return;
   if (!getParameterValue(args, "-query", queryNumber)) return;
+  if (args.find("-test-on") != args.end()) {
+    if (queryNumber != "-1") {
+      std::cerr << "Error: The -test-on argument can only be used when -query is set to -1." << std::endl;
+      return;
+    }
+    testOn = args["-test-on"];
+  }
 
   QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
   FilteredVamanaIndex<BaseDataVector<float>> index;
@@ -358,6 +365,8 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
 
   if (queryNumber == "-1") {
     for (size_t i = 0; i < query_vectors.size(); ++i) {
+      if (testOn == "filtered" && query_vectors[i].getQueryType() != 1) continue;
+      if (testOn == "unfiltered" && query_vectors[i].getQueryType() != 0) continue;
       processQuery(i);
     }
   } else {
