@@ -79,7 +79,7 @@ FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const Categori
  */
 template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
@@ -96,7 +96,11 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
 
   // Initialize G to an empty graph and get the medoid node
   this->fillGraphNodes();
-  this->createRandomEdges(R); // Experimental
+
+  // Fill graph with random edges if required
+  if (!empty) {
+    this->createRandomEdges(R);
+  }
   GraphNode<vamana_t> s = this->findMedoid(this->G, 1000);
 
   // Let st(f) be the start node for filter label f for every f in F.

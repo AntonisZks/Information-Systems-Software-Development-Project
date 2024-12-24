@@ -112,14 +112,15 @@ void Create(std::unordered_map<std::string, std::string> args) {
   using BaseVectorVector = std::vector<BaseDataVector<float>>;
   using BaseVectors = std::vector<DataVector<float>>;
 
-  std::string indexType, baseFile, L, R, alpha, outputFile;
+  std::string indexType, baseFile, L, R, alpha, outputFile, connectionMode;
   std::string L_small, R_small, R_stiched;
   bool save = false;
+  bool leaveEmpty = false;
 
-  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode"};
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
-      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save");
+      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode");
     }
   }
 
@@ -184,6 +185,15 @@ void Create(std::unordered_map<std::string, std::string> args) {
     save = true;
   }
 
+  if (args.find("-connection-mode") != args.end()) {
+    connectionMode = args["-connection-mode"];
+    if (connectionMode == "empty") {
+      leaveEmpty = true;
+    } else if (connectionMode != "filled") {
+      throw std::invalid_argument("Error: Invalid value for -connection-mode. Valid values are: empty, filled");
+    }
+  }
+
   if (indexType == "simple") {
     BaseVectors base_vectors = ReadVectorFile(baseFile);
     if (base_vectors.empty()) {
@@ -212,7 +222,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
 
     if (indexType == "filtered") {
       FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R));
+      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -220,7 +230,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched));
+      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
