@@ -31,7 +31,7 @@ public:
    * @param R An unsigned int parameter.
    */
   void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, 
-                   const unsigned int R_small, const unsigned int R_stiched, bool visualized = true);
+                   const unsigned int R_small, const unsigned int R_stiched, bool visualized = true, bool empty = true);
 
 };
 

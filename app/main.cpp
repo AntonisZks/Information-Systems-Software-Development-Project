@@ -8,6 +8,7 @@
 #include <ctime>
 #include <chrono>
 #include <algorithm>
+#include <fstream>
 #include "../include/DataVector.h"
 #include "../include/VamanaIndex.h"
 #include "../include/FilteredVamanaIndex.h"
@@ -112,14 +113,15 @@ void Create(std::unordered_map<std::string, std::string> args) {
   using BaseVectorVector = std::vector<BaseDataVector<float>>;
   using BaseVectors = std::vector<DataVector<float>>;
 
-  std::string indexType, baseFile, L, R, alpha, outputFile;
+  std::string indexType, baseFile, L, R, alpha, outputFile, connectionMode;
   std::string L_small, R_small, R_stiched;
   bool save = false;
+  bool leaveEmpty = false;
 
-  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode"};
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
-      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save");
+      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode");
     }
   }
 
@@ -141,6 +143,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
     } else {
       R = args["-R"];
     }
+
   } else if (indexType == "stiched") {
     if (args.find("-L-small") == args.end()) {
       throw std::invalid_argument("Error: Missing required argument: -L-small");
@@ -183,6 +186,15 @@ void Create(std::unordered_map<std::string, std::string> args) {
     save = true;
   }
 
+  if (args.find("-connection-mode") != args.end()) {
+    connectionMode = args["-connection-mode"];
+    if (connectionMode == "empty") {
+      leaveEmpty = true;
+    } else if (connectionMode != "filled") {
+      throw std::invalid_argument("Error: Invalid value for -connection-mode. Valid values are: empty, filled");
+    }
+  }
+
   if (indexType == "simple") {
     BaseVectors base_vectors = ReadVectorFile(baseFile);
     if (base_vectors.empty()) {
@@ -211,7 +223,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
 
     if (indexType == "filtered") {
       FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R));
+      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -219,7 +231,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched));
+      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -282,7 +294,7 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
 void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   using QueryVectorVector = std::vector<QueryDataVector<float>>;
 
-  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber;
+  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber, testOn, saveRecallsFile;
 
   if (!getParameterValue(args, "-load", indexFile)) return;
   if (!getParameterValue(args, "-k", k)) return;
@@ -290,59 +302,102 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   if (!getParameterValue(args, "-gt-file", groundtruthFile)) return;
   if (!getParameterValue(args, "-query-file", queryFile)) return;
   if (!getParameterValue(args, "-query", queryNumber)) return;
-
-  QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
-  QueryDataVector<float> xq = query_vectors[std::stoi(queryNumber)];
-  if (xq.getQueryType() > 1) {
-    return;
+  if (args.find("-test-on") != args.end()) {
+    if (queryNumber != "-1") {
+      std::cerr << "Error: The -test-on argument can only be used when -query is set to -1." << std::endl;
+      return;
+    }
+    testOn = args["-test-on"];
+  }
+  if (args.find("-save-recalls") != args.end()) {
+    if (queryNumber != "-1") {
+      std::cerr << "Error: The -save-recalls argument can only be used when -query is set to -1." << std::endl;
+      return;
+    }
+    saveRecallsFile = args["-save-recalls"];
   }
 
+  QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
   FilteredVamanaIndex<BaseDataVector<float>> index;
   index.loadGraph(indexFile);
   std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile(groundtruthFile);
-
   std::map<Filter, GraphNode<BaseDataVector<float>>> medoids = index.findFilteredMedoid(std::stoi(L)); 
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
   for (auto filter : index.getFilters()) {
     start_nodes.push_back(medoids[filter]);
   }
 
-  std::vector<CategoricalAttributeFilter> Fx;
-  if (xq.getQueryType() == 1) {
-    Fx.push_back(CategoricalAttributeFilter(xq.getV()));
-  }
-
-  std::vector<GraphNode<BaseDataVector<float>>> P = index.getNodes();
-  std::set<BaseDataVector<float>> exactNeighbors;
-
-  for (auto index : groundtruth[std::stoi(queryNumber)]) {
-    exactNeighbors.insert(P[index].getData());
-    if ((int)exactNeighbors.size() >= std::stoi(k)) {
-      break;
+  std::ofstream recallFile;
+  if (!saveRecallsFile.empty()) {
+    recallFile.open(saveRecallsFile);
+    if (!recallFile.is_open()) {
+      std::cerr << "Error: Could not open file " << saveRecallsFile << " for writing." << std::endl;
+      return;
     }
   }
 
-  auto start = std::chrono::high_resolution_clock::now();
-  FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
+  auto processQuery = [&](int queryIdx) {
+    QueryDataVector<float> xq = query_vectors[queryIdx];
+    if (xq.getQueryType() > 1) {
+      return;
+    }
 
-  std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
-  double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
+    std::vector<CategoricalAttributeFilter> Fx;
+    if (xq.getQueryType() == 1) {
+      Fx.push_back(CategoricalAttributeFilter(xq.getV()));
+    }
 
-  std::cout << brightMagenta << std::endl << "Results:" << reset << std::endl;
-  std::cout << reset << "Current Query: " << brightCyan << queryNumber << reset << " | ";
-  std::cout << reset << "Query Type: ";
-  if (xq.getQueryType() == 0) std::cout << brightBlack << "Uniltered" << reset << " | ";
-  else std::cout << brightWhite << "Filtered" << reset << " | ";
-  std::cout << reset << "Recall: ";
-  if (recall < 0.2) std::cout << brightRed;
-  else if (recall < 0.4) std::cout << brightOrange;
-  else if (recall < 0.6) std::cout << brightYellow;
-  else if (recall < 0.8) std::cout << brightCyan;
-  else std::cout << brightGreen;
-  std::cout << recall*100 << "%" << reset << " | ";
-  std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
+    std::vector<GraphNode<BaseDataVector<float>>> P = index.getNodes();
+    std::set<BaseDataVector<float>> exactNeighbors;
+
+    for (auto idx : groundtruth[queryIdx]) {
+      exactNeighbors.insert(P[idx].getData());
+      if ((int)exactNeighbors.size() >= std::stoi(k)) {
+        break;
+      }
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+
+    std::set<BaseDataVector<float>> approximateNeighbors = greedyResult.first;
+    double recall = calculateRecallEvaluation(approximateNeighbors, exactNeighbors);
+
+    // std::cout << brightMagenta << std::endl << "Results for query " << queryIdx << ":" << reset << std::endl;
+    std::cout << reset << "Current Query: " << brightCyan << queryIdx << reset << " | ";
+    std::cout << reset << "Query Type: ";
+    if (xq.getQueryType() == 0) std::cout << brightBlack << "Unfiltered" << reset << " | ";
+    else std::cout << brightWhite << "Filtered  " << reset << " | ";
+    std::cout << reset << "Recall: ";
+    if (recall < 0.2) std::cout << brightRed;
+    else if (recall < 0.4) std::cout << brightOrange;
+    else if (recall < 0.6) std::cout << brightYellow;
+    else if (recall < 0.8) std::cout << brightCyan;
+    else std::cout << brightGreen;
+    std::cout << recall*100 << "%" << reset << " | ";
+    std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
+
+    if (recallFile.is_open()) {
+      recallFile << "Query " << queryIdx << ": " << recall * 100 << "%" << std::endl;
+    }
+  };
+
+  if (queryNumber == "-1") {
+    for (size_t i = 0; i < query_vectors.size(); ++i) {
+      if (testOn == "filtered" && query_vectors[i].getQueryType() != 1) continue;
+      if (testOn == "unfiltered" && query_vectors[i].getQueryType() != 0) continue;
+      processQuery(i);
+    }
+  } else {
+    processQuery(std::stoi(queryNumber));
+  }
+
+  if (recallFile.is_open()) {
+    recallFile.close();
+    std::cout << "Recalls saved to " << saveRecallsFile << std::endl;
+  }
 }
 
 void Test(std::unordered_map<std::string, std::string> args) {

@@ -185,7 +185,7 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
   const unsigned int k, const unsigned int L, const std::vector<CategoricalAttributeFilter>& queryFilters, const EXEC_MODE mode) {
 
   float p_star_distance, currentDistance;
-
+  
   std::set<graph_t> candidates = {};
   std::set<graph_t> visited = {};
 

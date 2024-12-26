@@ -16,8 +16,8 @@
  * @param R An unsigned int parameter.
  */
 template <typename vamana_t>
-void StichedVamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, const unsigned int R_small, const unsigned int R_stiched, bool visualized) {
+void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, 
+  const unsigned int R_small, const unsigned int R_stiched, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
 
@@ -33,6 +33,11 @@ void StichedVamanaIndex<vamana_t>::createGraph(
   // Initialize G = (V, E) to an empty graph
   this->G.setNodesCount(n);
   this->fillGraphNodes();
+
+  // Fill graph with random nodes if required
+  if (!empty) {
+    this->createRandomEdges(R_stiched);
+  }
 
   // Let Pf proper subset of P be the set of points with label f in F
   std::map<Filter, std::vector<vamana_t>> Pf;
