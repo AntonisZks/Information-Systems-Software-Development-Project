@@ -87,6 +87,18 @@ test_filtered_via:
 test_stiched_via:
 	./bin/main --test -index-type 'stiched' -load 'stiched_index.bin' -L 150 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query 1
 
+test_and_save_stiched_empty_unfiltered_via:
+	./bin/main --test -index-type 'stiched' -load 'models/stiched/stiched_index_empty.bin' -L 150 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query -1 -test-on unfiltered -save-recalls results/empty/empty_stiched_index_unfiltered_recalls.txt
+
+test_and_save_stiched_empty_filtered_via:
+	./bin/main --test -index-type 'stiched' -load 'models/stiched/stiched_index_empty.bin' -L 150 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query -1 -test-on filtered -save-recalls results/empty/empty_stiched_index_filtered_recalls.txt
+
+test_and_save_stiched_filled_unfiltered_via:
+	./bin/main --test -index-type 'stiched' -load 'models/stiched/stiched_index_filled.bin' -L 150 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query -1 -test-on unfiltered -save-recalls results/filled/filled_stiched_index_unfiltered_recalls.txt
+
+test_and_save_stiched_filled_filtered_via:
+	./bin/main --test -index-type 'stiched' -load 'models/stiched/stiched_index_filled.bin' -L 150 -k 100 -gt-file 'data/Dummy/dummy-groundtruth.bin' -query-file 'data/Dummy/dummy-queries.bin' -query -1 -test-on filtered -save-recalls results/filled/filled_stiched_index_filtered_recalls.txt
+
 
 run_tests:
 	./bin/graph_node_test

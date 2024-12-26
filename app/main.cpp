@@ -8,6 +8,7 @@
 #include <ctime>
 #include <chrono>
 #include <algorithm>
+#include <fstream>
 #include "../include/DataVector.h"
 #include "../include/VamanaIndex.h"
 #include "../include/FilteredVamanaIndex.h"
@@ -293,7 +294,7 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
 void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   using QueryVectorVector = std::vector<QueryDataVector<float>>;
 
-  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber, testOn;
+  std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber, testOn, saveRecallsFile;
 
   if (!getParameterValue(args, "-load", indexFile)) return;
   if (!getParameterValue(args, "-k", k)) return;
@@ -308,6 +309,13 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
     }
     testOn = args["-test-on"];
   }
+  if (args.find("-save-recalls") != args.end()) {
+    if (queryNumber != "-1") {
+      std::cerr << "Error: The -save-recalls argument can only be used when -query is set to -1." << std::endl;
+      return;
+    }
+    saveRecallsFile = args["-save-recalls"];
+  }
 
   QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
   FilteredVamanaIndex<BaseDataVector<float>> index;
@@ -317,6 +325,15 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
   for (auto filter : index.getFilters()) {
     start_nodes.push_back(medoids[filter]);
+  }
+
+  std::ofstream recallFile;
+  if (!saveRecallsFile.empty()) {
+    recallFile.open(saveRecallsFile);
+    if (!recallFile.is_open()) {
+      std::cerr << "Error: Could not open file " << saveRecallsFile << " for writing." << std::endl;
+      return;
+    }
   }
 
   auto processQuery = [&](int queryIdx) {
@@ -361,6 +378,10 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
     else std::cout << brightGreen;
     std::cout << recall*100 << "%" << reset << " | ";
     std::cout << "Time: " << cyan << elapsed.count() << " seconds" << std::endl;
+
+    if (recallFile.is_open()) {
+      recallFile << "Query " << queryIdx << ": " << recall * 100 << "%" << std::endl;
+    }
   };
 
   if (queryNumber == "-1") {
@@ -371,6 +392,11 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
     }
   } else {
     processQuery(std::stoi(queryNumber));
+  }
+
+  if (recallFile.is_open()) {
+    recallFile.close();
+    std::cout << "Recalls saved to " << saveRecallsFile << std::endl;
   }
 }
 
