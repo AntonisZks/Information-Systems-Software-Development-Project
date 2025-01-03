@@ -79,7 +79,7 @@ FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const Categori
  */
 template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized, bool empty) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, unsigned int distance_threads, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
@@ -91,7 +91,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   for (unsigned int i = 0; i < n; i++) {
     this->distanceMatrix[i] = new double[n];
   }
-  this->computeDistances();
+  this->computeDistances(true, distance_threads);
   this->G.setNodesCount(n);
 
   // Initialize G to an empty graph and get the medoid node

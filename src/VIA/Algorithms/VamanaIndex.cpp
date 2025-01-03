@@ -98,27 +98,39 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
  * @brief Computes the distances between every node in the dataset and stores them in the distance matrix.
  */
 template <typename vamana_t>
-void VamanaIndex<vamana_t>::computeDistances(const bool visualize) {
+void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigned int numThreads) {
 
-  // Compute the distance between every pair of points in the dataset
-  if (visualize) {
-    withProgress(0, this->P.size(), "Computing Distances", [&](int i) {
-      for (unsigned int j = i; j < this->P.size(); j++) {
-        double dist = euclideanDistance(this->P.at(i), this->P.at(j));
-        this->distanceMatrix[i][j] = dist;
-        this->distanceMatrix[j][i] = dist;
-      }
-    });
-  } else {
-    for (unsigned int i = 0; i < this->P.size(); i++) {
-      for (unsigned int j = i; j < this->P.size(); j++) {
+  // Define a lambda function to compute the distances between points
+  auto compute = [&](int start, int end) {
+    for (int i = start; i < end; ++i) {
+      for (unsigned int j = i; j < this->P.size(); ++j) {
         double dist = euclideanDistance(this->P.at(i), this->P.at(j));
         this->distanceMatrix[i][j] = dist;
         this->distanceMatrix[j][i] = dist;
       }
     }
-  }
+  };
 
+  // Compute distances using multiple threads if numThreads > 1 or a single thread otherwise
+  if (numThreads > 1) {
+    std::vector<std::thread> threads;
+    int chunkSize = this->P.size() / numThreads;
+    for (unsigned int t = 0; t < numThreads; ++t) {
+      int start = t * chunkSize;
+      int end = (t == numThreads - 1) ? this->P.size() : start + chunkSize;
+      threads.emplace_back(compute, start, end);
+    }
+    for (auto& thread : threads) {
+      thread.join();
+    }
+  } 
+  else {
+    if (visualize) {
+      withProgress(0, this->P.size(), "Computing Distances", [&](int i) { compute(i, i + 1); });
+    } else {
+      compute(0, this->P.size());
+    }
+  }
 }
 
 /**
@@ -138,7 +150,7 @@ void VamanaIndex<vamana_t>::computeDistances(const bool visualize) {
 */
 template <typename vamana_t> 
 void VamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize, double** distanceMatrix) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, unsigned int distance_threads, bool visualize, double** distanceMatrix) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
@@ -160,10 +172,10 @@ void VamanaIndex<vamana_t>::createGraph(
     for (unsigned int i = 0; i < n; i++) {
       this->distanceMatrix[i] = new double[n];
     }
-    this->computeDistances(visualize);
+    this->computeDistances(visualize, distance_threads);
   }
   
-  this->computeDistances(false);
+  // this->computeDistances(false);
   this->G.setNodesCount(n);
 
   // Initialize the graph to a random R-regular directed graph with n vertices and R edges per vertex
@@ -172,70 +184,38 @@ void VamanaIndex<vamana_t>::createGraph(
   GraphNode<vamana_t> s = findMedoid(this->G, visualize, 1000);
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
+  // Define a lambda function to process each node in the sigma permutation
+  auto processNode = [&](int i) {
+    GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
+    vamana_t sigma_i = sigma_i_node->getData();
+
+    greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
+    RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
+
+    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
+    for (auto j : *sigma_i_neighbors) {
+      std::set<vamana_t> outgoing;
+      GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
+
+      for (auto neighbor : *j_node->getNeighborsVector()) {
+        outgoing.insert(neighbor);
+      }
+      outgoing.insert(sigma_i);
+
+      if (outgoing.size() > (long unsigned int)R) {
+        RobustPrune(*this, *j_node, outgoing, alpha, R);
+      } else {
+        j_node->addNeighbor(sigma_i);
+      }
+    }
+  };
+
+  // Run the lambda process function if visualization is enabled, otherwise run it without progress visualization
   if (visualize) {
-    withProgress(0, n, "Creating Vamana", [&](int i) {
-      
-      GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
-      vamana_t sigma_i = sigma_i_node->getData();
-
-      // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
-      greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
-      RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
-
-      // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
-      std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
-      for (auto j : *sigma_i_neighbors) {
-        std::set<vamana_t> outgoing;
-        GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
-
-        // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
-        for (auto neighbor : *j_node->getNeighborsVector()) {
-          outgoing.insert(neighbor);
-        }
-        outgoing.insert(sigma_i);
-
-        // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
-        if (outgoing.size() > (long unsigned int)R) {
-          RobustPrune(*this, *j_node, outgoing, alpha, R);
-        } 
-        else {
-          j_node->addNeighbor(sigma_i);
-        }
-      }
-
-    });
-  }
-  else {
+    withProgress(0, n, "Creating Vamana", processNode);
+  } else {
     for (unsigned int i = 0; i < n; i++) {
-
-      GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
-      vamana_t sigma_i = sigma_i_node->getData();
-
-      // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
-      greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
-      RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
-
-      // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
-      std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
-      for (auto j : *sigma_i_neighbors) {
-        std::set<vamana_t> outgoing;
-        GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
-
-        // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
-        for (auto neighbor : *j_node->getNeighborsVector()) {
-          outgoing.insert(neighbor);
-        }
-        outgoing.insert(sigma_i);
-
-        // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
-        if (outgoing.size() > (long unsigned int)R) {
-          RobustPrune(*this, *j_node, outgoing, alpha, R);
-        } 
-        else {
-          j_node->addNeighbor(sigma_i);
-        }
-      }
-
+      processNode(i);
     }
   }
 
@@ -387,32 +367,19 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
   std::vector<std::vector<float>> distance_matrix(sample_size, std::vector<float>(sample_size, 0.0));
 
   // Compute pairwise distances between each pair of sampled nodes
+  auto computeDistances = [&](int i) {
+    for (int j = i + 1; j < sample_size; ++j) {
+      float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
+      distance_matrix[i][j] = dist;
+      distance_matrix[j][i] = dist;
+    }
+  };
+
   if (visualize) {
-    withProgress(0, sample_size, "Finding Medoid", [&](int i) {
-
-      for (int j = i + 1; j < sample_size; ++j) {
-        // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
-        float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
-        
-        // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
-        // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
-        distance_matrix[i][j] = dist;
-        distance_matrix[j][i] = dist;
-      }
-
-    });
-  }
-  else {
+    withProgress(0, sample_size, "Finding Medoid", computeDistances);
+  } else {
     for (unsigned int i = 0; i < (unsigned int)sample_size; i++) {
-      for (int j = i + 1; j < sample_size; ++j) {
-        // Calculate the Euclidean distance between nodes `i` and `j` in the sampled subset
-        float dist = euclideanDistance(graph.getNode(sampled_indices[i])->getData(), graph.getNode(sampled_indices[j])->getData());
-        
-        // Store the computed distance in both `distance_matrix[i][j]` and `distance_matrix[j][i]`
-        // This leverages the symmetry of the matrix, as distance from i to j equals distance from j to i
-        distance_matrix[i][j] = dist;
-        distance_matrix[j][i] = dist;
-      }
+      computeDistances(i);
     }
   }
 
