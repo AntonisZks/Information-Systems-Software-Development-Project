@@ -4,6 +4,10 @@
 
 #include <thread>
 #include <chrono>
+#include <atomic>
+#include <mutex>
+
+std::mutex distanceMutex;
 
 /**
  * @brief Generates a random permutation of integers in a specified range. This function creates a vector 
@@ -100,6 +104,9 @@ void VamanaIndex<vamana_t>::createRandomEdges(const unsigned int maxEdges) {
 template <typename vamana_t>
 void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigned int numThreads) {
 
+  std::atomic<int> progress(0);
+  auto startTime = std::chrono::steady_clock::now();
+
   // Define a lambda function to compute the distances between points
   auto compute = [&](int start, int end) {
     for (int i = start; i < end; ++i) {
@@ -107,6 +114,11 @@ void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigne
         double dist = euclideanDistance(this->P.at(i), this->P.at(j));
         this->distanceMatrix[i][j] = dist;
         this->distanceMatrix[j][i] = dist;
+      }
+      progress++;
+      if (visualize && progress % 100 == 0) {
+        std::lock_guard<std::mutex> lock(distanceMutex);
+        displayProgressBar(progress, this->P.size(), "Computing Distances", startTime, 30);
       }
     }
   };
@@ -120,8 +132,13 @@ void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigne
       int end = (t == numThreads - 1) ? this->P.size() : start + chunkSize;
       threads.emplace_back(compute, start, end);
     }
+
     for (auto& thread : threads) {
       thread.join();
+    }
+    if (visualize) {
+      displayProgressBar(this->P.size(), this->P.size(), "Computing Distances", startTime, 30);
+      std::cout << std::endl;
     }
   } 
   else {
