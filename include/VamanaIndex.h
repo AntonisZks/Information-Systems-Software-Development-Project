@@ -49,8 +49,9 @@ protected:
    * @brief Computes the distances between every node in the dataset and stores them in the distance matrix.
    * 
    * @param visualize a boolean flag to visualize the progress of the computation
+   * @param numThreads the number of threads to use for computation
    */
-  void computeDistances(const bool visualize = true);
+  void computeDistances(const bool visualize = true, const unsigned int numThreads = 1);
 
 public:
 
@@ -102,7 +103,7 @@ public:
    * @param R the parameter R
    * 
   */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize = true, double** distanceMatrix = nullptr);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, unsigned int distance_threads = 1, bool visualize = true, double** distanceMatrix = nullptr);
 
   /**
    * @brief Saves a specific graph into a file. Specifically this method is used to save the contents of a Vamana 

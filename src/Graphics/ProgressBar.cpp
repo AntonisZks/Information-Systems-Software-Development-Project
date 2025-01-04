@@ -104,7 +104,7 @@ void displayProgressBar(
   }
   else if (current == total) {
     std::cout << " " << verticalLineSymbol << " " << yellow;
-    std::cout << brightGreen << "Done" << std::setw(14) << std::setfill(' ') << reset;
+    std::cout << brightGreen << "Done " << tickSymbol << std::setw(12) << std::setfill(' ') << reset;
   }
 
   // Display elapsed time
@@ -137,8 +137,9 @@ void withProgress(
   auto startTime = std::chrono::steady_clock::now();
 
   for (unsigned int i = start; i < end; i++) {
-    displayProgressBar(i - start + 1, total, message, startTime, barWidth);
+    displayProgressBar(i - start, total, message, startTime, barWidth);
     func(i);
+    displayProgressBar(i - start + 1, total, message, startTime, barWidth);
   }
 
   std::cout << std::endl;

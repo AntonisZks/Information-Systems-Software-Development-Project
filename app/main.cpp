@@ -117,11 +117,12 @@ void Create(std::unordered_map<std::string, std::string> args) {
   std::string L_small, R_small, R_stiched;
   bool save = false;
   bool leaveEmpty = false;
+  int distanceThreads = 1; // Default value
 
-  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode", "-distance-threads"};
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
-      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode");
+      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode, -distance-threads");
     }
   }
 
@@ -195,6 +196,10 @@ void Create(std::unordered_map<std::string, std::string> args) {
     }
   }
 
+  if (args.find("-distance-threads") != args.end()) {
+    distanceThreads = std::stoi(args["-distance-threads"]);
+  }
+
   if (indexType == "simple") {
     BaseVectors base_vectors = ReadVectorFile(baseFile);
     if (base_vectors.empty()) {
@@ -203,7 +208,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
     }
 
     VamanaIndex<DataVector<float>> vamanaIndex = VamanaIndex<DataVector<float>>();
-    vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R));
+    vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R), distanceThreads, true);
 
     if (save) {
       if (!vamanaIndex.saveGraph(outputFile)) {
@@ -223,7 +228,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
 
     if (indexType == "filtered") {
       FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), true, leaveEmpty);
+      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -231,7 +236,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), true, leaveEmpty);
+      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);

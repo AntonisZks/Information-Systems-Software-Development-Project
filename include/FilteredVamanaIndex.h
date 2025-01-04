@@ -60,7 +60,7 @@ public:
    * @param L An unsigned int parameter.
    * @param R An unsigned int parameter.
    */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, bool visualized = true, bool empty = true);
+  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, unsigned int distance_threads = 1, bool visualized = true, bool empty = true);
 
   /**
    * @brief Load a graph from a file. Specifically this method is used to receive the contents of a Vamana Index Graph

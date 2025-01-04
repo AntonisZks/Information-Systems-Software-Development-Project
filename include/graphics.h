@@ -31,6 +31,7 @@ const std::string brightWhite = "\033[1;37m";
 
 const std::string ProgressSymbol = "\u25AC";
 const std::string RemainingSymbol = "\u25AC";
+const std::string tickSymbol = "\u2713";
 
 
 /**

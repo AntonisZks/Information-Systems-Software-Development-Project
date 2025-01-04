@@ -4,11 +4,15 @@
 
 #include <thread>
 #include <chrono>
+#include <atomic>
+#include <mutex>
 #include <random>
 #include <algorithm>
 #include <numeric>
 #include <fstream>
 #include <iostream>
+
+std::mutex distanceMutex;
 
 /**
  * @brief Generates a random permutation of integers in a specified range. This function creates a vector 
@@ -91,26 +95,53 @@ template <typename vamana_t> void VamanaIndex<vamana_t>::createRandomEdges(const
 /**
  * @brief Computes the distances between every node in the dataset and stores them in the distance matrix.
  */
-template <typename vamana_t> void VamanaIndex<vamana_t>::computeDistances(const bool visualize) {
+template <typename vamana_t>
+void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigned int numThreads) {
 
-  // Define a lambda function to compute the distances between two points
-  auto compute = [&](int i) {
-    for (unsigned int j = i; j < this->P.size(); j++) {
-      double dist = euclideanDistance(this->P.at(i), this->P.at(j));
-      this->distanceMatrix[i][j] = dist;
-      this->distanceMatrix[j][i] = dist;
+  std::atomic<int> progress(0);
+  auto startTime = std::chrono::steady_clock::now();
+
+  // Define a lambda function to compute the distances between points
+  auto compute = [&](int start, int end) {
+    for (int i = start; i < end; ++i) {
+      for (unsigned int j = i; j < this->P.size(); ++j) {
+        double dist = euclideanDistance(this->P.at(i), this->P.at(j));
+        this->distanceMatrix[i][j] = dist;
+        this->distanceMatrix[j][i] = dist;
+      }
+      progress++;
+      if (visualize && progress % 100 == 0) {
+        std::lock_guard<std::mutex> lock(distanceMutex);
+        displayProgressBar(progress, this->P.size(), "Computing Distances", startTime, 30);
+      }
     }
   };
 
-  // Compute distances with or without visualization, depending on the visualize flag value
-  if (visualize) {
-    withProgress(0, this->P.size(), "Computing Distances", compute);
-  } else {
-    for (unsigned int i = 0; i < this->P.size(); i++) {
-      compute(i);
+  // Compute distances using multiple threads if numThreads > 1 or a single thread otherwise
+  if (numThreads > 1) {
+    std::vector<std::thread> threads;
+    int chunkSize = this->P.size() / numThreads;
+    for (unsigned int t = 0; t < numThreads; ++t) {
+      int start = t * chunkSize;
+      int end = (t == numThreads - 1) ? this->P.size() : start + chunkSize;
+      threads.emplace_back(compute, start, end);
+    }
+
+    for (auto& thread : threads) {
+      thread.join();
+    }
+    if (visualize) {
+      displayProgressBar(this->P.size(), this->P.size(), "Computing Distances", startTime, 30);
+      std::cout << std::endl;
+    }
+  } 
+  else {
+    if (visualize) {
+      withProgress(0, this->P.size(), "Computing Distances", [&](int i) { compute(i, i + 1); });
+    } else {
+      compute(0, this->P.size());
     }
   }
-
 }
 
 /**
@@ -131,7 +162,7 @@ template <typename vamana_t> void VamanaIndex<vamana_t>::computeDistances(const 
  */
 template <typename vamana_t> 
 void VamanaIndex<vamana_t>::createGraph(
-const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, bool visualize, double** distanceMatrix) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, unsigned int distance_threads, bool visualize, double** distanceMatrix) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
@@ -151,8 +182,11 @@ const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const 
     for (unsigned int i = 0; i < n; i++) {
       this->distanceMatrix[i] = new double[n];
     }
-    this->computeDistances(visualize);
+    this->computeDistances(visualize, distance_threads);
   }
+  
+  // this->computeDistances(false);
+  this->G.setNodesCount(n);
 
   // Set the number of nodes in the graph, fill the nodes with the dataset points, and create random edges for the nodes
   this->G.setNodesCount(n);
@@ -163,43 +197,38 @@ const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const 
   GraphNode<vamana_t> s = findMedoid(this->G, visualize, 1000);
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
-  // Define a lambda function for the main loop process of the Vamana algorithm
-  auto loopProcess = [&](int i) {
-
+  // Define a lambda function to process each node in the sigma permutation
+  auto processNode = [&](int i) {
     GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
     vamana_t sigma_i = sigma_i_node->getData();
 
-    // Run Greedy Search and Robust Prune for the current sigma[i] node and its neighbors
     greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
     RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
 
-    // Get the neighbors of sigma[i] node and iterate over them to run Robust Prune for each one of them as well
-    for (auto j : *sigma_i_node->getNeighborsVector()) {
+    std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
+    for (auto j : *sigma_i_neighbors) {
       std::set<vamana_t> outgoing;
       GraphNode<vamana_t>* j_node = this->G.getNode(j.getIndex());
 
-      // The outgoing set has to consist of the neighbors of j and the sigma[i] node itself
       for (auto neighbor : *j_node->getNeighborsVector()) {
         outgoing.insert(neighbor);
       }
       outgoing.insert(sigma_i);
 
-      // Check if the |N_out(j) union {sigma[i]}| > R and run Robust Prune accordingly
-      if (outgoing.size() > (unsigned int)R) {
+      if (outgoing.size() > (long unsigned int)R) {
         RobustPrune(*this, *j_node, outgoing, alpha, R);
       } else {
         j_node->addNeighbor(sigma_i);
       }
     }
-
   };
 
-  // Process each node with or without visualization
+  // Run the lambda process function if visualization is enabled, otherwise run it without progress visualization
   if (visualize) {
-    withProgress(0, n, "Creating Vamana", loopProcess);
+    withProgress(0, n, "Creating Vamana", processNode);
   } else {
     for (unsigned int i = 0; i < n; i++) {
-      loopProcess(i);
+      processNode(i);
     }
   }
 

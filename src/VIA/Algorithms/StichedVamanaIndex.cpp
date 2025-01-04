@@ -17,7 +17,7 @@
  */
 template <typename vamana_t>
 void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, 
-  const unsigned int R_small, const unsigned int R_stiched, bool visualized, bool empty) {
+  const unsigned int R_small, const unsigned int R_stiched, unsigned int distance_threads, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
 
@@ -28,7 +28,7 @@ void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, c
   for (unsigned int i = 0; i < n; i++) {
     this->distanceMatrix[i] = new double[n];
   }
-  this->computeDistances();
+  this->computeDistances(true, distance_threads);
 
   // Initialize G = (V, E) to an empty graph
   this->G.setNodesCount(n);
@@ -73,7 +73,7 @@ void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, c
 
     // Initialize the sub-index for the current filter and create its graph
     VamanaIndex<vamana_t> subIndex;
-    subIndex.createGraph(Pf[filter], alpha, R_small, L_small, false, this->distanceMatrix);
+    subIndex.createGraph(Pf[filter], alpha, R_small, L_small, 1, false, this->distanceMatrix);
 
     for (unsigned int i = 0; i < subIndex.getGraph().getNodesCount(); i++) {
       
