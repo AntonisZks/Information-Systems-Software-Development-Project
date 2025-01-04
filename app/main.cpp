@@ -118,8 +118,13 @@ void Create(std::unordered_map<std::string, std::string> args) {
   bool save = false;
   bool leaveEmpty = false;
   int distanceThreads = 1; // Default value
+  int computingThreads = 1; // Default value
 
   std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode", "-distance-threads"};
+  if (args["-index-type"] == "stiched") {
+    validArguments.push_back("-computing-threads");
+  }
+
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
       throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode, -distance-threads");
@@ -146,6 +151,8 @@ void Create(std::unordered_map<std::string, std::string> args) {
     }
 
   } else if (indexType == "stiched") {
+    validArguments.push_back("-computing-threads");
+
     if (args.find("-L-small") == args.end()) {
       throw std::invalid_argument("Error: Missing required argument: -L-small");
     } else {
@@ -162,6 +169,10 @@ void Create(std::unordered_map<std::string, std::string> args) {
       throw std::invalid_argument("Error: Missing required argument: -R-stiched");
     } else {
       R_stiched = args["-R-stiched"];
+    }
+
+    if (args.find("-computing-threads") != args.end()) {
+      computingThreads = std::stoi(args["-computing-threads"]);
     }
   } else {
     throw std::invalid_argument("Error: Invalid index type: " + indexType + ". Supported index types are: simple, filtered, stiched");
@@ -236,7 +247,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceThreads, true, leaveEmpty);
+      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceThreads, computingThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
