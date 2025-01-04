@@ -3,6 +3,8 @@
 #include <vector>
 #include "../../include/DataVector.h"
 #include "../../include/read_data.h"
+#include "../../include/graphics.h"
+
 
 using namespace std;
 
@@ -156,13 +158,14 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
         return {};
     }
 
-    uint32_t num_vectors;
+    unsigned int num_vectors;
     file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
 
     vector<BaseDataVector<float>> dataVectors;
     dataVectors.reserve(num_vectors);
 
-    for (uint32_t i = 0; i < num_vectors; ++i) {
+    withProgress(0, num_vectors, "Reading base vectors", [&](int i) {
+
         float C, T;
         file.read(reinterpret_cast<char*>(&C), sizeof(C));
         file.read(reinterpret_cast<char*>(&T), sizeof(T));
@@ -176,7 +179,8 @@ std::vector<BaseDataVector<float>> ReadFilteredBaseVectorFile(const string& file
         }
 
         dataVectors.push_back(dataVector);
-    }
+        
+    });
 
     file.close();
     return dataVectors;
@@ -201,13 +205,13 @@ std::vector<QueryDataVector<float>> ReadFilteredQueryVectorFile(const string& fi
         return {};
     }
 
-    uint32_t num_vectors;
+    unsigned int num_vectors;
     file.read(reinterpret_cast<char*>(&num_vectors), sizeof(num_vectors));
 
     vector<QueryDataVector<float>> dataVectors;
     dataVectors.reserve(num_vectors);
 
-    for (uint32_t i = 0; i < num_vectors; ++i) {
+    for (unsigned int i = 0; i < num_vectors; ++i) {
         float query_type, v, l, r;
 
         file.read(reinterpret_cast<char*>(&query_type), sizeof(query_type));

@@ -37,7 +37,22 @@ template <typename set_t> double calculateRecallEvaluation(const std::set<set_t>
 }
 
 // Explicit template instantiation for int and float types
-template double calculateRecallEvaluation(const std::set<int>& X, const std::set<int>& G);
-template double calculateRecallEvaluation(const std::set<float>& X, const std::set<float>& G);
-template double calculateRecallEvaluation(const std::set<DataVector<float>>& X, const std::set<DataVector<float>>& G);
-template double calculateRecallEvaluation(const std::set<BaseDataVector<float>>& X, const std::set<BaseDataVector<float>>& G);
+template double calculateRecallEvaluation(
+  const std::set<int>& X, 
+  const std::set<int>& G
+);
+
+template double calculateRecallEvaluation(
+  const std::set<float>& X, 
+  const std::set<float>& G
+);
+
+template double calculateRecallEvaluation(
+  const std::set<DataVector<float>>& X, 
+  const std::set<DataVector<float>>& G
+);
+
+template double calculateRecallEvaluation(
+  const std::set<BaseDataVector<float>>& X, 
+  const std::set<BaseDataVector<float>>& G
+);

@@ -15,6 +15,7 @@
 
 #ifndef DATAVECTOR_H
 #define DATAVECTOR_H
+
 #include "DataVector.h"
 
 /**
@@ -77,6 +78,39 @@ public:
     // Setter for the timestamp attribute (T)
     inline void setT(float timestamp) { T = timestamp; }
 };
+
+template <typename dvector_t> std::ostream& operator<<(std::ostream& out, const BaseDataVector<dvector_t>& bdv) {
+
+    out << bdv.getDimension() << " " << bdv.getIndex();
+    out << " " << bdv.getC() << " " << bdv.getT();
+    for (unsigned int i = 0; i < bdv.getDimension(); i++) {
+        out << " " << bdv.getDataAtIndex(i);
+    }
+
+    return out;
+
+}
+
+template <typename dvector_t> std::istream& operator>>(std::istream& in, BaseDataVector<dvector_t>& bdv) {
+
+    unsigned int dimension, index, category;
+    float timestamp;
+
+    in >> dimension >> index >> category >> timestamp;
+
+    bdv.setDimension(dimension);
+    bdv.setIndex(index);
+    bdv.setC(category);
+    bdv.setT(timestamp);
+
+    for (unsigned int i = 0; i < dimension; i++) {
+        dvector_t currentValue;
+        in >> currentValue;
+        bdv.setDataAtIndex(currentValue, i);
+    }
+
+    return in;
+}
 
 /**
  * @brief Class that represents a query vector with additional query-related 
@@ -143,12 +177,5 @@ public:
     // Setter for upper bound of timestamp range (r)
     inline void setR(float r_value) { r = r_value; }
 };
-
-// Operator << for BaseDataVector
-template <typename dvector_t> std::ostream& operator<<(std::ostream& os, const BaseDataVector<dvector_t>& bdv) {
-    os << "BaseDataVector: " << bdv.getIndex() << " [C: " << bdv.getC() << ", T: " << bdv.getT() << "] ";
-    os << static_cast<DataVector<dvector_t>>(bdv);
-    return os;
-}
 
 #endif // DATAVECTOR_H
