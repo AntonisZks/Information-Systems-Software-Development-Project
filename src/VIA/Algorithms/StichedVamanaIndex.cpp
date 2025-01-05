@@ -81,7 +81,7 @@ void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, c
 
       // Initialize the sub-index for the current filter and create its graph
       VamanaIndex<vamana_t> subIndex;
-      subIndex.createGraph(Pf[filter], alpha, R_small, L_small, 1, false, this->distanceMatrix);
+      subIndex.createGraph(Pf[filter], alpha, R_small, L_small, NONE, 1, false, this->distanceMatrix);
 
       for (unsigned int i = 0; i < subIndex.getGraph().getNodesCount(); i++) {
         

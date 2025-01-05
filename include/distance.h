@@ -7,6 +7,11 @@
 #include <vector>
 #include "DataVector.h"
 
+enum DISTANCE_SAVE_METHOD {
+  NONE = 0,
+  MATRIX = 1,
+};
+
 
 /**
  * @brief Comparator structure for ordering elements by Euclidean distance.

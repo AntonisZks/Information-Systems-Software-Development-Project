@@ -28,6 +28,7 @@ enum EXEC_MODE {
     TEST = 1
 };
 
+
 template <typename vamana_t> class VamanaIndex;
 template <typename vamana_t> class FilteredVamanaIndex;
 
@@ -52,7 +53,7 @@ template <typename graph_t, typename query_t> std::pair<std::set<graph_t>, std::
     const query_t& xq, 
     unsigned int k, 
     unsigned int L,
-    const EXEC_MODE execMode = CREATE
+    const DISTANCE_SAVE_METHOD distanceSaveMethod = NONE
 );
 
 /**

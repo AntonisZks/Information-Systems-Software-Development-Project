@@ -162,7 +162,8 @@ void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigne
  */
 template <typename vamana_t> 
 void VamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, unsigned int distance_threads, bool visualize, double** distanceMatrix) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, const DISTANCE_SAVE_METHOD distanceSaveMethod, 
+  unsigned int distance_threads, bool visualize, double** distanceMatrix) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
@@ -174,18 +175,21 @@ void VamanaIndex<vamana_t>::createGraph(
   unsigned int n = P.size();
   this->P = P;
 
-  // If the distance matrix is provided, use it, otherwise compute the distances
-  if (distanceMatrix != nullptr) {
-    this->distanceMatrix = distanceMatrix;
-  } else {
-    this->distanceMatrix = new double*[n];
-    for (unsigned int i = 0; i < n; i++) {
-      this->distanceMatrix[i] = new double[n];
+  if (distanceSaveMethod == MATRIX) {
+
+    // If the distance matrix is provided, use it, otherwise compute the distances
+    if (distanceMatrix != nullptr) {
+      this->distanceMatrix = distanceMatrix;
+    } else {
+      this->distanceMatrix = new double*[n];
+      for (unsigned int i = 0; i < n; i++) {
+        this->distanceMatrix[i] = new double[n];
+      }
+      this->computeDistances(visualize, distance_threads);
     }
-    this->computeDistances(visualize, distance_threads);
+
   }
   
-  // this->computeDistances(false);
   this->G.setNodesCount(n);
 
   // Set the number of nodes in the graph, fill the nodes with the dataset points, and create random edges for the nodes
@@ -202,8 +206,8 @@ void VamanaIndex<vamana_t>::createGraph(
     GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
     vamana_t sigma_i = sigma_i_node->getData();
 
-    greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L);
-    RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R);
+    greedyResult = GreedySearch(*this, s, this->P.at(sigma.at(i)), 1, L, distanceSaveMethod);
+    RobustPrune(*this, *sigma_i_node, greedyResult.second, alpha, R, distanceSaveMethod);
 
     std::vector<vamana_t>* sigma_i_neighbors = sigma_i_node->getNeighborsVector();
     for (auto j : *sigma_i_neighbors) {
@@ -216,7 +220,7 @@ void VamanaIndex<vamana_t>::createGraph(
       outgoing.insert(sigma_i);
 
       if (outgoing.size() > (long unsigned int)R) {
-        RobustPrune(*this, *j_node, outgoing, alpha, R);
+        RobustPrune(*this, *j_node, outgoing, alpha, R, distanceSaveMethod);
       } else {
         j_node->addNeighbor(sigma_i);
       }
@@ -233,7 +237,7 @@ void VamanaIndex<vamana_t>::createGraph(
   }
 
   // Free up the memory allocated for the distance matrix, if it was computed
-  if (distanceMatrix == nullptr) {
+  if (distanceSaveMethod == MATRIX && distanceMatrix == nullptr) {
     for (unsigned int i = 0; i < n; i++) {
       delete[] this->distanceMatrix[i];
     }

@@ -3,6 +3,7 @@
 #include "DataVector.h"
 #include "BQDataVectors.h"
 #include "VamanaIndex.h"
+#include "distance.h"
 
 template <typename graph_t> class VamanaIndex;
 template <typename graph_t> class FilteredVamanaIndex;
@@ -27,8 +28,14 @@ template <typename graph_t> class FilteredVamanaIndex;
  * 4. Removes nodes from `V` that do not satisfy the distance threshold defined by `alpha`.
  * 5. Stops when the number of neighbors of `p_node` reaches `R` or `V` is empty.
  */
-template <typename graph_t>
-void RobustPrune(VamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R);
+template <typename graph_t> void RobustPrune(
+  VamanaIndex<graph_t>& index, 
+  GraphNode<graph_t>& p_node, 
+  std::set<graph_t>& V, 
+  float alpha, 
+  int R,
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
+);
 
 /**
  * @brief Prunes the neighbors of a given node in a graph based on a robust pruning algorithm with filtering.

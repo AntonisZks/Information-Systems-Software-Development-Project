@@ -50,8 +50,11 @@ static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>&
  * 5. Stops when the number of neighbors of `p_node` reaches `R` or `V` is empty.
  */
 template <typename graph_t>
-void RobustPrune(VamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R) {
+void RobustPrune(VamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::set<graph_t>& V, float alpha, int R, const DISTANCE_SAVE_METHOD distanceSaveMethod) {
     
+  float p_star_distance = 0, currentDistance = 0;
+  float distance1 = 0, distance2 = 0;
+
   // Get the data of the node p_node
   graph_t p = p_node.getData();
 
@@ -70,11 +73,24 @@ void RobustPrune(VamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::s
 
     // Find the closest neighbor to p_node in V, and initialize the distance to p_star
     graph_t p_star = getSetItemAtIndex(0, V);
-    float p_star_distance = index.getDistanceMatrix()[p.getIndex()][p_star.getIndex()];
+
+    if (distanceSaveMethod == NONE) {
+      p_star_distance = euclideanDistance(p, p_star);
+    }
+    else if (distanceSaveMethod == MATRIX) {
+      p_star_distance = index.getDistanceMatrix()[p.getIndex()][p_star.getIndex()];
+    }
+    
 
     // Update p_star if a closer neighbor is found
     for (auto p_tone : V) {
-      float currentDistance = index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()];
+      
+      if (distanceSaveMethod == NONE) {
+        currentDistance = euclideanDistance(p, p_tone);
+      }
+      else if (distanceSaveMethod == MATRIX) {
+        currentDistance = index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()];
+      }
       
       if (currentDistance < p_star_distance) {
         p_star_distance = currentDistance;
@@ -95,8 +111,14 @@ void RobustPrune(VamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node, std::s
     for (auto p_tone : V_copy) {
 
       // Remove neighbors that are too far from p_star based on alpha and euclideanDistance
-      double distance1 = index.getDistanceMatrix()[p_star.getIndex()][p_tone.getIndex()];
-      double distance2 = index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()];
+      if (distanceSaveMethod == NONE) {
+        distance1 = euclideanDistance(p_star, p_tone);
+        distance2 = euclideanDistance(p, p_tone);
+      }
+      else if (distanceSaveMethod == MATRIX) {
+        distance1 = index.getDistanceMatrix()[p_star.getIndex()][p_tone.getIndex()];
+        distance2 = index.getDistanceMatrix()[p.getIndex()][p_tone.getIndex()];
+      }
       
       if ((alpha * distance1) <= distance2) {
         V.erase(p_tone);
@@ -200,7 +222,8 @@ template void RobustPrune<DataVector<float>>(
   GraphNode<DataVector<float>>& p_node, 
   std::set<DataVector<float>>& V, 
   float alpha, 
-  int R
+  int R,
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );
 
 // Explicit instantiation for FilteredRobustPrune with float data type and DataVector query type
@@ -209,7 +232,8 @@ template void RobustPrune<BaseDataVector<float>>(
   GraphNode<BaseDataVector<float>>& p_node, 
   std::set<BaseDataVector<float>>& V, 
   float alpha, 
-  int R
+  int R,
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );
 
 // Explicit instantiation for FilteredRobustPrune with float data type and DataVector query type

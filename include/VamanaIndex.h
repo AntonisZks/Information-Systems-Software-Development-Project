@@ -103,7 +103,16 @@ public:
    * @param R the parameter R
    * 
   */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, unsigned int distance_threads = 1, bool visualize = true, double** distanceMatrix = nullptr);
+  void createGraph(
+    const std::vector<vamana_t>& P, 
+    const float& alpha, 
+    const unsigned int L, 
+    const unsigned int& R,
+    const DISTANCE_SAVE_METHOD distanceSaveMethod = NONE,
+    unsigned int distance_threads = 1, 
+    bool visualize = true, 
+    double** distanceMatrix = nullptr
+  );
 
   /**
    * @brief Saves a specific graph into a file. Specifically this method is used to save the contents of a Vamana 

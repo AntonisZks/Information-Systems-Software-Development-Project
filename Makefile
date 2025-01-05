@@ -67,7 +67,7 @@ FLAGS += $(DEPFLAGS)
 # Execution Rules
 
 create_simple_via:
-	./bin/main --create -index-type 'simple' -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 120 -R 12 -alpha 1.0 -save 'simple_index.bin' -distance-threads 1
+	./bin/main --create -index-type 'simple' -base-file 'data/siftsmall/siftsmall_base.fvecs' -L 120 -R 12 -alpha 1.0 -save 'simple_index.bin' -distance-save matrix -distance-threads 1
 
 create_filtered_via:
 	./bin/main --create -index-type 'filtered' -base-file 'data/Dummy/dummy-data.bin' -L 120 -R 12 -alpha 1.0 -save 'filtered_index.bin' -distance-threads 1
