@@ -38,6 +38,7 @@ public:
     const unsigned int L_small, 
     const unsigned int R_small, 
     const unsigned int R_stiched,
+    const DISTANCE_SAVE_METHOD distanceSaveMethod,
     unsigned int distance_threads, 
     unsigned int compute_threads = 500, 
     bool visualized = true, 

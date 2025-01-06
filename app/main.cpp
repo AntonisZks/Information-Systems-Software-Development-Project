@@ -273,7 +273,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceThreads, computingThreads, true, leaveEmpty);
+      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceSaveMethodEnum, distanceThreads, computingThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);

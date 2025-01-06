@@ -24,18 +24,22 @@ std::mutex computingMutex;
  */
 template <typename vamana_t>
 void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, 
-  const unsigned int R_small, const unsigned int R_stiched, unsigned int distance_threads, unsigned int compute_threads, bool visualized, bool empty) {
+  const unsigned int R_small, const unsigned int R_stiched, const DISTANCE_SAVE_METHOD distanceSaveMethod, unsigned int distance_threads, unsigned int compute_threads, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
 
   // Initialize graph memory
   unsigned int n = P.size();
   this->P = P;
-  this->distanceMatrix = new double*[n];
-  for (unsigned int i = 0; i < n; i++) {
-    this->distanceMatrix[i] = new double[n];
+  
+  // Compute the distances between the points if it is specified to save the distances in a matrix
+  if (distanceSaveMethod == MATRIX) { 
+    this->distanceMatrix = new double*[n];
+    for (unsigned int i = 0; i < n; i++) {
+      this->distanceMatrix[i] = new double[n];
+    }
+    this->computeDistances(true, distance_threads);
   }
-  this->computeDistances(true, distance_threads);
 
   // Initialize G = (V, E) to an empty graph
   this->G.setNodesCount(n);
@@ -81,7 +85,7 @@ void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, c
 
       // Initialize the sub-index for the current filter and create its graph
       VamanaIndex<vamana_t> subIndex;
-      subIndex.createGraph(Pf[filter], alpha, R_small, L_small, NONE, 1, false, this->distanceMatrix);
+      subIndex.createGraph(Pf[filter], alpha, R_small, L_small, distanceSaveMethod, 1, false, this->distanceMatrix);
 
       for (unsigned int i = 0; i < subIndex.getGraph().getNodesCount(); i++) {
         
@@ -160,10 +164,12 @@ void StichedVamanaIndex<vamana_t>::createGraph(const std::vector<vamana_t>& P, c
   // }
 
   // Free up the memory allocated for the distance matrix
-  for (unsigned int i = 0; i < n; i++) {
-    delete[] this->distanceMatrix[i];
+  if (distanceSaveMethod == MATRIX) {
+    for (unsigned int i = 0; i < n; i++) {
+      delete[] this->distanceMatrix[i];
+    }
+    delete[] this->distanceMatrix;
   }
-  delete[] this->distanceMatrix;
 
 }
 

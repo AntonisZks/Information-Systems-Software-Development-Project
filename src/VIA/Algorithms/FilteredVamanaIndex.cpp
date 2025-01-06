@@ -164,7 +164,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   });
 
   // Free up the memory allocated for the distance matrix
-  if (distanceSaveMethod == MATRIX && this->distanceMatrix == nullptr) {
+  if (distanceSaveMethod == MATRIX) {
     for (unsigned int i = 0; i < n; i++) {
       delete[] this->distanceMatrix[i];
     }
