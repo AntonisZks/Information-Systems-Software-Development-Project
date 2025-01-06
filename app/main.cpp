@@ -256,9 +256,16 @@ void Create(std::unordered_map<std::string, std::string> args) {
       filters.insert(filter);
     }
 
+    DISTANCE_SAVE_METHOD distanceSaveMethodEnum = NONE;
+    if (distanceSaveMethod == "none") {
+      distanceSaveMethodEnum = NONE;
+    } else if (distanceSaveMethod == "matrix") {
+      distanceSaveMethodEnum = MATRIX;
+    }
+
     if (indexType == "filtered") {
       FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceThreads, true, leaveEmpty);
+      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -393,7 +400,7 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
+    FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, NONE);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
 

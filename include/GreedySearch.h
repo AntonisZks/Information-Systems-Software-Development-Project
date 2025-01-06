@@ -83,7 +83,7 @@ template <typename graph_t, typename query_t> std::pair<std::set<graph_t>, std::
     const unsigned int k, 
     const unsigned int L,  
     const std::vector<CategoricalAttributeFilter>& queryFilters,
-    const EXEC_MODE execMode = CREATE
+    const DISTANCE_SAVE_METHOD distanceSaveMethod = NONE
 );
                      
 

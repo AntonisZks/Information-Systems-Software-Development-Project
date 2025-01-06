@@ -52,4 +52,11 @@ template <typename graph_t> void RobustPrune(
  * @param R An integer specifying the maximum number of neighbors to retain.
  */
 template <typename graph_t>
-void FilteredRobustPrune(FilteredVamanaIndex<graph_t>& index, GraphNode<graph_t>& p_node,std::set<graph_t>& V, float alpha,int R);
+void FilteredRobustPrune(
+  FilteredVamanaIndex<graph_t>& index, 
+  GraphNode<graph_t>& p_node,
+  std::set<graph_t>& V, 
+  float alpha,
+  int R,
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
+);

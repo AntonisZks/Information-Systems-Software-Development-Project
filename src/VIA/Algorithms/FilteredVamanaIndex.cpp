@@ -79,7 +79,8 @@ FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const Categori
  */
 template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
-  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, unsigned int distance_threads, bool visualized, bool empty) {
+  const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, const DISTANCE_SAVE_METHOD distanceSaveMethod,
+  unsigned int distance_threads, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
@@ -87,14 +88,18 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   // Initialize graph memory
   unsigned int n = P.size();
   this->P = P;
-  this->distanceMatrix = new double*[n];
-  for (unsigned int i = 0; i < n; i++) {
-    this->distanceMatrix[i] = new double[n];
+
+  // Compute the distances between the points if it is specified to save the distances in a matrix
+  if (distanceSaveMethod == MATRIX) {
+    this->distanceMatrix = new double*[n];
+    for (unsigned int i = 0; i < n; i++) {
+      this->distanceMatrix[i] = new double[n];
+    }
+    this->computeDistances(true, distance_threads);
   }
-  this->computeDistances(true, distance_threads);
-  this->G.setNodesCount(n);
 
   // Initialize G to an empty graph and get the medoid node
+  this->G.setNodesCount(n);
   this->fillGraphNodes();
 
   // Fill graph with random edges if required
@@ -129,7 +134,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
     std::vector<Filter> queryFilters;
     queryFilters.push_back(F_x_sigma_i);
 
-    GreedyResult greedyResult = FilteredGreedySearch(*this, S_F_x_sigma_i, this->P[sigma[i]], 0, L, queryFilters);
+    GreedyResult greedyResult = FilteredGreedySearch(*this, S_F_x_sigma_i, this->P[sigma[i]], 0, L, queryFilters, distanceSaveMethod);
 
     // Construct the V_F_x_sigma[i] based on the second greedy result item
     std::set<vamana_t> V_F_x_sigma_i = greedyResult.second;
@@ -138,7 +143,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
 
     // Run Filtered Robust Prune to update out-neighbors of sigma[i]
     GraphNode<vamana_t>* sigma_i = this->G.getNode(this->P[sigma[i]].getIndex());
-    FilteredRobustPrune(*this, *sigma_i, V_F_x_sigma_i, alpha, R);
+    FilteredRobustPrune(*this, *sigma_i, V_F_x_sigma_i, alpha, R, distanceSaveMethod);
 
     // Receive neighbors of sigma_i
     std::vector<vamana_t>* neighbors = sigma_i->getNeighborsVector();
@@ -151,7 +156,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
       // Checking if the neighbors of j is greater than R. If so run Filtered Robust Prune
       std::set<vamana_t> j_neighbors = j_node->getNeighborsSet();
       if (j_neighbors.size() > R) {
-        FilteredRobustPrune(*this, *j_node, j_neighbors, alpha, R);
+        FilteredRobustPrune(*this, *j_node, j_neighbors, alpha, R, distanceSaveMethod);
       }
 
     }
@@ -159,10 +164,12 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   });
 
   // Free up the memory allocated for the distance matrix
-  for (unsigned int i = 0; i < n; i++) {
-    delete[] this->distanceMatrix[i];
+  if (distanceSaveMethod == MATRIX && this->distanceMatrix == nullptr) {
+    for (unsigned int i = 0; i < n; i++) {
+      delete[] this->distanceMatrix[i];
+    }
+    delete[] this->distanceMatrix;
   }
-  delete[] this->distanceMatrix;
 
 }
 
