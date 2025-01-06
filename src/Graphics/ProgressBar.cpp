@@ -15,7 +15,7 @@ bool isUtf8Supported() {
 }
 
 /**
- * @brief Function to display a progress bar with a percentage.
+ * @brief Function to display a progress bar with a percentage and a loading animation.
  * 
  * Loading Symbol: =>
  * 
@@ -30,19 +30,22 @@ void displayProgressBar(
   const int current, const int total, const std::string& message, const std::chrono::steady_clock::time_point& startTime, const unsigned int barWidth) {
 
   static bool utf8Supported = isUtf8Supported();
+  static const char loadingSymbols[] = {'-', '\\', '|', '/'};
+  static int loadingIndex = 0;
+  static int callCounter = 0; // Counter to slow down the animation
   
   const std::string horizontalLineSymbol = "\u2500";
   const std::string verticalLineSymbol = "\u2502";
   const std::string crossSymbol = "\u253C";
 
   if (firstTime) {
-    std::cout << brightMagenta << "Action" << std::setw(22) << reset << " " << verticalLineSymbol << " ";
+    std::cout << brightMagenta << "Action" << std::setw(24) << reset << " " << verticalLineSymbol << " ";
     std::cout << brightMagenta << "Progress" << std::setw(36) << reset << " " << verticalLineSymbol << " ";
     std::cout << brightMagenta << "Time Remaining" << reset << " | ";
     std::cout << brightMagenta << "Time Elapsed" << reset << std::endl;
 
 
-    for (unsigned int i = 0; i < 25; i++) { std::cout << horizontalLineSymbol; } std::cout << crossSymbol;
+    for (unsigned int i = 0; i < 27; i++) { std::cout << horizontalLineSymbol; } std::cout << crossSymbol;
     for (unsigned int i = 0; i < 42; i++) { std::cout << horizontalLineSymbol; } std::cout << crossSymbol;
     for (unsigned int i = 0; i < 16; i++) { std::cout << horizontalLineSymbol; } std::cout << crossSymbol;
     for (unsigned int i = 0; i < 15; i++) { std::cout << horizontalLineSymbol; }
@@ -67,8 +70,18 @@ void displayProgressBar(
   int minutes = remainingSeconds / 60;
   int seconds = remainingSeconds % 60;
 
-  // Display action message
-  std::cout << brightYellow << std::setw(24) << std::setfill(' ') << std::left << message << reset;
+  // Display action message with loading animation
+  if (current > 0 && current < total) {    
+    std::cout << brightYellow << std::setw(24) << std::setfill(' ') << std::left << message;
+    if (callCounter % 8 == 0) { // Update loading symbol every 8 calls
+      loadingIndex++;
+    }
+    std::cout << " " << loadingSymbols[loadingIndex % 4] << reset;
+  }
+  else if (current == total) {
+    std::cout << brightGreen << std::setw(24) << std::setfill(' ') << std::left << message;
+    std::cout << " " << tickSymbol << reset;
+  }
 
   // Display progress bar
   std::cout << " " << verticalLineSymbol << " ";
@@ -104,7 +117,7 @@ void displayProgressBar(
   }
   else if (current == total) {
     std::cout << " " << verticalLineSymbol << " " << yellow;
-    std::cout << brightGreen << "Done " << tickSymbol << std::setw(12) << std::setfill(' ') << reset;
+    std::cout << brightGreen << "Done" << std::setw(14) << std::setfill(' ') << reset;
   }
 
   // Display elapsed time
@@ -119,6 +132,7 @@ void displayProgressBar(
   std::cout << "\r"; // Return the cursor to the start of the line
   std::cout.flush();
 
+  callCounter++;
 }
 
 /**

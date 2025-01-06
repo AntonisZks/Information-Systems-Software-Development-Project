@@ -113,16 +113,21 @@ void Create(std::unordered_map<std::string, std::string> args) {
   using BaseVectorVector = std::vector<BaseDataVector<float>>;
   using BaseVectors = std::vector<DataVector<float>>;
 
-  std::string indexType, baseFile, L, R, alpha, outputFile, connectionMode;
+  std::string indexType, baseFile, L, R, alpha, outputFile, connectionMode, distanceSaveMethod;
   std::string L_small, R_small, R_stiched;
   bool save = false;
   bool leaveEmpty = false;
   int distanceThreads = 1; // Default value
+  int computingThreads = 1; // Default value
 
-  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode", "-distance-threads"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode", "-distance-threads", "-distance-save"};
+  if (args["-index-type"] == "stiched") {
+    validArguments.push_back("-computing-threads");
+  }
+
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
-      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode, -distance-threads");
+      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode, -distance-threads, -distance-save");
     }
   }
 
@@ -146,6 +151,8 @@ void Create(std::unordered_map<std::string, std::string> args) {
     }
 
   } else if (indexType == "stiched") {
+    validArguments.push_back("-computing-threads");
+
     if (args.find("-L-small") == args.end()) {
       throw std::invalid_argument("Error: Missing required argument: -L-small");
     } else {
@@ -162,6 +169,10 @@ void Create(std::unordered_map<std::string, std::string> args) {
       throw std::invalid_argument("Error: Missing required argument: -R-stiched");
     } else {
       R_stiched = args["-R-stiched"];
+    }
+
+    if (args.find("-computing-threads") != args.end()) {
+      computingThreads = std::stoi(args["-computing-threads"]);
     }
   } else {
     throw std::invalid_argument("Error: Invalid index type: " + indexType + ". Supported index types are: simple, filtered, stiched");
@@ -196,7 +207,19 @@ void Create(std::unordered_map<std::string, std::string> args) {
     }
   }
 
+  if (args.find("-distance-save") != args.end()) {
+    distanceSaveMethod = args["-distance-save"];
+    if (distanceSaveMethod != "none" && distanceSaveMethod != "matrix") {
+      throw std::invalid_argument("Error: Invalid value for -distance-save. Valid values are: none, matrix");
+    }
+  } else {
+    distanceSaveMethod = "none"; // Default value
+  }
+
   if (args.find("-distance-threads") != args.end()) {
+    if (distanceSaveMethod != "matrix") {
+      throw std::invalid_argument("Error: -distance-threads can only be used if -distance-save is set to 'matrix'");
+    }
     distanceThreads = std::stoi(args["-distance-threads"]);
   }
 
@@ -206,9 +229,16 @@ void Create(std::unordered_map<std::string, std::string> args) {
       std::cerr << "Error reading base file" << std::endl;
       return;
     }
+    
+    DISTANCE_SAVE_METHOD distanceSaveMethodEnum = NONE;
+    if (distanceSaveMethod == "none") {
+      distanceSaveMethodEnum = NONE;
+    } else if (distanceSaveMethod == "matrix") {
+      distanceSaveMethodEnum = MATRIX;
+    }
 
     VamanaIndex<DataVector<float>> vamanaIndex = VamanaIndex<DataVector<float>>();
-    vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R), distanceThreads, true);
+    vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, true);
 
     if (save) {
       if (!vamanaIndex.saveGraph(outputFile)) {
@@ -226,9 +256,16 @@ void Create(std::unordered_map<std::string, std::string> args) {
       filters.insert(filter);
     }
 
+    DISTANCE_SAVE_METHOD distanceSaveMethodEnum = NONE;
+    if (distanceSaveMethod == "none") {
+      distanceSaveMethodEnum = NONE;
+    } else if (distanceSaveMethod == "matrix") {
+      distanceSaveMethodEnum = MATRIX;
+    }
+
     if (indexType == "filtered") {
       FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceThreads, true, leaveEmpty);
+      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -236,7 +273,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
       }
     } else if (indexType == "stiched") {
       StichedVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceThreads, true, leaveEmpty);
+      index.createGraph(base_vectors, std::stof(alpha), std::stoi(L_small), std::stoi(R_small), std::stoi(R_stiched), distanceSaveMethodEnum, distanceThreads, computingThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -277,7 +314,7 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
   GraphNode<DataVector<float>> s = vamanaIndex.findMedoid(vamanaIndex.getGraph(), 1000);
   
   auto start = std::chrono::high_resolution_clock::now();
-  SimpleGreedyResult greedyResult = GreedySearch(vamanaIndex, s, query_vectors.at(std::stoi(queryNumber)), std::stoi(k), std::stoi(L), TEST);
+  SimpleGreedyResult greedyResult = GreedySearch(vamanaIndex, s, query_vectors.at(std::stoi(queryNumber)), std::stoi(k), std::stoi(L), NONE);
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
 
@@ -363,7 +400,7 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
     }
 
     auto start = std::chrono::high_resolution_clock::now();
-    FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, TEST);
+    FilteredGreedyResult greedyResult = FilteredGreedySearch(index, start_nodes, xq, std::stoi(k), std::stoi(L), Fx, NONE);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
 

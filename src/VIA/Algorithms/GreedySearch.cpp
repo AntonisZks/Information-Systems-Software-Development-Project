@@ -70,7 +70,7 @@ static set_t getSetItemAtIndex(const unsigned int& index, const std::set<set_t>&
  */
 template <typename graph_t, typename query_t>
 std::pair<std::set<graph_t>, std::set<graph_t>>
-GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, const query_t& xq, unsigned int k, unsigned int L, const EXEC_MODE execMode) {
+GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, const query_t& xq, unsigned int k, unsigned int L, const DISTANCE_SAVE_METHOD distanceSaveMethod) {
   
   std::set<graph_t> candidates = {s.getData()};
   std::set<graph_t> visited = {};
@@ -78,7 +78,7 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
   // Calculate initial difference between candidates and visited sets
   std::set<graph_t> candidates_minus_visited = getSetDifference(candidates, visited);
   unsigned int cnt = 0;
-  float p_star_distance, currentDistance;
+  float p_star_distance = 0, currentDistance = 0;
 
   // Main search loop: continue until there are no unvisited candidates
   while (!candidates_minus_visited.empty()) {
@@ -86,18 +86,18 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
     // Select the closest candidate to the query vector xq
     graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
 
-    if (execMode == TEST) {
+    if (distanceSaveMethod == NONE) {
       p_star_distance = euclideanDistance(p_star, xq);
-    } else {
+    } else if (distanceSaveMethod == MATRIX) {
       p_star_distance = index.getDistanceMatrix()[p_star.getIndex()][xq.getIndex()];
     }
 
     // Compare each unvisited candidate's distance to find the nearest
     for (auto xp : candidates_minus_visited) {
 
-      if (execMode == TEST) {
+      if (distanceSaveMethod == NONE) {
         currentDistance = euclideanDistance(xp, xq);
-      } else {
+      } else if (distanceSaveMethod == MATRIX) {
         currentDistance = index.getDistanceMatrix()[xp.getIndex()][xq.getIndex()];
       }
 
@@ -119,7 +119,7 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
     // Limit the size of candidates to L by keeping the closest L elements to the query
     if (candidates.size() > static_cast<size_t>(L)) {
       std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
-        EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), execMode==CREATE)
+        EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), distanceSaveMethod==MATRIX)
       };
 
       for (auto candidate : candidates) {
@@ -141,7 +141,7 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
 
   // Final selection of k closest candidates after main loop
   std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
-    EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), execMode==CREATE)
+    EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), distanceSaveMethod==MATRIX)
   };
   
   for (auto candidate : candidates) {
@@ -182,9 +182,9 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
 template <typename graph_t, typename query_t>
 std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
   const FilteredVamanaIndex<graph_t>& index, const std::vector<GraphNode<graph_t>>& S, const query_t& xq,  
-  const unsigned int k, const unsigned int L, const std::vector<CategoricalAttributeFilter>& queryFilters, const EXEC_MODE mode) {
+  const unsigned int k, const unsigned int L, const std::vector<CategoricalAttributeFilter>& queryFilters, const DISTANCE_SAVE_METHOD distanceSaveMethod) {
 
-  float p_star_distance, currentDistance;
+  float p_star_distance = 0, currentDistance = 0;
   
   std::set<graph_t> candidates = {};
   std::set<graph_t> visited = {};
@@ -218,16 +218,16 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
     // Select the closest candidate to the query vector xq
     graph_t p_star = getSetItemAtIndex(0, candidates_minus_visited);
 
-    if (mode == TEST) {
+    if (distanceSaveMethod == NONE) {
       p_star_distance = euclideanDistance(p_star, xq);
-    } else {
+    } else if (distanceSaveMethod == MATRIX) {
       p_star_distance = index.getDistanceMatrix()[p_star.getIndex()][xq.getIndex()];
     }
 
     // Compare each unvisited candidate's distance to find the nearest
     for (auto xp : candidates_minus_visited) {
       
-      if (mode == TEST) {
+      if (distanceSaveMethod == NONE) {
         currentDistance = euclideanDistance(xp, xq);
       } else {
         currentDistance = index.getDistanceMatrix()[xp.getIndex()][xq.getIndex()];
@@ -268,7 +268,7 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
     if (candidates.size() > static_cast<size_t>(L)) {
 
       std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
-        EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), mode==CREATE)
+        EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), distanceSaveMethod==MATRIX)
       };
 
       for (auto candidate : candidates) {
@@ -291,7 +291,7 @@ std::pair<std::set<graph_t>, std::set<graph_t>> FilteredGreedySearch(
 
   // Final selection of k closest candidates after main loop
   std::set<graph_t, EuclideanDistanceOrder<graph_t, query_t>> newCandidates{
-    EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), mode==CREATE)
+    EuclideanDistanceOrder<graph_t, query_t>(xq, index.getDistanceMatrix(), distanceSaveMethod==MATRIX)
   };
 
   for (auto candidate : candidates) {
@@ -315,7 +315,7 @@ template std::pair<std::set<DataVector<float>>, std::set<DataVector<float>>> Gre
   const DataVector<float>& xq, 
   unsigned int k, 
   unsigned int L,
-  const EXEC_MODE mode
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );
 
 template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>> GreedySearch(
@@ -324,7 +324,7 @@ template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<floa
   const BaseDataVector<float>& xq, 
   unsigned int k, 
   unsigned int L,
-  const EXEC_MODE mode
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );
 
 template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>> GreedySearch(
@@ -333,7 +333,7 @@ template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<floa
   const QueryDataVector<float>& xq, 
   unsigned int k, 
   unsigned int L,
-  const EXEC_MODE mode
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );
 
 // Filtered Greedy Search
@@ -344,7 +344,7 @@ template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<floa
   const unsigned int k, 
   const unsigned int L, 
   const std::vector<CategoricalAttributeFilter>& queryFilters,
-  const EXEC_MODE mode
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );
 
 template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<float>>> FilteredGreedySearch(
@@ -354,5 +354,5 @@ template std::pair<std::set<BaseDataVector<float>>, std::set<BaseDataVector<floa
   const unsigned int k, 
   const unsigned int L, 
   const std::vector<CategoricalAttributeFilter>& queryFilters,
-  const EXEC_MODE mode
+  const DISTANCE_SAVE_METHOD distanceSaveMethod
 );

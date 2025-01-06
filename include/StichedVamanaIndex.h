@@ -13,14 +13,16 @@ public:
   /**
    * @brief Default constructor for the StichedVamanaIndex class.
    */
-  StichedVamanaIndex() : FilteredVamanaIndex<vamana_t>() {}
+  StichedVamanaIndex() 
+    : FilteredVamanaIndex<vamana_t>() {}
 
   /**
    * @brief Constructor for the StichedVamanaIndex class with filters.
    * 
    * @param filters A set of CategoricalAttributeFilter to initialize the index with.
    */
-  StichedVamanaIndex(std::set<CategoricalAttributeFilter> filters) : FilteredVamanaIndex<vamana_t>(filters) {}
+  StichedVamanaIndex(std::set<CategoricalAttributeFilter> filters) 
+    : FilteredVamanaIndex<vamana_t>(filters) {}
 
   /**
    * @brief Create the graph with the given parameters.
@@ -30,8 +32,18 @@ public:
    * @param L An unsigned int parameter.
    * @param R An unsigned int parameter.
    */
-  void createGraph(const std::vector<vamana_t>& P, const float& alpha, const unsigned int L_small, 
-                   const unsigned int R_small, const unsigned int R_stiched, unsigned int distance_threads, bool visualized = true, bool empty = true);
+  void createGraph(
+    const std::vector<vamana_t>& P, 
+    const float& alpha, 
+    const unsigned int L_small, 
+    const unsigned int R_small, 
+    const unsigned int R_stiched,
+    const DISTANCE_SAVE_METHOD distanceSaveMethod,
+    unsigned int distance_threads, 
+    unsigned int compute_threads = 500, 
+    bool visualized = true, 
+    bool empty = true
+  );
 
 };
 
