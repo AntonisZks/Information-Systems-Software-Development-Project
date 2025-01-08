@@ -19,7 +19,6 @@ std::vector<std::vector<int>> computeGroundtruth(
   const std::vector<BaseDataVector<float>> base_vectors, const std::vector<QueryDataVector<float>> query_vectors, const unsigned int maxBaseVectors) {
 
   // Allocate memory for the distance vector and the indexes of the base vectors
-  std::vector<std::vector<float>> distances(query_vectors.size());
   std::vector<std::vector<int>> base_vectors_indexes(query_vectors.size());
 
   // Compute the distances between the query vectors and the base vectors (with the same filter)
@@ -27,12 +26,12 @@ std::vector<std::vector<int>> computeGroundtruth(
   withProgress(0, query_vectors.size(), "Computing Groundtruth", [&](int i) {
 
     auto query = query_vectors[i];
+    std::vector<std::pair<float, int>> paired_vec;
 
     // Compute the distances between the query vector and all base vectors
     if (query.getQueryType() == NO_FILTER) {
       for (auto base : base_vectors) {
-        distances[query.getIndex()].push_back(euclideanDistance(base, query));
-        base_vectors_indexes[query.getIndex()].push_back(base.getIndex());
+        paired_vec.emplace_back(euclideanDistance(base, query), base.getIndex());
       }
     }
 
@@ -41,39 +40,21 @@ std::vector<std::vector<int>> computeGroundtruth(
     else if (query.getQueryType() == C_EQUALS_v) {
       for (auto base : base_vectors) {
         if (base.getC() == query.getV()) {
-          distances[query.getIndex()].push_back(euclideanDistance(base, query));
-          base_vectors_indexes[query.getIndex()].push_back(base.getIndex());
+          paired_vec.emplace_back(euclideanDistance(base, query), base.getIndex());
         }
       }
     }
 
-    // IMPORTANT: Queries with filter type 2 and 3 are not supported in this version of the application
-
-  });
-
-  // Sort the distances for each query vector and keep the base vector indexes for each distance
-  withProgress(0, query_vectors.size(), "Sorting Distances", [&](int i) {
-    
-    // Pack the distances and the base vector indexes into a vector of pairs
-    std::vector<std::pair<float, int>> paired_vec;
-    for (unsigned int j = 0; j < distances[i].size(); j++) {
-      paired_vec.emplace_back(distances[i][j], base_vectors_indexes[i][j]);
-    }
-
+    // Sort the distances and keep only the first `maxBaseVectors` vectors
     std::sort(paired_vec.begin(), paired_vec.end());
+    paired_vec.resize(std::min((int)maxBaseVectors, (int)paired_vec.size()));
 
-    // Unpack the sorted distances and base vector indexes
-    for (unsigned int j = 0; j < paired_vec.size(); j++) {
-      distances[i][j] = paired_vec[j].first;
-      base_vectors_indexes[i][j] = paired_vec[j].second;
+    // Store the indexes of the nearest base vectors
+    for (const auto& pair : paired_vec) {
+      base_vectors_indexes[query.getIndex()].push_back(pair.second);
     }
 
   });
-
-  // Return the first `maxBaseVectors` distances for each query vector
-  for (auto& base_vector_indexes : base_vectors_indexes) {
-    base_vector_indexes.resize(std::min((int)maxBaseVectors, (int)base_vector_indexes.size()));
-  }
 
   return base_vectors_indexes;
 
