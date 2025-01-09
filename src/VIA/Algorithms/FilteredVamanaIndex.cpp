@@ -3,6 +3,13 @@
 #include "../../../include/RobustPrune.h"
 #include "../../../include/Filter.h"
 #include <map>
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <iostream>
+
+std::mutex filterComputingMutex;
 
 
 /**
@@ -80,7 +87,7 @@ FilteredVamanaIndex<vamana_t>::getNodesWithCategoricalValueFilter(const Categori
 template <typename vamana_t>
 void FilteredVamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int R, const DISTANCE_SAVE_METHOD distanceSaveMethod,
-  unsigned int distance_threads, bool visualized, bool empty) {
+  unsigned int distance_threads, unsigned int filtersThreads, bool visualized, bool empty) {
 
   using Filter = CategoricalAttributeFilter;
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
@@ -109,7 +116,7 @@ void FilteredVamanaIndex<vamana_t>::createGraph(
   GraphNode<vamana_t> s = this->findMedoid(this->G, 1000);
 
   // Let st(f) be the start node for filter label f for every f in F.
-  std::map<Filter, GraphNode<vamana_t>> st = this->findFilteredMedoid(1000);
+  std::map<Filter, GraphNode<vamana_t>> st = this->findFilteredMedoid(1000, filtersThreads);
 
   // Let sigma be a random permutation of the indices of [n]
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
@@ -212,7 +219,7 @@ template <typename vamana_t> bool FilteredVamanaIndex<vamana_t>::loadGraph(const
  * @return A map containing the medoid node for each filter.
  */
 template <typename vamana_t>
-std::map<Filter, GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::findFilteredMedoid(const unsigned int tau) {
+std::map<Filter, GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::findFilteredMedoid(const unsigned int tau, const unsigned int filtersThreadCount) {
 
   // Initialize M to be an empty map, and T to a zero map
   std::map<Filter, GraphNode<vamana_t>> M;
@@ -221,36 +228,59 @@ std::map<Filter, GraphNode<vamana_t>> FilteredVamanaIndex<vamana_t>::findFiltere
     T[*this->G.getNode(i)] = 0;
   }
 
-  // Foreach f in F, the set of all filters do
-  withProgress(0, this->F.size(), "Finding Filtered Medoid", [&](int i) {
+  std::atomic<int> progress(0);
+  auto startTime = std::chrono::steady_clock::now();
 
-    // Get the filter
-    Filter filter = *std::next(this->F.begin(), i);
+  auto compute = [&](int start, int end) {
+    for (int i = start; i < end; i++) {
+      // Get the filter
+      Filter filter = *std::next(this->F.begin(), i);
 
-    // Let Pf be the set of points with label f in F
-    std::vector<GraphNode<vamana_t>> Pf = this->getNodesWithCategoricalValueFilter(filter);
+      // Let Pf be the set of points with label f in F
+      std::vector<GraphNode<vamana_t>> Pf = this->getNodesWithCategoricalValueFilter(filter);
 
-    // Let Rf be a random sample of tau points from Pf
-    std::vector<int> Rf_indexes = generateRandomPermutation(0, std::min(tau, (unsigned int)Pf.size()) - 1);
-    std::vector<GraphNode<vamana_t>> Rf;
-    for (auto i : Rf_indexes) {
-      Rf.push_back(Pf[i]);
+      // Let Rf be a random sample of tau points from Pf
+      std::vector<int> Rf_indexes = generateRandomPermutation(0, std::min(tau, (unsigned int)Pf.size()) - 1);
+      std::vector<GraphNode<vamana_t>> Rf;
+      for (auto i : Rf_indexes) {
+        Rf.push_back(Pf[i]);
+      }
+
+      // p* <- argmin_{p in Rf} T[p]
+      GraphNode<vamana_t> p_star = Rf[0];
+      for (auto p : Rf) {
+        if (T[p] < T[p_star]) p_star = p;
+      }
+
+      // Update M[f] <- p* and T[p*] <- T[p*] + 1
+      M[filter] = p_star;
+      T[p_star]++;
+      
+      progress++;
+      std::lock_guard<std::mutex> lock(filterComputingMutex);
+      displayProgressBar(progress, this->F.size(), "Finding Filtered Medoid", startTime, 30);
     }
+  };
 
-    // p* <- argmin_{p in Rf} T[p]
-    GraphNode<vamana_t> p_star = Rf[0];
-    for (auto p : Rf) {
-      if (T[p] < T[p_star]) p_star = p;
-    }
+  unsigned int compute_threads = filtersThreadCount;
+  compute_threads = std::min(compute_threads, (unsigned int)this->F.size());
 
-    // Update M[f] <- p* and T[p*] <- T[p*] + 1
-    M[filter] = p_star;
-    T[p_star]++;
+  std::vector<std::thread> threads;
+  int threadFiltersChunk = this->F.size() / compute_threads;
+  for (unsigned int t = 0; t < compute_threads; ++t) {
+    int start = t * threadFiltersChunk;
+    int end = (t == compute_threads - 1) ? this->F.size() : start + threadFiltersChunk;
+    threads.emplace_back(compute, start, end);
+  }
 
-  });
+  for (auto& thread : threads) {
+    thread.join();
+  }
+
+  displayProgressBar(this->F.size(), this->F.size(), "Finding Filtered Medoid", startTime, 30);
+  std::cout << std::endl;
 
   return M;
-
 }
 
 template class FilteredVamanaIndex<BaseDataVector<float>>;

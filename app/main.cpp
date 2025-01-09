@@ -119,15 +119,20 @@ void Create(std::unordered_map<std::string, std::string> args) {
   bool leaveEmpty = false;
   int distanceThreads = 1; // Default value
   int computingThreads = 1; // Default value
+  int filtersThreads = 1; // Default value
+  std::string medoidType = "regular"; // Default value
 
-  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode", "-distance-threads", "-distance-save"};
+  std::vector<std::string> validArguments = {"-index-type", "-base-file", "-L", "-L-small", "-R", "-R-small", "-R-stiched", "-alpha", "-save", "-random-edges", "-connection-mode", "-distance-threads", "-distance-save", "-medoid"};
   if (args["-index-type"] == "stiched") {
     validArguments.push_back("-computing-threads");
+  }
+  if (args["-index-type"] == "filtered") {
+    validArguments.push_back("-filters-threads");
   }
 
   for (auto arg : args) {
     if (std::find(validArguments.begin(), validArguments.end(), arg.first) == validArguments.end()) {
-      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode, -distance-threads, -distance-save");
+      throw std::invalid_argument("Error: Invalid argument: " + arg.first + ". Valid arguments are: -index-type, -base-file, -L, -L-small, -R, -R-small, -R-stiched, -alpha, -save, -connection-mode, -distance-threads, -distance-save -medoid");
     }
   }
 
@@ -223,6 +228,19 @@ void Create(std::unordered_map<std::string, std::string> args) {
     distanceThreads = std::stoi(args["-distance-threads"]);
   }
 
+  if (indexType == "filtered") {
+    if (args.find("-filters-threads") != args.end()) {
+      filtersThreads = std::stoi(args["-filters-threads"]);
+    }
+  }
+
+  if (args.find("-medoid") != args.end()) {
+    medoidType = args["-medoid"];
+    if (medoidType != "regular" && medoidType != "random") {
+      throw std::invalid_argument("Error: Invalid value for -medoid. Valid values are: regular, random");
+    }
+  }
+
   if (indexType == "simple") {
     BaseVectors base_vectors = ReadVectorFile(baseFile);
     if (base_vectors.empty()) {
@@ -237,8 +255,10 @@ void Create(std::unordered_map<std::string, std::string> args) {
       distanceSaveMethodEnum = MATRIX;
     }
 
+    bool randomMedoid = (medoidType == "random");
+
     VamanaIndex<DataVector<float>> vamanaIndex = VamanaIndex<DataVector<float>>();
-    vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, true);
+    vamanaIndex.createGraph(base_vectors, std::stof(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, true, nullptr, randomMedoid);
 
     if (save) {
       if (!vamanaIndex.saveGraph(outputFile)) {
@@ -265,7 +285,7 @@ void Create(std::unordered_map<std::string, std::string> args) {
 
     if (indexType == "filtered") {
       FilteredVamanaIndex<BaseDataVector<float>> index(filters);
-      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, true, leaveEmpty);
+      index.createGraph(base_vectors, std::stoi(alpha), std::stoi(L), std::stoi(R), distanceSaveMethodEnum, distanceThreads, filtersThreads, true, leaveEmpty);
 
       if (save) {
         index.saveGraph(outputFile);
@@ -287,6 +307,7 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
   using BaseVectors = std::vector<DataVector<float>>;
 
   std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber;
+  std::string medoidType = "regular"; // Default value
 
   if (!getParameterValue(args, "-load", indexFile)) return;
   if (!getParameterValue(args, "-k", k)) return;
@@ -294,6 +315,13 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
   if (!getParameterValue(args, "-gt-file", groundtruthFile)) return;
   if (!getParameterValue(args, "-query-file", queryFile)) return;
   if (!getParameterValue(args, "-query", queryNumber)) return;
+  if (args.find("-medoid") != args.end()) {
+    medoidType = args["-medoid"];
+    if (medoidType != "regular" && medoidType != "random") {
+      std::cerr << "Error: Invalid value for -medoid. Valid values are: regular, random" << std::endl;
+      return;
+    }
+  }
 
   BaseVectors query_vectors = ReadVectorFile(queryFile);
   if (query_vectors.empty()) {
@@ -311,7 +339,8 @@ void TestSimple(std::unordered_map<std::string, std::string> args) {
     vamanaIndex.getPoints(), ReadGroundTruth(groundtruthFile), std::stoi(queryNumber)
   );
 
-  GraphNode<DataVector<float>> s = vamanaIndex.findMedoid(vamanaIndex.getGraph(), 1000);
+  GraphNode<DataVector<float>> s;
+  s = vamanaIndex.findMedoid(vamanaIndex.getGraph(), true, medoidType == "random", 1000);
   
   auto start = std::chrono::high_resolution_clock::now();
   SimpleGreedyResult greedyResult = GreedySearch(vamanaIndex, s, query_vectors.at(std::stoi(queryNumber)), std::stoi(k), std::stoi(L), NONE);
@@ -337,6 +366,7 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
   using QueryVectorVector = std::vector<QueryDataVector<float>>;
 
   std::string indexFile, k, L, groundtruthFile, queryFile, queryNumber, testOn, saveRecallsFile;
+  int filtersThreads = 1; // Default value
 
   if (!getParameterValue(args, "-load", indexFile)) return;
   if (!getParameterValue(args, "-k", k)) return;
@@ -359,11 +389,15 @@ void TestFilteredOrStiched(std::unordered_map<std::string, std::string> args) {
     saveRecallsFile = args["-save-recalls"];
   }
 
+  if (args.find("-filters-threads") != args.end()) {
+    filtersThreads = std::stoi(args["-filters-threads"]);
+  }
+
   QueryVectorVector query_vectors = ReadFilteredQueryVectorFile(queryFile);
   FilteredVamanaIndex<BaseDataVector<float>> index;
   index.loadGraph(indexFile);
   std::vector<std::vector<int>> groundtruth = readGroundtruthFromFile(groundtruthFile);
-  std::map<Filter, GraphNode<BaseDataVector<float>>> medoids = index.findFilteredMedoid(std::stoi(L)); 
+  std::map<Filter, GraphNode<BaseDataVector<float>>> medoids = index.findFilteredMedoid(std::stoi(L), filtersThreads); 
   std::vector<GraphNode<BaseDataVector<float>>> start_nodes;
   for (auto filter : index.getFilters()) {
     start_nodes.push_back(medoids[filter]);

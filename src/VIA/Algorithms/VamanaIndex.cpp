@@ -191,7 +191,7 @@ void VamanaIndex<vamana_t>::computeDistances(const bool visualize, const unsigne
 template <typename vamana_t> 
 void VamanaIndex<vamana_t>::createGraph(
   const std::vector<vamana_t>& P, const float& alpha, const unsigned int L, const unsigned int& R, const DISTANCE_SAVE_METHOD distanceSaveMethod, 
-  unsigned int distance_threads, bool visualize, double** distanceMatrix) {
+  unsigned int distance_threads, bool visualize, double** distanceMatrix, const bool& randomMedoid) {
 
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
@@ -217,8 +217,8 @@ void VamanaIndex<vamana_t>::createGraph(
   this->fillGraphNodes();
   this->createRandomEdges(R);
 
- // Replace the call to findMedoid with the selection of a random point as the medoid
-  GraphNode<vamana_t> s = *(this->G.getNode(generateRandomIndex(0, n-1)));
+  // Replace the call to findMedoid with the selection of a random point as the medoid
+  GraphNode<vamana_t> s = this->findMedoid(this->G, true, randomMedoid, 1000);
 
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
@@ -359,7 +359,12 @@ template <typename vamana_t> bool VamanaIndex<vamana_t>::loadGraph(const std::st
  * @param sample_size The number of nodes to sample from the graph for medoid calculation. Default is 100.
  * @return The medoid node of the sampled nodes.
  */
-template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedoid(const Graph<vamana_t>& graph, bool visualize, int sample_size) {
+template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedoid(const Graph<vamana_t>& graph, bool visualize, bool random, int sample_size) {
+
+  // Return a random node as the medoid if the random flag is set
+  if (random) {
+    return *graph.getNode(generateRandomIndex(0, graph.getNodesCount() - 1));
+  }
 
   const int node_count = graph.getNodesCount();
   sample_size = std::min(sample_size, node_count);
@@ -391,8 +396,18 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
     }
   }
 
-  // Randomly select a point as the medoid
-  GraphNode<vamana_t>* medoid_node = graph.getNode(generateRandomIndex(0, graph.getNodesCount() - 1));
+  // Find the medoid node among the sampled nodes by calculating the average distance for each one
+  float min_average_distance = std::numeric_limits<float>::max();
+  GraphNode<vamana_t>* medoid_node = nullptr;
+
+  for (int i = 0; i < sample_size; ++i) {
+    float total_distance = std::accumulate(distance_matrix[i].begin(), distance_matrix[i].end(), 0.0f);
+    float average_distance = total_distance / (sample_size - 1);
+    if (average_distance < min_average_distance) {
+      min_average_distance = average_distance;
+      medoid_node = graph.getNode(sampled_indices[i]);
+    }
+  }
 
   return *medoid_node;
 

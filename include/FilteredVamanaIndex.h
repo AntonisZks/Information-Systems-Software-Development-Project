@@ -67,6 +67,7 @@ public:
     const unsigned int R, 
     const DISTANCE_SAVE_METHOD distanceSaveMethod = NONE,
     unsigned int distance_threads = 1, 
+    unsigned int filtersThreads = 1,
     bool visualized = true, 
     bool empty = true
   );
@@ -91,7 +92,10 @@ public:
    * @param tau The graph from which to find the medoid.
    * @return A map containing the medoid node for each filter.
    */
-  std::map<Filter, GraphNode<vamana_t>> findFilteredMedoid(const unsigned int tau);
+  std::map<Filter, GraphNode<vamana_t>> findFilteredMedoid(
+    const unsigned int tau, 
+    const unsigned int filtersThreadCount = 1
+  );
 
 };
 
