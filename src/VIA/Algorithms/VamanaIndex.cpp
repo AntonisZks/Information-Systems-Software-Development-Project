@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 
+// Mutex for synchronizing distance calculations
 std::mutex distanceMutex;
 
 /**
@@ -24,13 +25,36 @@ std::mutex distanceMutex;
  * @return A vector containing a shuffled sequence of integers from `start` to `end`
  */
 static std::vector<int> generateRandomPermutation(const unsigned int start, const unsigned int end) {
-
+  // Create a vector containing all integers from start to end
   std::vector<int> permutation(end - start + 1);
+  
+  // Fill the vector with sequential values starting from 'start'
   std::iota(permutation.begin(), permutation.end(), start);
+  
+  // Shuffle the vector randomly using a random number generator
   std::shuffle(permutation.begin(), permutation.end(), std::mt19937{std::random_device{}()});
-
+  
+  // Return the shuffled vector
   return permutation;
+}
 
+/**
+ * @brief Generates a random index within a specified range.
+ * 
+ * @param start The starting integer of the range (inclusive)
+ * @param end The ending integer of the range (inclusive)
+ * 
+ * @return A random integer within the specified range
+ */
+static int generateRandomIndex(const unsigned int start, const unsigned int end) {
+  // Create a random number generator
+  std::mt19937 generator(std::random_device{}());
+  
+  // Create a uniform distribution within the specified range
+  std::uniform_int_distribution<unsigned int> distribution(start, end);
+  
+  // Generate and return a random integer within the range
+  return distribution(generator);
 }
 
 /**
@@ -43,9 +67,13 @@ static std::vector<int> generateRandomPermutation(const unsigned int start, cons
  * @return A set of unique random indices of the specified length, excluding index i
  */
 static std::set<int> generateRandomIndices(const unsigned int max, const unsigned int i, unsigned int length) {
-
+  // Create a set to store unique random indices
   std::set<int> indices;
+  
+  // Create a random number generator
   std::mt19937 generator(std::random_device{}());
+  
+  // Create a uniform distribution within the specified range
   std::uniform_int_distribution<unsigned int> distribution(0, max - 1);
 
   // Generate random indices until the set reaches the desired length
@@ -56,8 +84,8 @@ static std::set<int> generateRandomIndices(const unsigned int max, const unsigne
     }
   }
 
+  // Return the set of unique random indices
   return indices;
-
 }
 
 /**
@@ -168,16 +196,12 @@ void VamanaIndex<vamana_t>::createGraph(
   using GreedyResult = std::pair<std::set<vamana_t>, std::set<vamana_t>>;
   GreedyResult greedyResult;
 
-  // Check if the dataset is empty or it has only one point
   if (P.size() <= 1) return;
 
-  // Initialize graph memory
   unsigned int n = P.size();
   this->P = P;
 
   if (distanceSaveMethod == MATRIX) {
-
-    // If the distance matrix is provided, use it, otherwise compute the distances
     if (distanceMatrix != nullptr) {
       this->distanceMatrix = distanceMatrix;
     } else {
@@ -187,21 +211,17 @@ void VamanaIndex<vamana_t>::createGraph(
       }
       this->computeDistances(visualize, distance_threads);
     }
-
   }
   
-  this->G.setNodesCount(n);
-
-  // Set the number of nodes in the graph, fill the nodes with the dataset points, and create random edges for the nodes
   this->G.setNodesCount(n);
   this->fillGraphNodes();
   this->createRandomEdges(R);
 
-  // Find the medoid node in the graph, and generate a random permutation of node indices
-  GraphNode<vamana_t> s = findMedoid(this->G, visualize, 1000);
+ // Replace the call to findMedoid with the selection of a random point as the medoid
+  GraphNode<vamana_t> s = *(this->G.getNode(generateRandomIndex(0, n-1)));
+
   std::vector<int> sigma = generateRandomPermutation(0, n-1);
 
-  // Define a lambda function to process each node in the sigma permutation
   auto processNode = [&](int i) {
     GraphNode<vamana_t>* sigma_i_node = this->G.getNode(sigma.at(i));
     vamana_t sigma_i = sigma_i_node->getData();
@@ -227,7 +247,6 @@ void VamanaIndex<vamana_t>::createGraph(
     }
   };
 
-  // Run the lambda process function if visualization is enabled, otherwise run it without progress visualization
   if (visualize) {
     withProgress(0, n, "Creating Vamana", processNode);
   } else {
@@ -236,14 +255,12 @@ void VamanaIndex<vamana_t>::createGraph(
     }
   }
 
-  // Free up the memory allocated for the distance matrix, if it was computed
   if (distanceSaveMethod == MATRIX && distanceMatrix == nullptr) {
     for (unsigned int i = 0; i < n; i++) {
       delete[] this->distanceMatrix[i];
     }
     delete[] this->distanceMatrix;
   }
-
 }
 
 /**
@@ -374,22 +391,13 @@ template <typename vamana_t> GraphNode<vamana_t> VamanaIndex<vamana_t>::findMedo
     }
   }
 
-  // Find the medoid node among the sampled nodes by calculating the average distance for each one
-  float min_average_distance = std::numeric_limits<float>::max();
-  GraphNode<vamana_t>* medoid_node = nullptr;
-
-  for (int i = 0; i < sample_size; ++i) {
-    float total_distance = std::accumulate(distance_matrix[i].begin(), distance_matrix[i].end(), 0.0f);
-    float average_distance = total_distance / (sample_size - 1);
-    if (average_distance < min_average_distance) {
-      min_average_distance = average_distance;
-      medoid_node = graph.getNode(sampled_indices[i]);
-    }
-  }
+  // Randomly select a point as the medoid
+  GraphNode<vamana_t>* medoid_node = graph.getNode(generateRandomIndex(0, graph.getNodesCount() - 1));
 
   return *medoid_node;
 
 }
 
+// Explicit template instantiation for specific types
 template class VamanaIndex<DataVector<float>>;
 template class VamanaIndex<BaseDataVector<float>>;
