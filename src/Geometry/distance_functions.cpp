@@ -15,7 +15,8 @@ using namespace std;
  * 
  * @return True if the first element is closer to the target vector than the second element.
  */
-template <typename base_t, typename query_t> bool EuclideanDistanceOrder<base_t, query_t>::operator()(const base_t& a, const base_t& b) {
+template <typename base_t, typename query_t> 
+bool EuclideanDistanceOrder<base_t, query_t>::operator()(const base_t& a, const base_t& b) const {
 
     double distanceA, distanceB;
 

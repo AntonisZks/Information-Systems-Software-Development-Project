@@ -38,12 +38,12 @@ template <typename node_t> void GraphNode<node_t>::removeNeighbor(node_t data) {
 
 }
 
-template class GraphNode<int>;
-template class GraphNode<double>;
-template class GraphNode<std::string>;
+template struct GraphNode<int>;
+template struct GraphNode<double>;
+template struct GraphNode<std::string>;
 
-template class GraphNode<DataVector<float>>;
-template class GraphNode<DataVector<double>>;
-template class GraphNode<BaseDataVector<float>>;
-template class GraphNode<BaseDataVector<double>>;
+template struct GraphNode<DataVector<float>>;
+template struct GraphNode<DataVector<double>>;
+template struct GraphNode<BaseDataVector<float>>;
+template struct GraphNode<BaseDataVector<double>>;
 

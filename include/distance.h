@@ -42,7 +42,7 @@ struct EuclideanDistanceOrder {
    * 
    * @return True if the first element is closer to the target vector than the second element.
    */
-  bool operator()(const base_t& a, const base_t& b);
+  bool operator()(const base_t& a, const base_t& b) const;
 
 };
 

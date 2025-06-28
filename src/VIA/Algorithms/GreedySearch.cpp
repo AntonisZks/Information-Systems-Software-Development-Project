@@ -77,7 +77,6 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
 
   // Calculate initial difference between candidates and visited sets
   std::set<graph_t> candidates_minus_visited = getSetDifference(candidates, visited);
-  unsigned int cnt = 0;
   float p_star_distance = 0, currentDistance = 0;
 
   // Main search loop: continue until there are no unvisited candidates
@@ -136,7 +135,6 @@ GreedySearch(const VamanaIndex<graph_t>& index, const GraphNode<graph_t>& s, con
 
     // Update candidates_minus_visited with the new difference after adding p_star to visited
     candidates_minus_visited = getSetDifference(candidates, visited);
-    cnt++; // Increment loop counter for diagnostics if needed
   }
 
   // Final selection of k closest candidates after main loop

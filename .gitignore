@@ -9,3 +9,4 @@ data/Dummy/dummy-groundtruth*.bin
 *.bin
 .idea
 venv
+.DS_Store

@@ -78,7 +78,6 @@ vector<DataVector<int>> ReadGroundTruth(const string& filename) {
     }
 
     vector<DataVector<int>> dataVectors; // Vector to store DataVector objects
-    int nb_vectors = 0;
 
     while (file) {
         int d;  // Dimensionality of the vector (first 4 bytes)
@@ -101,7 +100,6 @@ vector<DataVector<int>> ReadGroundTruth(const string& filename) {
 
         // Add the DataVector object to the vector
         dataVectors.push_back(dataVector);
-        nb_vectors++;
     }
 
     file.close();
