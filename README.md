@@ -3,13 +3,13 @@
 
 <div align="center">
 
-![License](https://img.shields.io/github/license/AntonisZks/Information-Systems-Software-Development-Project.svg)
-![Repository Size](https://img.shields.io/github/repo-size/AntonisZks/Information-Systems-Software-Development-Project.svg)
-![Actions](https://github.com/AntonisZks/Information-Systems-Software-Development-Project/actions/workflows/unit_tests.yml/badge.svg)
-![Release](https://img.shields.io/github/v/release/AntonisZks/Information-Systems-Software-Development-Project.svg)
-![Issues](https://img.shields.io/github/issues/AntonisZks/Information-Systems-Software-Development-Project.svg)
-![Contributors](https://img.shields.io/github/contributors/AntonisZks/Information-Systems-Software-Development-Project.svg)
-![Stars](https://img.shields.io/github/stars/AntonisZks/Information-Systems-Software-Development-Project?style=social)
+![License](https://img.shields.io/github/license/AntonisZks/Vamana-Indexing-Algorithm.svg)
+![Repository Size](https://img.shields.io/github/repo-size/AntonisZks/Vamana-Indexing-Algorithm.svg)
+![Actions](https://github.com/AntonisZks/Vamana-Indexing-Algorithm/actions/workflows/unit_tests.yml/badge.svg)
+![Release](https://img.shields.io/github/v/release/AntonisZks/Vamana-Indexing-Algorithm.svg)
+![Issues](https://img.shields.io/github/issues/AntonisZks/Vamana-Indexing-Algorithm.svg)
+![Contributors](https://img.shields.io/github/contributors/AntonisZks/Vamana-Indexing-Algorithm.svg)
+![Stars](https://img.shields.io/github/stars/AntonisZks/Vamana-Indexing-Algorithm?style=social)
 	
 </div>
 
